@@ -164,6 +164,9 @@ func (l *yyLex) readSingleQuotedString(lval *yySymType) (int, int) {
 	start := l.pos + 1 // Skip opening quote
 	pos := start
 	for pos < len(l.input) && l.input[pos] != '\'' {
+		if l.input[pos] == '\\' {
+			pos++
+		}
 		pos++
 	}
 	if pos < len(l.input) {
@@ -178,6 +181,9 @@ func (l *yyLex) readDoubleQuotedString(lval *yySymType) (int, int) {
 	start := l.pos + 1 // Skip opening quote
 	pos := start
 	for pos < len(l.input) && l.input[pos] != '"' {
+		if l.input[pos] == '\\' {
+			pos++
+		}
 		pos++
 	}
 	if pos < len(l.input) {

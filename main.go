@@ -12,10 +12,10 @@ type Context struct {
 }
 
 func main() {
-	input := "role = 'admin' and not age <= 18"
+	input := "role = '\\'admin' and age >= 18"
 	context := new(Context)
 	context.vars = make(map[string]lang.Value)
-	context.vars["role"] = "admin"
+	context.vars["role"] = "\\'admin"
 	context.vars["age"] = lang.NumberValue(20)
 	context.funcs = make(map[string]lang.Function)
 

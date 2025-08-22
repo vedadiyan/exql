@@ -1,0 +1,960 @@
+
+state 0
+	$accept: .program $end 
+
+	IDENTIFIER  shift 12
+	STRING  shift 14
+	DSTRING  shift 15
+	NUMBER  shift 13
+	BOOLEAN  shift 16
+	NOT  shift 9
+	LPAREN  shift 17
+	LBRACKET  shift 21
+	'-'  shift 10
+	.  error
+
+	expr  goto 2
+	logical_expr  goto 3
+	equality_expr  goto 4
+	relational_expr  goto 5
+	additive_expr  goto 6
+	multiplicative_expr  goto 7
+	unary_expr  goto 8
+	primary_expr  goto 11
+	field_access  goto 18
+	function_call  goto 19
+	list_literal  goto 20
+	program  goto 1
+
+state 1
+	$accept:  program.$end 
+
+	$end  accept
+	.  error
+
+
+state 2
+	program:  expr.    (1)
+
+	.  reduce 1 (src line 39)
+
+
+state 3
+	expr:  logical_expr.    (2)
+	logical_expr:  logical_expr.AND equality_expr 
+	logical_expr:  logical_expr.OR equality_expr 
+
+	AND  shift 22
+	OR  shift 23
+	.  reduce 2 (src line 41)
+
+
+state 4
+	logical_expr:  equality_expr.    (5)
+	equality_expr:  equality_expr.EQ relational_expr 
+	equality_expr:  equality_expr.NE relational_expr 
+
+	EQ  shift 24
+	NE  shift 25
+	.  reduce 5 (src line 49)
+
+
+state 5
+	equality_expr:  relational_expr.    (8)
+	relational_expr:  relational_expr.LT additive_expr 
+	relational_expr:  relational_expr.LE additive_expr 
+	relational_expr:  relational_expr.GT additive_expr 
+	relational_expr:  relational_expr.GE additive_expr 
+	relational_expr:  relational_expr.IN additive_expr 
+	relational_expr:  relational_expr.NOT IN additive_expr 
+
+	NOT  shift 31
+	IN  shift 30
+	LT  shift 26
+	LE  shift 27
+	GT  shift 28
+	GE  shift 29
+	.  reduce 8 (src line 57)
+
+
+state 6
+	relational_expr:  additive_expr.    (15)
+	additive_expr:  additive_expr.'+' multiplicative_expr 
+	additive_expr:  additive_expr.'-' multiplicative_expr 
+
+	'+'  shift 32
+	'-'  shift 33
+	.  reduce 15 (src line 77)
+
+
+state 7
+	additive_expr:  multiplicative_expr.    (18)
+	multiplicative_expr:  multiplicative_expr.'*' unary_expr 
+	multiplicative_expr:  multiplicative_expr.'/' unary_expr 
+
+	'*'  shift 34
+	'/'  shift 35
+	.  reduce 18 (src line 85)
+
+
+state 8
+	multiplicative_expr:  unary_expr.    (21)
+
+	.  reduce 21 (src line 93)
+
+
+state 9
+	unary_expr:  NOT.unary_expr 
+
+	IDENTIFIER  shift 12
+	STRING  shift 14
+	DSTRING  shift 15
+	NUMBER  shift 13
+	BOOLEAN  shift 16
+	NOT  shift 9
+	LPAREN  shift 17
+	LBRACKET  shift 21
+	'-'  shift 10
+	.  error
+
+	unary_expr  goto 36
+	primary_expr  goto 11
+	field_access  goto 18
+	function_call  goto 19
+	list_literal  goto 20
+
+state 10
+	unary_expr:  '-'.unary_expr 
+
+	IDENTIFIER  shift 12
+	STRING  shift 14
+	DSTRING  shift 15
+	NUMBER  shift 13
+	BOOLEAN  shift 16
+	NOT  shift 9
+	LPAREN  shift 17
+	LBRACKET  shift 21
+	'-'  shift 10
+	.  error
+
+	unary_expr  goto 37
+	primary_expr  goto 11
+	field_access  goto 18
+	function_call  goto 19
+	list_literal  goto 20
+
+state 11
+	unary_expr:  primary_expr.    (24)
+	field_access:  primary_expr.DOT IDENTIFIER 
+	field_access:  primary_expr.LBRACKET expr RBRACKET 
+
+	LBRACKET  shift 39
+	DOT  shift 38
+	.  reduce 24 (src line 101)
+
+
+state 12
+	primary_expr:  IDENTIFIER.    (25)
+	function_call:  IDENTIFIER.LPAREN argument_list RPAREN 
+	function_call:  IDENTIFIER.LPAREN RPAREN 
+
+	LPAREN  shift 40
+	.  reduce 25 (src line 103)
+
+
+state 13
+	primary_expr:  NUMBER.    (26)
+
+	.  reduce 26 (src line 106)
+
+
+state 14
+	primary_expr:  STRING.    (27)
+
+	.  reduce 27 (src line 109)
+
+
+state 15
+	primary_expr:  DSTRING.    (28)
+
+	.  reduce 28 (src line 112)
+
+
+state 16
+	primary_expr:  BOOLEAN.    (29)
+
+	.  reduce 29 (src line 115)
+
+
+state 17
+	primary_expr:  LPAREN.expr RPAREN 
+
+	IDENTIFIER  shift 12
+	STRING  shift 14
+	DSTRING  shift 15
+	NUMBER  shift 13
+	BOOLEAN  shift 16
+	NOT  shift 9
+	LPAREN  shift 17
+	LBRACKET  shift 21
+	'-'  shift 10
+	.  error
+
+	expr  goto 41
+	logical_expr  goto 3
+	equality_expr  goto 4
+	relational_expr  goto 5
+	additive_expr  goto 6
+	multiplicative_expr  goto 7
+	unary_expr  goto 8
+	primary_expr  goto 11
+	field_access  goto 18
+	function_call  goto 19
+	list_literal  goto 20
+
+state 18
+	primary_expr:  field_access.    (31)
+
+	.  reduce 31 (src line 121)
+
+
+state 19
+	primary_expr:  function_call.    (32)
+
+	.  reduce 32 (src line 122)
+
+
+state 20
+	primary_expr:  list_literal.    (33)
+
+	.  reduce 33 (src line 123)
+
+
+state 21
+	list_literal:  LBRACKET.expression_list RBRACKET 
+	list_literal:  LBRACKET.RBRACKET 
+
+	IDENTIFIER  shift 12
+	STRING  shift 14
+	DSTRING  shift 15
+	NUMBER  shift 13
+	BOOLEAN  shift 16
+	NOT  shift 9
+	LPAREN  shift 17
+	LBRACKET  shift 21
+	RBRACKET  shift 43
+	'-'  shift 10
+	.  error
+
+	expr  goto 44
+	logical_expr  goto 3
+	equality_expr  goto 4
+	relational_expr  goto 5
+	additive_expr  goto 6
+	multiplicative_expr  goto 7
+	unary_expr  goto 8
+	primary_expr  goto 11
+	field_access  goto 18
+	function_call  goto 19
+	list_literal  goto 20
+	expression_list  goto 42
+
+state 22
+	logical_expr:  logical_expr AND.equality_expr 
+
+	IDENTIFIER  shift 12
+	STRING  shift 14
+	DSTRING  shift 15
+	NUMBER  shift 13
+	BOOLEAN  shift 16
+	NOT  shift 9
+	LPAREN  shift 17
+	LBRACKET  shift 21
+	'-'  shift 10
+	.  error
+
+	equality_expr  goto 45
+	relational_expr  goto 5
+	additive_expr  goto 6
+	multiplicative_expr  goto 7
+	unary_expr  goto 8
+	primary_expr  goto 11
+	field_access  goto 18
+	function_call  goto 19
+	list_literal  goto 20
+
+state 23
+	logical_expr:  logical_expr OR.equality_expr 
+
+	IDENTIFIER  shift 12
+	STRING  shift 14
+	DSTRING  shift 15
+	NUMBER  shift 13
+	BOOLEAN  shift 16
+	NOT  shift 9
+	LPAREN  shift 17
+	LBRACKET  shift 21
+	'-'  shift 10
+	.  error
+
+	equality_expr  goto 46
+	relational_expr  goto 5
+	additive_expr  goto 6
+	multiplicative_expr  goto 7
+	unary_expr  goto 8
+	primary_expr  goto 11
+	field_access  goto 18
+	function_call  goto 19
+	list_literal  goto 20
+
+state 24
+	equality_expr:  equality_expr EQ.relational_expr 
+
+	IDENTIFIER  shift 12
+	STRING  shift 14
+	DSTRING  shift 15
+	NUMBER  shift 13
+	BOOLEAN  shift 16
+	NOT  shift 9
+	LPAREN  shift 17
+	LBRACKET  shift 21
+	'-'  shift 10
+	.  error
+
+	relational_expr  goto 47
+	additive_expr  goto 6
+	multiplicative_expr  goto 7
+	unary_expr  goto 8
+	primary_expr  goto 11
+	field_access  goto 18
+	function_call  goto 19
+	list_literal  goto 20
+
+state 25
+	equality_expr:  equality_expr NE.relational_expr 
+
+	IDENTIFIER  shift 12
+	STRING  shift 14
+	DSTRING  shift 15
+	NUMBER  shift 13
+	BOOLEAN  shift 16
+	NOT  shift 9
+	LPAREN  shift 17
+	LBRACKET  shift 21
+	'-'  shift 10
+	.  error
+
+	relational_expr  goto 48
+	additive_expr  goto 6
+	multiplicative_expr  goto 7
+	unary_expr  goto 8
+	primary_expr  goto 11
+	field_access  goto 18
+	function_call  goto 19
+	list_literal  goto 20
+
+state 26
+	relational_expr:  relational_expr LT.additive_expr 
+
+	IDENTIFIER  shift 12
+	STRING  shift 14
+	DSTRING  shift 15
+	NUMBER  shift 13
+	BOOLEAN  shift 16
+	NOT  shift 9
+	LPAREN  shift 17
+	LBRACKET  shift 21
+	'-'  shift 10
+	.  error
+
+	additive_expr  goto 49
+	multiplicative_expr  goto 7
+	unary_expr  goto 8
+	primary_expr  goto 11
+	field_access  goto 18
+	function_call  goto 19
+	list_literal  goto 20
+
+state 27
+	relational_expr:  relational_expr LE.additive_expr 
+
+	IDENTIFIER  shift 12
+	STRING  shift 14
+	DSTRING  shift 15
+	NUMBER  shift 13
+	BOOLEAN  shift 16
+	NOT  shift 9
+	LPAREN  shift 17
+	LBRACKET  shift 21
+	'-'  shift 10
+	.  error
+
+	additive_expr  goto 50
+	multiplicative_expr  goto 7
+	unary_expr  goto 8
+	primary_expr  goto 11
+	field_access  goto 18
+	function_call  goto 19
+	list_literal  goto 20
+
+state 28
+	relational_expr:  relational_expr GT.additive_expr 
+
+	IDENTIFIER  shift 12
+	STRING  shift 14
+	DSTRING  shift 15
+	NUMBER  shift 13
+	BOOLEAN  shift 16
+	NOT  shift 9
+	LPAREN  shift 17
+	LBRACKET  shift 21
+	'-'  shift 10
+	.  error
+
+	additive_expr  goto 51
+	multiplicative_expr  goto 7
+	unary_expr  goto 8
+	primary_expr  goto 11
+	field_access  goto 18
+	function_call  goto 19
+	list_literal  goto 20
+
+state 29
+	relational_expr:  relational_expr GE.additive_expr 
+
+	IDENTIFIER  shift 12
+	STRING  shift 14
+	DSTRING  shift 15
+	NUMBER  shift 13
+	BOOLEAN  shift 16
+	NOT  shift 9
+	LPAREN  shift 17
+	LBRACKET  shift 21
+	'-'  shift 10
+	.  error
+
+	additive_expr  goto 52
+	multiplicative_expr  goto 7
+	unary_expr  goto 8
+	primary_expr  goto 11
+	field_access  goto 18
+	function_call  goto 19
+	list_literal  goto 20
+
+state 30
+	relational_expr:  relational_expr IN.additive_expr 
+
+	IDENTIFIER  shift 12
+	STRING  shift 14
+	DSTRING  shift 15
+	NUMBER  shift 13
+	BOOLEAN  shift 16
+	NOT  shift 9
+	LPAREN  shift 17
+	LBRACKET  shift 21
+	'-'  shift 10
+	.  error
+
+	additive_expr  goto 53
+	multiplicative_expr  goto 7
+	unary_expr  goto 8
+	primary_expr  goto 11
+	field_access  goto 18
+	function_call  goto 19
+	list_literal  goto 20
+
+state 31
+	relational_expr:  relational_expr NOT.IN additive_expr 
+
+	IN  shift 54
+	.  error
+
+
+state 32
+	additive_expr:  additive_expr '+'.multiplicative_expr 
+
+	IDENTIFIER  shift 12
+	STRING  shift 14
+	DSTRING  shift 15
+	NUMBER  shift 13
+	BOOLEAN  shift 16
+	NOT  shift 9
+	LPAREN  shift 17
+	LBRACKET  shift 21
+	'-'  shift 10
+	.  error
+
+	multiplicative_expr  goto 55
+	unary_expr  goto 8
+	primary_expr  goto 11
+	field_access  goto 18
+	function_call  goto 19
+	list_literal  goto 20
+
+state 33
+	additive_expr:  additive_expr '-'.multiplicative_expr 
+
+	IDENTIFIER  shift 12
+	STRING  shift 14
+	DSTRING  shift 15
+	NUMBER  shift 13
+	BOOLEAN  shift 16
+	NOT  shift 9
+	LPAREN  shift 17
+	LBRACKET  shift 21
+	'-'  shift 10
+	.  error
+
+	multiplicative_expr  goto 56
+	unary_expr  goto 8
+	primary_expr  goto 11
+	field_access  goto 18
+	function_call  goto 19
+	list_literal  goto 20
+
+state 34
+	multiplicative_expr:  multiplicative_expr '*'.unary_expr 
+
+	IDENTIFIER  shift 12
+	STRING  shift 14
+	DSTRING  shift 15
+	NUMBER  shift 13
+	BOOLEAN  shift 16
+	NOT  shift 9
+	LPAREN  shift 17
+	LBRACKET  shift 21
+	'-'  shift 10
+	.  error
+
+	unary_expr  goto 57
+	primary_expr  goto 11
+	field_access  goto 18
+	function_call  goto 19
+	list_literal  goto 20
+
+state 35
+	multiplicative_expr:  multiplicative_expr '/'.unary_expr 
+
+	IDENTIFIER  shift 12
+	STRING  shift 14
+	DSTRING  shift 15
+	NUMBER  shift 13
+	BOOLEAN  shift 16
+	NOT  shift 9
+	LPAREN  shift 17
+	LBRACKET  shift 21
+	'-'  shift 10
+	.  error
+
+	unary_expr  goto 58
+	primary_expr  goto 11
+	field_access  goto 18
+	function_call  goto 19
+	list_literal  goto 20
+
+state 36
+	unary_expr:  NOT unary_expr.    (22)
+
+	.  reduce 22 (src line 95)
+
+
+state 37
+	unary_expr:  '-' unary_expr.    (23)
+
+	.  reduce 23 (src line 98)
+
+
+state 38
+	field_access:  primary_expr DOT.IDENTIFIER 
+
+	IDENTIFIER  shift 59
+	.  error
+
+
+state 39
+	field_access:  primary_expr LBRACKET.expr RBRACKET 
+
+	IDENTIFIER  shift 12
+	STRING  shift 14
+	DSTRING  shift 15
+	NUMBER  shift 13
+	BOOLEAN  shift 16
+	NOT  shift 9
+	LPAREN  shift 17
+	LBRACKET  shift 21
+	'-'  shift 10
+	.  error
+
+	expr  goto 60
+	logical_expr  goto 3
+	equality_expr  goto 4
+	relational_expr  goto 5
+	additive_expr  goto 6
+	multiplicative_expr  goto 7
+	unary_expr  goto 8
+	primary_expr  goto 11
+	field_access  goto 18
+	function_call  goto 19
+	list_literal  goto 20
+
+state 40
+	function_call:  IDENTIFIER LPAREN.argument_list RPAREN 
+	function_call:  IDENTIFIER LPAREN.RPAREN 
+
+	IDENTIFIER  shift 12
+	STRING  shift 14
+	DSTRING  shift 15
+	NUMBER  shift 13
+	BOOLEAN  shift 16
+	NOT  shift 9
+	LPAREN  shift 17
+	RPAREN  shift 62
+	LBRACKET  shift 21
+	'-'  shift 10
+	.  error
+
+	expr  goto 63
+	logical_expr  goto 3
+	equality_expr  goto 4
+	relational_expr  goto 5
+	additive_expr  goto 6
+	multiplicative_expr  goto 7
+	unary_expr  goto 8
+	primary_expr  goto 11
+	field_access  goto 18
+	function_call  goto 19
+	list_literal  goto 20
+	argument_list  goto 61
+
+state 41
+	primary_expr:  LPAREN expr.RPAREN 
+
+	RPAREN  shift 64
+	.  error
+
+
+state 42
+	list_literal:  LBRACKET expression_list.RBRACKET 
+	expression_list:  expression_list.COMMA expr 
+
+	RBRACKET  shift 65
+	COMMA  shift 66
+	.  error
+
+
+state 43
+	list_literal:  LBRACKET RBRACKET.    (39)
+
+	.  reduce 39 (src line 142)
+
+
+state 44
+	expression_list:  expr.    (42)
+
+	.  reduce 42 (src line 153)
+
+
+state 45
+	logical_expr:  logical_expr AND equality_expr.    (3)
+	equality_expr:  equality_expr.EQ relational_expr 
+	equality_expr:  equality_expr.NE relational_expr 
+
+	EQ  shift 24
+	NE  shift 25
+	.  reduce 3 (src line 43)
+
+
+state 46
+	logical_expr:  logical_expr OR equality_expr.    (4)
+	equality_expr:  equality_expr.EQ relational_expr 
+	equality_expr:  equality_expr.NE relational_expr 
+
+	EQ  shift 24
+	NE  shift 25
+	.  reduce 4 (src line 46)
+
+
+state 47
+	equality_expr:  equality_expr EQ relational_expr.    (6)
+	relational_expr:  relational_expr.LT additive_expr 
+	relational_expr:  relational_expr.LE additive_expr 
+	relational_expr:  relational_expr.GT additive_expr 
+	relational_expr:  relational_expr.GE additive_expr 
+	relational_expr:  relational_expr.IN additive_expr 
+	relational_expr:  relational_expr.NOT IN additive_expr 
+
+	NOT  shift 31
+	IN  shift 30
+	LT  shift 26
+	LE  shift 27
+	GT  shift 28
+	GE  shift 29
+	.  reduce 6 (src line 51)
+
+
+state 48
+	equality_expr:  equality_expr NE relational_expr.    (7)
+	relational_expr:  relational_expr.LT additive_expr 
+	relational_expr:  relational_expr.LE additive_expr 
+	relational_expr:  relational_expr.GT additive_expr 
+	relational_expr:  relational_expr.GE additive_expr 
+	relational_expr:  relational_expr.IN additive_expr 
+	relational_expr:  relational_expr.NOT IN additive_expr 
+
+	NOT  shift 31
+	IN  shift 30
+	LT  shift 26
+	LE  shift 27
+	GT  shift 28
+	GE  shift 29
+	.  reduce 7 (src line 54)
+
+
+state 49
+	relational_expr:  relational_expr LT additive_expr.    (9)
+	additive_expr:  additive_expr.'+' multiplicative_expr 
+	additive_expr:  additive_expr.'-' multiplicative_expr 
+
+	'+'  shift 32
+	'-'  shift 33
+	.  reduce 9 (src line 59)
+
+
+state 50
+	relational_expr:  relational_expr LE additive_expr.    (10)
+	additive_expr:  additive_expr.'+' multiplicative_expr 
+	additive_expr:  additive_expr.'-' multiplicative_expr 
+
+	'+'  shift 32
+	'-'  shift 33
+	.  reduce 10 (src line 62)
+
+
+state 51
+	relational_expr:  relational_expr GT additive_expr.    (11)
+	additive_expr:  additive_expr.'+' multiplicative_expr 
+	additive_expr:  additive_expr.'-' multiplicative_expr 
+
+	'+'  shift 32
+	'-'  shift 33
+	.  reduce 11 (src line 65)
+
+
+state 52
+	relational_expr:  relational_expr GE additive_expr.    (12)
+	additive_expr:  additive_expr.'+' multiplicative_expr 
+	additive_expr:  additive_expr.'-' multiplicative_expr 
+
+	'+'  shift 32
+	'-'  shift 33
+	.  reduce 12 (src line 68)
+
+
+state 53
+	relational_expr:  relational_expr IN additive_expr.    (13)
+	additive_expr:  additive_expr.'+' multiplicative_expr 
+	additive_expr:  additive_expr.'-' multiplicative_expr 
+
+	'+'  shift 32
+	'-'  shift 33
+	.  reduce 13 (src line 71)
+
+
+state 54
+	relational_expr:  relational_expr NOT IN.additive_expr 
+
+	IDENTIFIER  shift 12
+	STRING  shift 14
+	DSTRING  shift 15
+	NUMBER  shift 13
+	BOOLEAN  shift 16
+	NOT  shift 9
+	LPAREN  shift 17
+	LBRACKET  shift 21
+	'-'  shift 10
+	.  error
+
+	additive_expr  goto 67
+	multiplicative_expr  goto 7
+	unary_expr  goto 8
+	primary_expr  goto 11
+	field_access  goto 18
+	function_call  goto 19
+	list_literal  goto 20
+
+state 55
+	additive_expr:  additive_expr '+' multiplicative_expr.    (16)
+	multiplicative_expr:  multiplicative_expr.'*' unary_expr 
+	multiplicative_expr:  multiplicative_expr.'/' unary_expr 
+
+	'*'  shift 34
+	'/'  shift 35
+	.  reduce 16 (src line 79)
+
+
+state 56
+	additive_expr:  additive_expr '-' multiplicative_expr.    (17)
+	multiplicative_expr:  multiplicative_expr.'*' unary_expr 
+	multiplicative_expr:  multiplicative_expr.'/' unary_expr 
+
+	'*'  shift 34
+	'/'  shift 35
+	.  reduce 17 (src line 82)
+
+
+state 57
+	multiplicative_expr:  multiplicative_expr '*' unary_expr.    (19)
+
+	.  reduce 19 (src line 87)
+
+
+state 58
+	multiplicative_expr:  multiplicative_expr '/' unary_expr.    (20)
+
+	.  reduce 20 (src line 90)
+
+
+state 59
+	field_access:  primary_expr DOT IDENTIFIER.    (34)
+
+	.  reduce 34 (src line 125)
+
+
+state 60
+	field_access:  primary_expr LBRACKET expr.RBRACKET 
+
+	RBRACKET  shift 68
+	.  error
+
+
+state 61
+	function_call:  IDENTIFIER LPAREN argument_list.RPAREN 
+	argument_list:  argument_list.COMMA expr 
+
+	RPAREN  shift 69
+	COMMA  shift 70
+	.  error
+
+
+state 62
+	function_call:  IDENTIFIER LPAREN RPAREN.    (37)
+
+	.  reduce 37 (src line 135)
+
+
+state 63
+	argument_list:  expr.    (40)
+
+	.  reduce 40 (src line 146)
+
+
+state 64
+	primary_expr:  LPAREN expr RPAREN.    (30)
+
+	.  reduce 30 (src line 118)
+
+
+state 65
+	list_literal:  LBRACKET expression_list RBRACKET.    (38)
+
+	.  reduce 38 (src line 139)
+
+
+state 66
+	expression_list:  expression_list COMMA.expr 
+
+	IDENTIFIER  shift 12
+	STRING  shift 14
+	DSTRING  shift 15
+	NUMBER  shift 13
+	BOOLEAN  shift 16
+	NOT  shift 9
+	LPAREN  shift 17
+	LBRACKET  shift 21
+	'-'  shift 10
+	.  error
+
+	expr  goto 71
+	logical_expr  goto 3
+	equality_expr  goto 4
+	relational_expr  goto 5
+	additive_expr  goto 6
+	multiplicative_expr  goto 7
+	unary_expr  goto 8
+	primary_expr  goto 11
+	field_access  goto 18
+	function_call  goto 19
+	list_literal  goto 20
+
+state 67
+	relational_expr:  relational_expr NOT IN additive_expr.    (14)
+	additive_expr:  additive_expr.'+' multiplicative_expr 
+	additive_expr:  additive_expr.'-' multiplicative_expr 
+
+	'+'  shift 32
+	'-'  shift 33
+	.  reduce 14 (src line 74)
+
+
+state 68
+	field_access:  primary_expr LBRACKET expr RBRACKET.    (35)
+
+	.  reduce 35 (src line 128)
+
+
+state 69
+	function_call:  IDENTIFIER LPAREN argument_list RPAREN.    (36)
+
+	.  reduce 36 (src line 132)
+
+
+state 70
+	argument_list:  argument_list COMMA.expr 
+
+	IDENTIFIER  shift 12
+	STRING  shift 14
+	DSTRING  shift 15
+	NUMBER  shift 13
+	BOOLEAN  shift 16
+	NOT  shift 9
+	LPAREN  shift 17
+	LBRACKET  shift 21
+	'-'  shift 10
+	.  error
+
+	expr  goto 72
+	logical_expr  goto 3
+	equality_expr  goto 4
+	relational_expr  goto 5
+	additive_expr  goto 6
+	multiplicative_expr  goto 7
+	unary_expr  goto 8
+	primary_expr  goto 11
+	field_access  goto 18
+	function_call  goto 19
+	list_literal  goto 20
+
+state 71
+	expression_list:  expression_list COMMA expr.    (43)
+
+	.  reduce 43 (src line 156)
+
+
+state 72
+	argument_list:  argument_list COMMA expr.    (41)
+
+	.  reduce 41 (src line 149)
+
+
+31 terminals, 15 nonterminals
+44 grammar rules, 73/16000 states
+0 shift/reduce, 0 reduce/reduce conflicts reported
+64 working sets used
+memory: parser 190/240000
+64 extra closures
+266 shift entries, 1 exceptions
+36 goto entries
+152 entries saved by goto default
+Optimizer space used: output 109/240000
+109 table entries, 19 zero
+maximum spread: 30, maximum offset: 70

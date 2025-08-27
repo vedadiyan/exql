@@ -12,6 +12,7 @@ type (
 	NumberValue float64
 	ListValue   []Value
 	MapValue    map[string]Value
+	EachValue   Value
 	ExprNode    interface {
 		Evaluate(ctx Context) Value
 	}
@@ -51,8 +52,7 @@ type (
 	ListNode struct {
 		Elements []ExprNode
 	}
-	EachNode  struct{}
-	EachValue Value
+	EachNode struct{}
 )
 
 func (n *BinaryOpNode) Evaluate(ctx Context) Value {

@@ -19,6 +19,7 @@ package lang
 %token EQ NE LT LE GT GE
 %token LPAREN RPAREN LBRACKET RBRACKET
 %token DOT COMMA QUOTE DQUOTE
+%token <expr> EACH
 
 %type <expr> expr logical_expr equality_expr relational_expr additive_expr multiplicative_expr unary_expr primary_expr
 %type <expr> field_access function_call list_literal
@@ -127,6 +128,9 @@ field_access: primary_expr DOT IDENTIFIER {
     }
     | primary_expr LBRACKET expr RBRACKET {
         $$ = &IndexAccessNode{Object: $1, Index: $3}
+    }
+    | primary_expr LBRACKET EACH RBRACKET {
+        $$ = &IndexAccessNode{Object: $1, Index: &EachNode{}}
     }
 
 function_call: IDENTIFIER LPAREN argument_list RPAREN {

@@ -121,6 +121,11 @@ func (l *yyLex) Lex(lval *yySymType) int {
 			l.pos = newPos
 			return token
 		}
+	case '?':
+		{
+			l.pos++
+			return EACH
+		}
 	default:
 		if ch >= '0' && ch <= '9' {
 			if token, newPos := l.readNumber(lval); token != 0 {

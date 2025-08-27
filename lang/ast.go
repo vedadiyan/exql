@@ -51,6 +51,7 @@ type (
 	ListNode struct {
 		Elements []ExprNode
 	}
+	EachNode struct{}
 )
 
 func (n *BinaryOpNode) Evaluate(ctx Context) Value {
@@ -157,6 +158,10 @@ func (n *ListNode) Evaluate(ctx Context) Value {
 		elements[i] = elem.Evaluate(ctx)
 	}
 	return ListValue(elements)
+}
+
+func (n *EachNode) Evaluate(ctx Context) Value {
+	return 0
 }
 
 func toBool(v Value) bool {

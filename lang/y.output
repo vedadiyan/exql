@@ -36,7 +36,7 @@ state 1
 state 2
 	program:  expr.    (1)
 
-	.  reduce 1 (src line 39)
+	.  reduce 1 (src line 40)
 
 
 state 3
@@ -46,7 +46,7 @@ state 3
 
 	AND  shift 22
 	OR  shift 23
-	.  reduce 2 (src line 41)
+	.  reduce 2 (src line 42)
 
 
 state 4
@@ -56,7 +56,7 @@ state 4
 
 	EQ  shift 24
 	NE  shift 25
-	.  reduce 5 (src line 49)
+	.  reduce 5 (src line 50)
 
 
 state 5
@@ -74,7 +74,7 @@ state 5
 	LE  shift 27
 	GT  shift 28
 	GE  shift 29
-	.  reduce 8 (src line 57)
+	.  reduce 8 (src line 58)
 
 
 state 6
@@ -84,7 +84,7 @@ state 6
 
 	'+'  shift 32
 	'-'  shift 33
-	.  reduce 15 (src line 77)
+	.  reduce 15 (src line 78)
 
 
 state 7
@@ -94,13 +94,13 @@ state 7
 
 	'*'  shift 34
 	'/'  shift 35
-	.  reduce 18 (src line 85)
+	.  reduce 18 (src line 86)
 
 
 state 8
 	multiplicative_expr:  unary_expr.    (21)
 
-	.  reduce 21 (src line 93)
+	.  reduce 21 (src line 94)
 
 
 state 9
@@ -147,10 +147,11 @@ state 11
 	unary_expr:  primary_expr.    (24)
 	field_access:  primary_expr.DOT IDENTIFIER 
 	field_access:  primary_expr.LBRACKET expr RBRACKET 
+	field_access:  primary_expr.LBRACKET EACH RBRACKET 
 
 	LBRACKET  shift 39
 	DOT  shift 38
-	.  reduce 24 (src line 101)
+	.  reduce 24 (src line 102)
 
 
 state 12
@@ -159,31 +160,31 @@ state 12
 	function_call:  IDENTIFIER.LPAREN RPAREN 
 
 	LPAREN  shift 40
-	.  reduce 25 (src line 103)
+	.  reduce 25 (src line 104)
 
 
 state 13
 	primary_expr:  NUMBER.    (26)
 
-	.  reduce 26 (src line 106)
+	.  reduce 26 (src line 107)
 
 
 state 14
 	primary_expr:  STRING.    (27)
 
-	.  reduce 27 (src line 109)
+	.  reduce 27 (src line 110)
 
 
 state 15
 	primary_expr:  DSTRING.    (28)
 
-	.  reduce 28 (src line 112)
+	.  reduce 28 (src line 113)
 
 
 state 16
 	primary_expr:  BOOLEAN.    (29)
 
-	.  reduce 29 (src line 115)
+	.  reduce 29 (src line 116)
 
 
 state 17
@@ -215,19 +216,19 @@ state 17
 state 18
 	primary_expr:  field_access.    (31)
 
-	.  reduce 31 (src line 121)
+	.  reduce 31 (src line 122)
 
 
 state 19
 	primary_expr:  function_call.    (32)
 
-	.  reduce 32 (src line 122)
+	.  reduce 32 (src line 123)
 
 
 state 20
 	primary_expr:  list_literal.    (33)
 
-	.  reduce 33 (src line 123)
+	.  reduce 33 (src line 124)
 
 
 state 21
@@ -555,13 +556,13 @@ state 35
 state 36
 	unary_expr:  NOT unary_expr.    (22)
 
-	.  reduce 22 (src line 95)
+	.  reduce 22 (src line 96)
 
 
 state 37
 	unary_expr:  '-' unary_expr.    (23)
 
-	.  reduce 23 (src line 98)
+	.  reduce 23 (src line 99)
 
 
 state 38
@@ -573,6 +574,7 @@ state 38
 
 state 39
 	field_access:  primary_expr LBRACKET.expr RBRACKET 
+	field_access:  primary_expr LBRACKET.EACH RBRACKET 
 
 	IDENTIFIER  shift 12
 	STRING  shift 14
@@ -582,6 +584,7 @@ state 39
 	NOT  shift 9
 	LPAREN  shift 17
 	LBRACKET  shift 21
+	EACH  shift 61
 	'-'  shift 10
 	.  error
 
@@ -608,12 +611,12 @@ state 40
 	BOOLEAN  shift 16
 	NOT  shift 9
 	LPAREN  shift 17
-	RPAREN  shift 62
+	RPAREN  shift 63
 	LBRACKET  shift 21
 	'-'  shift 10
 	.  error
 
-	expr  goto 63
+	expr  goto 64
 	logical_expr  goto 3
 	equality_expr  goto 4
 	relational_expr  goto 5
@@ -624,12 +627,12 @@ state 40
 	field_access  goto 18
 	function_call  goto 19
 	list_literal  goto 20
-	argument_list  goto 61
+	argument_list  goto 62
 
 state 41
 	primary_expr:  LPAREN expr.RPAREN 
 
-	RPAREN  shift 64
+	RPAREN  shift 65
 	.  error
 
 
@@ -637,21 +640,21 @@ state 42
 	list_literal:  LBRACKET expression_list.RBRACKET 
 	expression_list:  expression_list.COMMA expr 
 
-	RBRACKET  shift 65
-	COMMA  shift 66
+	RBRACKET  shift 66
+	COMMA  shift 67
 	.  error
 
 
 state 43
-	list_literal:  LBRACKET RBRACKET.    (39)
+	list_literal:  LBRACKET RBRACKET.    (40)
 
-	.  reduce 39 (src line 142)
+	.  reduce 40 (src line 146)
 
 
 state 44
-	expression_list:  expr.    (42)
+	expression_list:  expr.    (43)
 
-	.  reduce 42 (src line 153)
+	.  reduce 43 (src line 157)
 
 
 state 45
@@ -661,7 +664,7 @@ state 45
 
 	EQ  shift 24
 	NE  shift 25
-	.  reduce 3 (src line 43)
+	.  reduce 3 (src line 44)
 
 
 state 46
@@ -671,7 +674,7 @@ state 46
 
 	EQ  shift 24
 	NE  shift 25
-	.  reduce 4 (src line 46)
+	.  reduce 4 (src line 47)
 
 
 state 47
@@ -689,7 +692,7 @@ state 47
 	LE  shift 27
 	GT  shift 28
 	GE  shift 29
-	.  reduce 6 (src line 51)
+	.  reduce 6 (src line 52)
 
 
 state 48
@@ -707,7 +710,7 @@ state 48
 	LE  shift 27
 	GT  shift 28
 	GE  shift 29
-	.  reduce 7 (src line 54)
+	.  reduce 7 (src line 55)
 
 
 state 49
@@ -717,7 +720,7 @@ state 49
 
 	'+'  shift 32
 	'-'  shift 33
-	.  reduce 9 (src line 59)
+	.  reduce 9 (src line 60)
 
 
 state 50
@@ -727,7 +730,7 @@ state 50
 
 	'+'  shift 32
 	'-'  shift 33
-	.  reduce 10 (src line 62)
+	.  reduce 10 (src line 63)
 
 
 state 51
@@ -737,7 +740,7 @@ state 51
 
 	'+'  shift 32
 	'-'  shift 33
-	.  reduce 11 (src line 65)
+	.  reduce 11 (src line 66)
 
 
 state 52
@@ -747,7 +750,7 @@ state 52
 
 	'+'  shift 32
 	'-'  shift 33
-	.  reduce 12 (src line 68)
+	.  reduce 12 (src line 69)
 
 
 state 53
@@ -757,7 +760,7 @@ state 53
 
 	'+'  shift 32
 	'-'  shift 33
-	.  reduce 13 (src line 71)
+	.  reduce 13 (src line 72)
 
 
 state 54
@@ -774,7 +777,7 @@ state 54
 	'-'  shift 10
 	.  error
 
-	additive_expr  goto 67
+	additive_expr  goto 68
 	multiplicative_expr  goto 7
 	unary_expr  goto 8
 	primary_expr  goto 11
@@ -789,7 +792,7 @@ state 55
 
 	'*'  shift 34
 	'/'  shift 35
-	.  reduce 16 (src line 79)
+	.  reduce 16 (src line 80)
 
 
 state 56
@@ -799,68 +802,75 @@ state 56
 
 	'*'  shift 34
 	'/'  shift 35
-	.  reduce 17 (src line 82)
+	.  reduce 17 (src line 83)
 
 
 state 57
 	multiplicative_expr:  multiplicative_expr '*' unary_expr.    (19)
 
-	.  reduce 19 (src line 87)
+	.  reduce 19 (src line 88)
 
 
 state 58
 	multiplicative_expr:  multiplicative_expr '/' unary_expr.    (20)
 
-	.  reduce 20 (src line 90)
+	.  reduce 20 (src line 91)
 
 
 state 59
 	field_access:  primary_expr DOT IDENTIFIER.    (34)
 
-	.  reduce 34 (src line 125)
+	.  reduce 34 (src line 126)
 
 
 state 60
 	field_access:  primary_expr LBRACKET expr.RBRACKET 
 
-	RBRACKET  shift 68
+	RBRACKET  shift 69
 	.  error
 
 
 state 61
-	function_call:  IDENTIFIER LPAREN argument_list.RPAREN 
-	argument_list:  argument_list.COMMA expr 
+	field_access:  primary_expr LBRACKET EACH.RBRACKET 
 
-	RPAREN  shift 69
-	COMMA  shift 70
+	RBRACKET  shift 70
 	.  error
 
 
 state 62
-	function_call:  IDENTIFIER LPAREN RPAREN.    (37)
+	function_call:  IDENTIFIER LPAREN argument_list.RPAREN 
+	argument_list:  argument_list.COMMA expr 
 
-	.  reduce 37 (src line 135)
+	RPAREN  shift 71
+	COMMA  shift 72
+	.  error
 
 
 state 63
-	argument_list:  expr.    (40)
-
-	.  reduce 40 (src line 146)
-
-
-state 64
-	primary_expr:  LPAREN expr RPAREN.    (30)
-
-	.  reduce 30 (src line 118)
-
-
-state 65
-	list_literal:  LBRACKET expression_list RBRACKET.    (38)
+	function_call:  IDENTIFIER LPAREN RPAREN.    (38)
 
 	.  reduce 38 (src line 139)
 
 
+state 64
+	argument_list:  expr.    (41)
+
+	.  reduce 41 (src line 150)
+
+
+state 65
+	primary_expr:  LPAREN expr RPAREN.    (30)
+
+	.  reduce 30 (src line 119)
+
+
 state 66
+	list_literal:  LBRACKET expression_list RBRACKET.    (39)
+
+	.  reduce 39 (src line 143)
+
+
+state 67
 	expression_list:  expression_list COMMA.expr 
 
 	IDENTIFIER  shift 12
@@ -874,7 +884,7 @@ state 66
 	'-'  shift 10
 	.  error
 
-	expr  goto 71
+	expr  goto 73
 	logical_expr  goto 3
 	equality_expr  goto 4
 	relational_expr  goto 5
@@ -886,29 +896,35 @@ state 66
 	function_call  goto 19
 	list_literal  goto 20
 
-state 67
+state 68
 	relational_expr:  relational_expr NOT IN additive_expr.    (14)
 	additive_expr:  additive_expr.'+' multiplicative_expr 
 	additive_expr:  additive_expr.'-' multiplicative_expr 
 
 	'+'  shift 32
 	'-'  shift 33
-	.  reduce 14 (src line 74)
-
-
-state 68
-	field_access:  primary_expr LBRACKET expr RBRACKET.    (35)
-
-	.  reduce 35 (src line 128)
+	.  reduce 14 (src line 75)
 
 
 state 69
-	function_call:  IDENTIFIER LPAREN argument_list RPAREN.    (36)
+	field_access:  primary_expr LBRACKET expr RBRACKET.    (35)
+
+	.  reduce 35 (src line 129)
+
+
+state 70
+	field_access:  primary_expr LBRACKET EACH RBRACKET.    (36)
 
 	.  reduce 36 (src line 132)
 
 
-state 70
+state 71
+	function_call:  IDENTIFIER LPAREN argument_list RPAREN.    (37)
+
+	.  reduce 37 (src line 136)
+
+
+state 72
 	argument_list:  argument_list COMMA.expr 
 
 	IDENTIFIER  shift 12
@@ -922,7 +938,7 @@ state 70
 	'-'  shift 10
 	.  error
 
-	expr  goto 72
+	expr  goto 74
 	logical_expr  goto 3
 	equality_expr  goto 4
 	relational_expr  goto 5
@@ -934,27 +950,27 @@ state 70
 	function_call  goto 19
 	list_literal  goto 20
 
-state 71
-	expression_list:  expression_list COMMA expr.    (43)
+state 73
+	expression_list:  expression_list COMMA expr.    (44)
 
-	.  reduce 43 (src line 156)
-
-
-state 72
-	argument_list:  argument_list COMMA expr.    (41)
-
-	.  reduce 41 (src line 149)
+	.  reduce 44 (src line 160)
 
 
-31 terminals, 15 nonterminals
-44 grammar rules, 73/16000 states
+state 74
+	argument_list:  argument_list COMMA expr.    (42)
+
+	.  reduce 42 (src line 153)
+
+
+32 terminals, 15 nonterminals
+45 grammar rules, 75/16000 states
 0 shift/reduce, 0 reduce/reduce conflicts reported
 64 working sets used
 memory: parser 190/240000
-64 extra closures
-266 shift entries, 1 exceptions
+66 extra closures
+268 shift entries, 1 exceptions
 36 goto entries
 152 entries saved by goto default
-Optimizer space used: output 109/240000
-109 table entries, 19 zero
-maximum spread: 30, maximum offset: 70
+Optimizer space used: output 127/240000
+127 table entries, 26 zero
+maximum spread: 31, maximum offset: 72

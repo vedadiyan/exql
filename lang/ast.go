@@ -51,7 +51,8 @@ type (
 	ListNode struct {
 		Elements []ExprNode
 	}
-	EachNode struct{}
+	EachNode  struct{}
+	EachValue Value
 )
 
 func (n *BinaryOpNode) Evaluate(ctx Context) Value {
@@ -112,30 +113,78 @@ func (n *VariableNode) Evaluate(ctx Context) Value {
 
 func (n *FieldAccessNode) Evaluate(ctx Context) Value {
 	obj := n.Object.Evaluate(ctx)
-	if mapVal, ok := obj.(MapValue); ok {
-		return mapVal[n.Field]
+	return n.evaluate(obj)
+}
+
+func (n *FieldAccessNode) evaluate(obj Value) Value {
+	switch obj := obj.(type) {
+	case ListValue:
+		{
+			values := make(ListValue, 0)
+			for _, i := range obj {
+				values = append(values, n.evaluate(i))
+			}
+			return values
+		}
+	case MapValue:
+		{
+			return obj[n.Field]
+		}
+	default:
+		{
+			return nil
+		}
 	}
-	return nil
 }
 
 func (n *IndexAccessNode) Evaluate(ctx Context) Value {
 	obj := n.Object.Evaluate(ctx)
 	index := n.Index.Evaluate(ctx)
 
-	if mapVal, ok := obj.(MapValue); ok {
-		if strIndex, ok := index.(StringValue); ok {
-			return mapVal[string(strIndex)]
+	switch obj := obj.(type) {
+	case MapValue:
+		{
+			if strIndex, ok := index.(StringValue); ok {
+				expr := new(FieldAccessNode)
+				expr.Field = string(strIndex)
+				expr.Object = n.Object
+				return expr.Evaluate(ctx)
+			}
+			return nil
 		}
-	}
-	if listVal, ok := obj.(ListValue); ok {
-		if numIndex, ok := index.(NumberValue); ok {
-			idx := int(numIndex)
-			if idx >= 0 && idx < len(listVal) {
-				return listVal[idx]
+	case ListValue:
+		{
+			switch index := index.(type) {
+			case NumberValue:
+				{
+					idx := int(index)
+					if idx >= 0 && idx < len(obj) {
+						return obj[idx]
+					}
+					return nil
+				}
+			case StringValue:
+				{
+					expr := new(FieldAccessNode)
+					expr.Field = string(index)
+					expr.Object = n.Object
+					return expr.Evaluate(ctx)
+				}
+			case EachValue:
+				{
+					return obj
+				}
+			default:
+				{
+					return nil
+				}
 			}
 		}
+	default:
+		{
+			return nil
+		}
 	}
-	return nil
 }
 
 func (n *FunctionCallNode) Evaluate(ctx Context) Value {
@@ -161,7 +210,7 @@ func (n *ListNode) Evaluate(ctx Context) Value {
 }
 
 func (n *EachNode) Evaluate(ctx Context) Value {
-	return 0
+	return EachValue(0)
 }
 
 func toBool(v Value) bool {

@@ -12,10 +12,33 @@ type Context struct {
 }
 
 func main() {
-	input := "role"
+	input := "role[?][?].test"
 	context := new(Context)
 	context.vars = make(map[string]lang.Value)
-	context.vars["role"] = "\\'admin"
+	context.vars["role"] = lang.ListValue{
+		lang.ListValue{
+			lang.MapValue{
+				"test": 1,
+			},
+			lang.MapValue{
+				"test": 2,
+			},
+			lang.MapValue{
+				"test": 3,
+			},
+		},
+		lang.ListValue{
+			lang.MapValue{
+				"test": 1,
+			},
+			lang.MapValue{
+				"test": 2,
+			},
+			lang.MapValue{
+				"test": 3,
+			},
+		},
+	}
 	context.vars["age"] = lang.NumberValue(20)
 	context.funcs = make(map[string]lang.Function)
 

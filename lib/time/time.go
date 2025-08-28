@@ -10,7 +10,7 @@ import (
 	"github.com/vedadiyan/exql/lib"
 )
 
-func now() (string, func([]lang.Value) (lang.Value, error)) {
+func now() (string, lang.Function) {
 	name := "now"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 0 {
@@ -21,7 +21,7 @@ func now() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func nowMillis() (string, func([]lang.Value) (lang.Value, error)) {
+func nowMillis() (string, lang.Function) {
 	name := "now_millis"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 0 {
@@ -32,7 +32,7 @@ func nowMillis() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func nowNanos() (string, func([]lang.Value) (lang.Value, error)) {
+func nowNanos() (string, lang.Function) {
 	name := "now_nanos"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 0 {
@@ -43,7 +43,7 @@ func nowNanos() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func parse() (string, func([]lang.Value) (lang.Value, error)) {
+func parse() (string, lang.Function) {
 	name := "parse"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 1 || len(args) > 2 {
@@ -70,7 +70,7 @@ func parse() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func toFormat() (string, func([]lang.Value) (lang.Value, error)) {
+func toFormat() (string, lang.Function) {
 	name := "format"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 1 || len(args) > 2 {
@@ -94,7 +94,7 @@ func toFormat() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func add() (string, func([]lang.Value) (lang.Value, error)) {
+func add() (string, lang.Function) {
 	name := "add"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -113,7 +113,7 @@ func add() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func addDays() (string, func([]lang.Value) (lang.Value, error)) {
+func addDays() (string, lang.Function) {
 	name := "add_days"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -132,7 +132,7 @@ func addDays() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func addHours() (string, func([]lang.Value) (lang.Value, error)) {
+func addHours() (string, lang.Function) {
 	name := "add_hours"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -151,7 +151,7 @@ func addHours() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func addMinutes() (string, func([]lang.Value) (lang.Value, error)) {
+func addMinutes() (string, lang.Function) {
 	name := "add_minutes"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -170,7 +170,7 @@ func addMinutes() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func diff() (string, func([]lang.Value) (lang.Value, error)) {
+func diff() (string, lang.Function) {
 	name := "diff"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -189,7 +189,7 @@ func diff() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func diffDays() (string, func([]lang.Value) (lang.Value, error)) {
+func diffDays() (string, lang.Function) {
 	name := "diff_days"
 	_, diff := diff()
 	fn := func(args []lang.Value) (lang.Value, error) {
@@ -206,7 +206,7 @@ func diffDays() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func diffHours() (string, func([]lang.Value) (lang.Value, error)) {
+func diffHours() (string, lang.Function) {
 	name := "diff_hours"
 	_, diff := diff()
 	fn := func(args []lang.Value) (lang.Value, error) {
@@ -223,7 +223,7 @@ func diffHours() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func diffMinutes() (string, func([]lang.Value) (lang.Value, error)) {
+func diffMinutes() (string, lang.Function) {
 	name := "diff_minutes"
 	_, diff := diff()
 	fn := func(args []lang.Value) (lang.Value, error) {
@@ -240,7 +240,7 @@ func diffMinutes() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func year() (string, func([]lang.Value) (lang.Value, error)) {
+func year() (string, lang.Function) {
 	name := "year"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -256,7 +256,7 @@ func year() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func month() (string, func([]lang.Value) (lang.Value, error)) {
+func month() (string, lang.Function) {
 	name := "month"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -272,7 +272,7 @@ func month() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func day() (string, func([]lang.Value) (lang.Value, error)) {
+func day() (string, lang.Function) {
 	name := "day"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -288,7 +288,7 @@ func day() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func hour() (string, func([]lang.Value) (lang.Value, error)) {
+func hour() (string, lang.Function) {
 	name := "hour"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -304,7 +304,7 @@ func hour() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func minute() (string, func([]lang.Value) (lang.Value, error)) {
+func minute() (string, lang.Function) {
 	name := "minute"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -320,7 +320,7 @@ func minute() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func second() (string, func([]lang.Value) (lang.Value, error)) {
+func second() (string, lang.Function) {
 	name := "second"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -336,7 +336,7 @@ func second() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func weekday() (string, func([]lang.Value) (lang.Value, error)) {
+func weekday() (string, lang.Function) {
 	name := "weekday"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -352,7 +352,7 @@ func weekday() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func yearday() (string, func([]lang.Value) (lang.Value, error)) {
+func yearday() (string, lang.Function) {
 	name := "yearday"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -368,7 +368,7 @@ func yearday() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func week() (string, func([]lang.Value) (lang.Value, error)) {
+func week() (string, lang.Function) {
 	name := "week"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -385,7 +385,7 @@ func week() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func startOfDay() (string, func([]lang.Value) (lang.Value, error)) {
+func startOfDay() (string, lang.Function) {
 	name := "start_of_day"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -402,7 +402,7 @@ func startOfDay() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func toEndOfDay() (string, func([]lang.Value) (lang.Value, error)) {
+func toEndOfDay() (string, lang.Function) {
 	name := "end_of_day"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -419,7 +419,7 @@ func toEndOfDay() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func startOfWeek() (string, func([]lang.Value) (lang.Value, error)) {
+func startOfWeek() (string, lang.Function) {
 	name := "start_of_week"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -442,7 +442,7 @@ func startOfWeek() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func startOfMonth() (string, func([]lang.Value) (lang.Value, error)) {
+func startOfMonth() (string, lang.Function) {
 	name := "start_of_month"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -459,7 +459,7 @@ func startOfMonth() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func startOfYear() (string, func([]lang.Value) (lang.Value, error)) {
+func startOfYear() (string, lang.Function) {
 	name := "start_of_year"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -476,7 +476,7 @@ func startOfYear() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func isWeekend() (string, func([]lang.Value) (lang.Value, error)) {
+func isWeekend() (string, lang.Function) {
 	name := "is_weekend"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -493,7 +493,7 @@ func isWeekend() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func isLeapYear() (string, func([]lang.Value) (lang.Value, error)) {
+func isLeapYear() (string, lang.Function) {
 	name := "is_leap_year"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -510,7 +510,7 @@ func isLeapYear() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func daysInMonth() (string, func([]lang.Value) (lang.Value, error)) {
+func daysInMonth() (string, lang.Function) {
 	name := "days_in_month"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -529,7 +529,7 @@ func daysInMonth() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func age() (string, func([]lang.Value) (lang.Value, error)) {
+func age() (string, lang.Function) {
 	name := "age"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 1 || len(args) > 2 {
@@ -557,7 +557,7 @@ func age() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func toTimezone() (string, func([]lang.Value) (lang.Value, error)) {
+func toTimezone() (string, lang.Function) {
 	name := "to_timezone"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -585,7 +585,7 @@ func toTimezone() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func toFromTimezone() (string, func([]lang.Value) (lang.Value, error)) {
+func toFromTimezone() (string, lang.Function) {
 	name := "from_timezone"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -613,7 +613,7 @@ func toFromTimezone() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func sleep() (string, func([]lang.Value) (lang.Value, error)) {
+func sleep() (string, lang.Function) {
 	name := "sleep"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -633,7 +633,7 @@ func sleep() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func validate() (string, func([]lang.Value) (lang.Value, error)) {
+func validate() (string, lang.Function) {
 	name := "validate"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 1 || len(args) > 2 {
@@ -657,7 +657,7 @@ func validate() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func rrange() (string, func([]lang.Value) (lang.Value, error)) {
+func rrange() (string, lang.Function) {
 	name := "range"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 3 {
@@ -729,7 +729,7 @@ func convertTimeLayout(layout string) string {
 	}
 }
 
-var TimeFunctions = []func() (string, func([]lang.Value) (lang.Value, error)){
+var TimeFunctions = []func() (string, lang.Function){
 	now,
 	nowMillis,
 	nowNanos,

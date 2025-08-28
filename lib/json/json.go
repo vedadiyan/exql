@@ -10,7 +10,7 @@ import (
 	"github.com/vedadiyan/exql/lib"
 )
 
-func parse() (string, func([]lang.Value) (lang.Value, error)) {
+func parse() (string, lang.Function) {
 	name := "json_parse"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -30,7 +30,7 @@ func parse() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func sstring() (string, func([]lang.Value) (lang.Value, error)) {
+func sstring() (string, lang.Function) {
 	name := "json_string"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 1 || len(args) > 2 {
@@ -61,7 +61,7 @@ func sstring() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func valid() (string, func([]lang.Value) (lang.Value, error)) {
+func valid() (string, lang.Function) {
 	name := "json_valid"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -78,7 +78,7 @@ func valid() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func get() (string, func([]lang.Value) (lang.Value, error)) {
+func get() (string, lang.Function) {
 	name := "json_get"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -104,7 +104,7 @@ func get() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func set() (string, func([]lang.Value) (lang.Value, error)) {
+func set() (string, lang.Function) {
 	name := "json_set"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 3 {
@@ -131,7 +131,7 @@ func set() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func remove() (string, func([]lang.Value) (lang.Value, error)) {
+func remove() (string, lang.Function) {
 	name := "json_delete"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -157,7 +157,7 @@ func remove() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func has() (string, func([]lang.Value) (lang.Value, error)) {
+func has() (string, lang.Function) {
 	name := "json_has"
 	_, Get := get()
 	fn := func(args []lang.Value) (lang.Value, error) {
@@ -173,7 +173,7 @@ func has() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func keys() (string, func([]lang.Value) (lang.Value, error)) {
+func keys() (string, lang.Function) {
 	name := "json_keys"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -202,7 +202,7 @@ func keys() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func values() (string, func([]lang.Value) (lang.Value, error)) {
+func values() (string, lang.Function) {
 	name := "json_values"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -237,7 +237,7 @@ func values() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func length() (string, func([]lang.Value) (lang.Value, error)) {
+func length() (string, lang.Function) {
 	name := "json_length"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -266,7 +266,7 @@ func length() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func merge() (string, func([]lang.Value) (lang.Value, error)) {
+func merge() (string, lang.Function) {
 	name := "json_merge"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 2 {
@@ -296,7 +296,7 @@ func merge() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func ttype() (string, func([]lang.Value) (lang.Value, error)) {
+func ttype() (string, lang.Function) {
 	name := "json_type"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -531,7 +531,7 @@ func convertValueToJSON(v lang.Value) interface{} {
 	}
 }
 
-var JsonFunctions = []func() (string, func([]lang.Value) (lang.Value, error)){
+var JsonFunctions = []func() (string, lang.Function){
 	parse,
 	sstring,
 	valid,

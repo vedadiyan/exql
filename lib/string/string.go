@@ -12,7 +12,7 @@ import (
 	"github.com/vedadiyan/exql/lib"
 )
 
-func length() (string, func([]lang.Value) (lang.Value, error)) {
+func length() (string, lang.Function) {
 	name := "len"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -27,7 +27,7 @@ func length() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func size() (string, func([]lang.Value) (lang.Value, error)) {
+func size() (string, lang.Function) {
 	name := "size"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -42,7 +42,7 @@ func size() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func voncat() (string, func([]lang.Value) (lang.Value, error)) {
+func voncat() (string, lang.Function) {
 	name := "concat"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		var result string
@@ -58,7 +58,7 @@ func voncat() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func repeat() (string, func([]lang.Value) (lang.Value, error)) {
+func repeat() (string, lang.Function) {
 	name := "repeat"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -81,7 +81,7 @@ func repeat() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func reverse() (string, func([]lang.Value) (lang.Value, error)) {
+func reverse() (string, lang.Function) {
 	name := "reverse"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -100,7 +100,7 @@ func reverse() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func toUpper() (string, func([]lang.Value) (lang.Value, error)) {
+func toUpper() (string, lang.Function) {
 	name := "upper"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -115,7 +115,7 @@ func toUpper() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func toLower() (string, func([]lang.Value) (lang.Value, error)) {
+func toLower() (string, lang.Function) {
 	name := "lower"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -130,7 +130,7 @@ func toLower() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func title() (string, func([]lang.Value) (lang.Value, error)) {
+func title() (string, lang.Function) {
 	name := "title"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -145,7 +145,7 @@ func title() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func capitalize() (string, func([]lang.Value) (lang.Value, error)) {
+func capitalize() (string, lang.Function) {
 	name := "capitalize"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -169,7 +169,7 @@ func capitalize() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func swapCase() (string, func([]lang.Value) (lang.Value, error)) {
+func swapCase() (string, lang.Function) {
 	name := "swap_case"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -192,7 +192,7 @@ func swapCase() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func trim() (string, func([]lang.Value) (lang.Value, error)) {
+func trim() (string, lang.Function) {
 	name := "trim"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 1 || len(args) > 2 {
@@ -214,7 +214,7 @@ func trim() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func trimLeft() (string, func([]lang.Value) (lang.Value, error)) {
+func trimLeft() (string, lang.Function) {
 	name := "trim_left"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 1 || len(args) > 2 {
@@ -236,7 +236,7 @@ func trimLeft() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func trimRight() (string, func([]lang.Value) (lang.Value, error)) {
+func trimRight() (string, lang.Function) {
 	name := "trim_right"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 1 || len(args) > 2 {
@@ -258,7 +258,7 @@ func trimRight() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func padLeft() (string, func([]lang.Value) (lang.Value, error)) {
+func padLeft() (string, lang.Function) {
 	name := "pad_left"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 2 || len(args) > 3 {
@@ -298,7 +298,7 @@ func padLeft() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func padRight() (string, func([]lang.Value) (lang.Value, error)) {
+func padRight() (string, lang.Function) {
 	name := "pad_right"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 2 || len(args) > 3 {
@@ -338,7 +338,7 @@ func padRight() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func padCenter() (string, func([]lang.Value) (lang.Value, error)) {
+func padCenter() (string, lang.Function) {
 	name := "pad_center"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 2 || len(args) > 3 {
@@ -383,7 +383,7 @@ func padCenter() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func substr() (string, func([]lang.Value) (lang.Value, error)) {
+func substr() (string, lang.Function) {
 	name := "substr"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 2 || len(args) > 3 {
@@ -432,7 +432,7 @@ func substr() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func left() (string, func([]lang.Value) (lang.Value, error)) {
+func left() (string, lang.Function) {
 	name := "left"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -462,7 +462,7 @@ func left() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func right() (string, func([]lang.Value) (lang.Value, error)) {
+func right() (string, lang.Function) {
 	name := "right"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -492,7 +492,7 @@ func right() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func contains() (string, func([]lang.Value) (lang.Value, error)) {
+func contains() (string, lang.Function) {
 	name := "contains"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -511,7 +511,7 @@ func contains() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func startsWith() (string, func([]lang.Value) (lang.Value, error)) {
+func startsWith() (string, lang.Function) {
 	name := "startswith"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -530,7 +530,7 @@ func startsWith() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func endsWith() (string, func([]lang.Value) (lang.Value, error)) {
+func endsWith() (string, lang.Function) {
 	name := "endswith"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -549,7 +549,7 @@ func endsWith() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func indexOf() (string, func([]lang.Value) (lang.Value, error)) {
+func indexOf() (string, lang.Function) {
 	name := "indexof"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 2 || len(args) > 3 {
@@ -592,7 +592,7 @@ func indexOf() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func lastIndexOf() (string, func([]lang.Value) (lang.Value, error)) {
+func lastIndexOf() (string, lang.Function) {
 	name := "last_index_of"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -619,7 +619,7 @@ func lastIndexOf() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func replace() (string, func([]lang.Value) (lang.Value, error)) {
+func replace() (string, lang.Function) {
 	name := "replace"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 3 || len(args) > 4 {
@@ -652,7 +652,7 @@ func replace() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func replaceAll() (string, func([]lang.Value) (lang.Value, error)) {
+func replaceAll() (string, lang.Function) {
 	name := "replace_all"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 3 {
@@ -675,7 +675,7 @@ func replaceAll() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func split() (string, func([]lang.Value) (lang.Value, error)) {
+func split() (string, lang.Function) {
 	name := "split"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 2 || len(args) > 3 {
@@ -715,7 +715,7 @@ func split() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func join() (string, func([]lang.Value) (lang.Value, error)) {
+func join() (string, lang.Function) {
 	name := "join"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -743,7 +743,7 @@ func join() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func lines() (string, func([]lang.Value) (lang.Value, error)) {
+func lines() (string, lang.Function) {
 	name := "lines"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -763,7 +763,7 @@ func lines() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func fields() (string, func([]lang.Value) (lang.Value, error)) {
+func fields() (string, lang.Function) {
 	name := "fields"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -783,7 +783,7 @@ func fields() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func match() (string, func([]lang.Value) (lang.Value, error)) {
+func match() (string, lang.Function) {
 	name := "match"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -807,7 +807,7 @@ func match() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func findAll() (string, func([]lang.Value) (lang.Value, error)) {
+func findAll() (string, lang.Function) {
 	name := "find_all"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 2 || len(args) > 3 {
@@ -846,7 +846,7 @@ func findAll() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func replaceRegex() (string, func([]lang.Value) (lang.Value, error)) {
+func replaceRegex() (string, lang.Function) {
 	name := "replace_regex"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 3 {
@@ -875,7 +875,7 @@ func replaceRegex() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func charAt() (string, func([]lang.Value) (lang.Value, error)) {
+func charAt() (string, lang.Function) {
 	name := "char_at"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -901,7 +901,7 @@ func charAt() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func charCode() (string, func([]lang.Value) (lang.Value, error)) {
+func charCode() (string, lang.Function) {
 	name := "char_code"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -927,7 +927,7 @@ func charCode() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func fromCharCode() (string, func([]lang.Value) (lang.Value, error)) {
+func fromCharCode() (string, lang.Function) {
 	name := "from_char_code"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) == 0 {
@@ -949,7 +949,7 @@ func fromCharCode() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func isEmpty() (string, func([]lang.Value) (lang.Value, error)) {
+func isEmpty() (string, lang.Function) {
 	name := "is_empty"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -964,7 +964,7 @@ func isEmpty() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func isNumeric() (string, func([]lang.Value) (lang.Value, error)) {
+func isNumeric() (string, lang.Function) {
 	name := "is_numeric"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -980,7 +980,7 @@ func isNumeric() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func isAlpha() (string, func([]lang.Value) (lang.Value, error)) {
+func isAlpha() (string, lang.Function) {
 	name := "is_alpha"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -1005,7 +1005,7 @@ func isAlpha() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func isAlphaNumeric() (string, func([]lang.Value) (lang.Value, error)) {
+func isAlphaNumeric() (string, lang.Function) {
 	name := "is_alphanumeric"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -1030,7 +1030,7 @@ func isAlphaNumeric() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func isSpace() (string, func([]lang.Value) (lang.Value, error)) {
+func isSpace() (string, lang.Function) {
 	name := "is_space"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -1055,7 +1055,7 @@ func isSpace() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func toStr() (string, func([]lang.Value) (lang.Value, error)) {
+func toStr() (string, lang.Function) {
 	name := "tostring"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -1070,7 +1070,7 @@ func toStr() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func toNumber() (string, func([]lang.Value) (lang.Value, error)) {
+func toNumber() (string, lang.Function) {
 	name := "tonumber"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -1088,7 +1088,7 @@ func toNumber() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-var StringFunctions = []func() (string, func([]lang.Value) (lang.Value, error)){
+var StringFunctions = []func() (string, lang.Function){
 
 	length,
 	size,

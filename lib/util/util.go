@@ -13,7 +13,7 @@ import (
 )
 
 // Conditional Functions
-func conditionalIf() (string, func([]lang.Value) (lang.Value, error)) {
+func conditionalIf() (string, lang.Function) {
 	name := "if"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 2 || len(args) > 3 {
@@ -38,7 +38,7 @@ func conditionalIf() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func conditionalUnless() (string, func([]lang.Value) (lang.Value, error)) {
+func conditionalUnless() (string, lang.Function) {
 	name := "unless"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 2 || len(args) > 3 {
@@ -63,7 +63,7 @@ func conditionalUnless() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func conditionalSwitch() (string, func([]lang.Value) (lang.Value, error)) {
+func conditionalSwitch() (string, lang.Function) {
 	name := "switch"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 3 || len(args)%2 == 0 {
@@ -89,7 +89,7 @@ func conditionalSwitch() (string, func([]lang.Value) (lang.Value, error)) {
 }
 
 // Null Coalescing Functions
-func coalesce() (string, func([]lang.Value) (lang.Value, error)) {
+func coalesce() (string, lang.Function) {
 	name := "coalesce"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		for _, arg := range args {
@@ -102,7 +102,7 @@ func coalesce() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func defaultValue() (string, func([]lang.Value) (lang.Value, error)) {
+func defaultValue() (string, lang.Function) {
 	name := "default"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -121,7 +121,7 @@ func defaultValue() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func firstNonNull() (string, func([]lang.Value) (lang.Value, error)) {
+func firstNonNull() (string, lang.Function) {
 	name := "first_non_null"
 	_, coalesceFunc := coalesce()
 	fn := func(args []lang.Value) (lang.Value, error) {
@@ -130,7 +130,7 @@ func firstNonNull() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func firstNonEmpty() (string, func([]lang.Value) (lang.Value, error)) {
+func firstNonEmpty() (string, lang.Function) {
 	name := "first_non_empty"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		for _, arg := range args {
@@ -144,7 +144,7 @@ func firstNonEmpty() (string, func([]lang.Value) (lang.Value, error)) {
 }
 
 // Comparison and Selection
-func greatest() (string, func([]lang.Value) (lang.Value, error)) {
+func greatest() (string, lang.Function) {
 	name := "greatest"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) == 0 {
@@ -166,7 +166,7 @@ func greatest() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func least() (string, func([]lang.Value) (lang.Value, error)) {
+func least() (string, lang.Function) {
 	name := "least"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) == 0 {
@@ -188,7 +188,7 @@ func least() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func choose() (string, func([]lang.Value) (lang.Value, error)) {
+func choose() (string, lang.Function) {
 	name := "choose"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 2 {
@@ -211,7 +211,7 @@ func choose() (string, func([]lang.Value) (lang.Value, error)) {
 }
 
 // Debugging and Inspection
-func debugPrint() (string, func([]lang.Value) (lang.Value, error)) {
+func debugPrint() (string, lang.Function) {
 	name := "debug"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		var parts []string
@@ -231,7 +231,7 @@ func debugPrint() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func inspect() (string, func([]lang.Value) (lang.Value, error)) {
+func inspect() (string, lang.Function) {
 	name := "inspect"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -243,7 +243,7 @@ func inspect() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func dump() (string, func([]lang.Value) (lang.Value, error)) {
+func dump() (string, lang.Function) {
 	name := "dump"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		var parts []string
@@ -257,7 +257,7 @@ func dump() (string, func([]lang.Value) (lang.Value, error)) {
 }
 
 // Identity and Pass-through
-func identity() (string, func([]lang.Value) (lang.Value, error)) {
+func identity() (string, lang.Function) {
 	name := "identity"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -268,7 +268,7 @@ func identity() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func noop() (string, func([]lang.Value) (lang.Value, error)) {
+func noop() (string, lang.Function) {
 	name := "noop"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		return nil, nil
@@ -276,7 +276,7 @@ func noop() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func constant() (string, func([]lang.Value) (lang.Value, error)) {
+func constant() (string, lang.Function) {
 	name := "constant"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -288,7 +288,7 @@ func constant() (string, func([]lang.Value) (lang.Value, error)) {
 }
 
 // Error Handling
-func tryOr() (string, func([]lang.Value) (lang.Value, error)) {
+func tryOr() (string, lang.Function) {
 	name := "try_or"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -307,7 +307,7 @@ func tryOr() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func safe() (string, func([]lang.Value) (lang.Value, error)) {
+func safe() (string, lang.Function) {
 	name := "safe"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -325,7 +325,7 @@ func safe() (string, func([]lang.Value) (lang.Value, error)) {
 }
 
 // Type Conversion Utilities
-func toString() (string, func([]lang.Value) (lang.Value, error)) {
+func toString() (string, lang.Function) {
 	name := "tostring"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -340,7 +340,7 @@ func toString() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func toNumber() (string, func([]lang.Value) (lang.Value, error)) {
+func toNumber() (string, lang.Function) {
 	name := "tonumber"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -355,7 +355,7 @@ func toNumber() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func toBool() (string, func([]lang.Value) (lang.Value, error)) {
+func toBool() (string, lang.Function) {
 	name := "tobool"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -370,7 +370,7 @@ func toBool() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func toList() (string, func([]lang.Value) (lang.Value, error)) {
+func toList() (string, lang.Function) {
 	name := "tolist"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) == 0 {
@@ -392,7 +392,7 @@ func toList() (string, func([]lang.Value) (lang.Value, error)) {
 }
 
 // Validation Utilities
-func assert() (string, func([]lang.Value) (lang.Value, error)) {
+func assert() (string, lang.Function) {
 	name := "assert"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 1 || len(args) > 2 {
@@ -421,7 +421,7 @@ func assert() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func validate() (string, func([]lang.Value) (lang.Value, error)) {
+func validate() (string, lang.Function) {
 	name := "validate"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 2 || len(args) > 3 {
@@ -447,7 +447,7 @@ func validate() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func require() (string, func([]lang.Value) (lang.Value, error)) {
+func require() (string, lang.Function) {
 	name := "require"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 1 || len(args) > 2 {
@@ -473,7 +473,7 @@ func require() (string, func([]lang.Value) (lang.Value, error)) {
 }
 
 // Functional Utilities
-func apply() (string, func([]lang.Value) (lang.Value, error)) {
+func apply() (string, lang.Function) {
 	name := "apply"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 1 {
@@ -484,7 +484,7 @@ func apply() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func pipe() (string, func([]lang.Value) (lang.Value, error)) {
+func pipe() (string, lang.Function) {
 	name := "pipe"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 1 {
@@ -495,7 +495,7 @@ func pipe() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func compose() (string, func([]lang.Value) (lang.Value, error)) {
+func compose() (string, lang.Function) {
 	name := "compose"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 1 {
@@ -507,7 +507,7 @@ func compose() (string, func([]lang.Value) (lang.Value, error)) {
 }
 
 // Miscellaneous Utilities
-func uuid_() (string, func([]lang.Value) (lang.Value, error)) {
+func uuid_() (string, lang.Function) {
 	name := "uuid"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 0 {
@@ -518,7 +518,7 @@ func uuid_() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func timestamp() (string, func([]lang.Value) (lang.Value, error)) {
+func timestamp() (string, lang.Function) {
 	name := "timestamp"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 0 {
@@ -529,7 +529,7 @@ func timestamp() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func randomString() (string, func([]lang.Value) (lang.Value, error)) {
+func randomString() (string, lang.Function) {
 	name := "random_string"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		length := 10 // default length
@@ -561,7 +561,7 @@ func randomString() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func memoize() (string, func([]lang.Value) (lang.Value, error)) {
+func memoize() (string, lang.Function) {
 	name := "memoize"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 1 {
@@ -572,7 +572,7 @@ func memoize() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func benchmark() (string, func([]lang.Value) (lang.Value, error)) {
+func benchmark() (string, lang.Function) {
 	name := "benchmark"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 1 {
@@ -688,7 +688,7 @@ func formatValueForInspect(v lang.Value) string {
 	}
 }
 
-var UtilityFunctions = []func() (string, func([]lang.Value) (lang.Value, error)){
+var UtilityFunctions = []func() (string, lang.Function){
 	conditionalIf,
 	conditionalUnless,
 	conditionalSwitch,

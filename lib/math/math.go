@@ -12,7 +12,7 @@ import (
 	"github.com/vedadiyan/exql/lib"
 )
 
-func Abs() (string, func([]lang.Value) (lang.Value, error)) {
+func Abs() (string, lang.Function) {
 	name := "abs"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -27,7 +27,7 @@ func Abs() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func Sign() (string, func([]lang.Value) (lang.Value, error)) {
+func Sign() (string, lang.Function) {
 	name := "sign"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -47,7 +47,7 @@ func Sign() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func Max() (string, func([]lang.Value) (lang.Value, error)) {
+func Max() (string, lang.Function) {
 	name := "max"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) == 0 {
@@ -71,7 +71,7 @@ func Max() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func Min() (string, func([]lang.Value) (lang.Value, error)) {
+func Min() (string, lang.Function) {
 	name := "min"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) == 0 {
@@ -95,7 +95,7 @@ func Min() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func Clamp() (string, func([]lang.Value) (lang.Value, error)) {
+func Clamp() (string, lang.Function) {
 	name := "clamp"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 3 {
@@ -124,7 +124,7 @@ func Clamp() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func Ceil() (string, func([]lang.Value) (lang.Value, error)) {
+func Ceil() (string, lang.Function) {
 	name := "ceil"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -139,7 +139,7 @@ func Ceil() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func Floor() (string, func([]lang.Value) (lang.Value, error)) {
+func Floor() (string, lang.Function) {
 	name := "floor"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -154,7 +154,7 @@ func Floor() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func Round() (string, func([]lang.Value) (lang.Value, error)) {
+func Round() (string, lang.Function) {
 	name := "round"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 1 || len(args) > 2 {
@@ -181,7 +181,7 @@ func Round() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func Trunc() (string, func([]lang.Value) (lang.Value, error)) {
+func Trunc() (string, lang.Function) {
 	name := "trunc"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -196,7 +196,7 @@ func Trunc() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func Pow() (string, func([]lang.Value) (lang.Value, error)) {
+func Pow() (string, lang.Function) {
 	name := "pow"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -215,7 +215,7 @@ func Pow() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func Sqrt() (string, func([]lang.Value) (lang.Value, error)) {
+func Sqrt() (string, lang.Function) {
 	name := "sqrt"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -233,7 +233,7 @@ func Sqrt() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func Cbrt() (string, func([]lang.Value) (lang.Value, error)) {
+func Cbrt() (string, lang.Function) {
 	name := "cbrt"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -248,7 +248,7 @@ func Cbrt() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func Exp() (string, func([]lang.Value) (lang.Value, error)) {
+func Exp() (string, lang.Function) {
 	name := "exp"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -263,7 +263,7 @@ func Exp() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func Exp2() (string, func([]lang.Value) (lang.Value, error)) {
+func Exp2() (string, lang.Function) {
 	name := "exp2"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -278,7 +278,7 @@ func Exp2() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func Log() (string, func([]lang.Value) (lang.Value, error)) {
+func Log() (string, lang.Function) {
 	name := "log"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -296,7 +296,7 @@ func Log() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func Log10() (string, func([]lang.Value) (lang.Value, error)) {
+func Log10() (string, lang.Function) {
 	name := "log10"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -314,7 +314,7 @@ func Log10() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func Log2() (string, func([]lang.Value) (lang.Value, error)) {
+func Log2() (string, lang.Function) {
 	name := "log2"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -332,7 +332,7 @@ func Log2() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func Sin() (string, func([]lang.Value) (lang.Value, error)) {
+func Sin() (string, lang.Function) {
 	name := "sin"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -347,7 +347,7 @@ func Sin() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func Cos() (string, func([]lang.Value) (lang.Value, error)) {
+func Cos() (string, lang.Function) {
 	name := "cos"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -362,7 +362,7 @@ func Cos() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func Tan() (string, func([]lang.Value) (lang.Value, error)) {
+func Tan() (string, lang.Function) {
 	name := "tan"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -377,7 +377,7 @@ func Tan() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func Asin() (string, func([]lang.Value) (lang.Value, error)) {
+func Asin() (string, lang.Function) {
 	name := "asin"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -395,7 +395,7 @@ func Asin() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func Acos() (string, func([]lang.Value) (lang.Value, error)) {
+func Acos() (string, lang.Function) {
 	name := "acos"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -413,7 +413,7 @@ func Acos() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func Atan() (string, func([]lang.Value) (lang.Value, error)) {
+func Atan() (string, lang.Function) {
 	name := "atan"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -428,7 +428,7 @@ func Atan() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func Atan2() (string, func([]lang.Value) (lang.Value, error)) {
+func Atan2() (string, lang.Function) {
 	name := "atan2"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -447,7 +447,7 @@ func Atan2() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func Sinh() (string, func([]lang.Value) (lang.Value, error)) {
+func Sinh() (string, lang.Function) {
 	name := "sinh"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -462,7 +462,7 @@ func Sinh() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func Cosh() (string, func([]lang.Value) (lang.Value, error)) {
+func Cosh() (string, lang.Function) {
 	name := "cosh"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -477,7 +477,7 @@ func Cosh() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func Tanh() (string, func([]lang.Value) (lang.Value, error)) {
+func Tanh() (string, lang.Function) {
 	name := "tanh"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -492,7 +492,7 @@ func Tanh() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func Radians() (string, func([]lang.Value) (lang.Value, error)) {
+func Radians() (string, lang.Function) {
 	name := "radians"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -507,7 +507,7 @@ func Radians() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func Degrees() (string, func([]lang.Value) (lang.Value, error)) {
+func Degrees() (string, lang.Function) {
 	name := "degrees"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -522,7 +522,7 @@ func Degrees() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func Sum() (string, func([]lang.Value) (lang.Value, error)) {
+func Sum() (string, lang.Function) {
 	name := "sum"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		sum := 0.0
@@ -548,7 +548,7 @@ func Sum() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func Mean() (string, func([]lang.Value) (lang.Value, error)) {
+func Mean() (string, lang.Function) {
 	name := "mean"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) == 0 {
@@ -583,7 +583,7 @@ func Mean() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func Median() (string, func([]lang.Value) (lang.Value, error)) {
+func Median() (string, lang.Function) {
 	name := "median"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		var values []float64
@@ -617,7 +617,7 @@ func Median() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func Mode() (string, func([]lang.Value) (lang.Value, error)) {
+func Mode() (string, lang.Function) {
 	name := "mode"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		frequency := make(map[float64]int)
@@ -654,7 +654,7 @@ func Mode() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func Variance() (string, func([]lang.Value) (lang.Value, error)) {
+func Variance() (string, lang.Function) {
 	name := "variance"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		_, meanFunc := Mean()
@@ -694,7 +694,7 @@ func Variance() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func StdDev() (string, func([]lang.Value) (lang.Value, error)) {
+func StdDev() (string, lang.Function) {
 	name := "stddev"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		_, varianceFunc := Variance()
@@ -708,7 +708,7 @@ func StdDev() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func Random() (string, func([]lang.Value) (lang.Value, error)) {
+func Random() (string, lang.Function) {
 	name := "random"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) == 0 {
@@ -746,7 +746,7 @@ func Random() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func RandomSeed() (string, func([]lang.Value) (lang.Value, error)) {
+func RandomSeed() (string, lang.Function) {
 	name := "random_seed"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) == 0 {
@@ -766,7 +766,7 @@ func RandomSeed() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func RandomFloat() (string, func([]lang.Value) (lang.Value, error)) {
+func RandomFloat() (string, lang.Function) {
 	name := "random_float"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) == 0 {
@@ -795,7 +795,7 @@ func RandomFloat() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func IsNaN() (string, func([]lang.Value) (lang.Value, error)) {
+func IsNaN() (string, lang.Function) {
 	name := "is_nan"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -810,7 +810,7 @@ func IsNaN() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func IsInf() (string, func([]lang.Value) (lang.Value, error)) {
+func IsInf() (string, lang.Function) {
 	name := "is_inf"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -825,7 +825,7 @@ func IsInf() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func IsFinite() (string, func([]lang.Value) (lang.Value, error)) {
+func IsFinite() (string, lang.Function) {
 	name := "is_finite"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -840,7 +840,7 @@ func IsFinite() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func GCD() (string, func([]lang.Value) (lang.Value, error)) {
+func GCD() (string, lang.Function) {
 	name := "gcd"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 2 {
@@ -864,7 +864,7 @@ func GCD() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func LCM() (string, func([]lang.Value) (lang.Value, error)) {
+func LCM() (string, lang.Function) {
 	name := "lcm"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 2 {
@@ -888,7 +888,7 @@ func LCM() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func Factorial() (string, func([]lang.Value) (lang.Value, error)) {
+func Factorial() (string, lang.Function) {
 	name := "factorial"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -914,7 +914,7 @@ func Factorial() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func Pi() (string, func([]lang.Value) (lang.Value, error)) {
+func Pi() (string, lang.Function) {
 	name := "pi"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 0 {
@@ -925,7 +925,7 @@ func Pi() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func E() (string, func([]lang.Value) (lang.Value, error)) {
+func E() (string, lang.Function) {
 	name := "e"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 0 {
@@ -936,7 +936,7 @@ func E() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func Phi() (string, func([]lang.Value) (lang.Value, error)) {
+func Phi() (string, lang.Function) {
 	name := "phi"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 0 {
@@ -961,7 +961,7 @@ func lcm(a, b int) int {
 	return a * b / gcd(a, b)
 }
 
-var MathFunctions = []func() (string, func([]lang.Value) (lang.Value, error)){
+var MathFunctions = []func() (string, lang.Function){
 	Abs,
 	Sign,
 	Max,

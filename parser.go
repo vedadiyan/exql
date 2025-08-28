@@ -11,5 +11,5 @@ func Eval(expr string, context lang.Context) (lang.Value, error) {
 	if err != nil {
 		return nil, err
 	}
-	return result.Evaluate(context), nil
+	return result.Evaluate(context)
 }

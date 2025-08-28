@@ -14,13 +14,13 @@ type (
 	MapValue    map[string]Value
 	EachValue   Value
 	ExprNode    interface {
-		Evaluate(ctx Context) Value
+		Evaluate(ctx Context) (Value, error)
 	}
 	Context interface {
 		GetVariable(name string) Value
 		GetFunction(name string) Function
 	}
-	Function     func(args []Value) Value
+	Function     func(args []Value) (Value, error)
 	BinaryOpNode struct {
 		Left, Right ExprNode
 		Operator    string
@@ -57,65 +57,77 @@ type (
 	}
 )
 
-func (n *BinaryOpNode) Evaluate(ctx Context) Value {
-	left := n.Left.Evaluate(ctx)
-	right := n.Right.Evaluate(ctx)
+func (n *BinaryOpNode) Evaluate(ctx Context) (Value, error) {
+	left, err := n.Left.Evaluate(ctx)
+	if err != nil {
+		return nil, err
+	}
+	right, err := n.Right.Evaluate(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	switch n.Operator {
 	case "and":
-		return BoolValue(ToBool(left) && ToBool(right))
+		return BoolValue(ToBool(left) && ToBool(right)), nil
 	case "or":
-		return BoolValue(ToBool(left) || ToBool(right))
+		return BoolValue(ToBool(left) || ToBool(right)), nil
 	case "=", "==":
-		return BoolValue(equal(left, right))
+		return BoolValue(equal(left, right)), nil
 	case "!=":
-		return BoolValue(!equal(left, right))
+		return BoolValue(!equal(left, right)), nil
 	case "<":
-		return BoolValue(compare(left, right) < 0)
+		return BoolValue(compare(left, right) < 0), nil
 	case "<=":
-		return BoolValue(compare(left, right) <= 0)
+		return BoolValue(compare(left, right) <= 0), nil
 	case ">":
-		return BoolValue(compare(left, right) > 0)
+		return BoolValue(compare(left, right) > 0), nil
 	case ">=":
-		return BoolValue(compare(left, right) >= 0)
+		return BoolValue(compare(left, right) >= 0), nil
 	case "in":
-		return BoolValue(contains(right, left))
+		return BoolValue(contains(right, left)), nil
 	case "not in":
-		return BoolValue(!contains(right, left))
+		return BoolValue(!contains(right, left)), nil
 	case "+":
-		return NumberValue(ToNumber(left) + ToNumber(right))
+		return NumberValue(ToNumber(left) + ToNumber(right)), nil
 	case "-":
-		return NumberValue(ToNumber(left) - ToNumber(right))
+		return NumberValue(ToNumber(left) - ToNumber(right)), nil
 	case "*":
-		return NumberValue(ToNumber(left) * ToNumber(right))
+		return NumberValue(ToNumber(left) * ToNumber(right)), nil
 	case "/":
-		return NumberValue(ToNumber(left) / ToNumber(right))
+		return NumberValue(ToNumber(left) / ToNumber(right)), nil
 	}
-	return BoolValue(false)
+	return nil, fmt.Errorf("expectation failed: %s not supported", n.Operator)
 }
 
-func (n *UnaryOpNode) Evaluate(ctx Context) Value {
-	operand := n.Operand.Evaluate(ctx)
+func (n *UnaryOpNode) Evaluate(ctx Context) (Value, error) {
+	operand, err := n.Operand.Evaluate(ctx)
+	if err != nil {
+		return nil, err
+	}
 	switch n.Operator {
 	case "not":
-		return BoolValue(!ToBool(operand))
+		return BoolValue(!ToBool(operand)), nil
 	case "-":
-		return NumberValue(-ToNumber(operand))
+		return NumberValue(-ToNumber(operand)), nil
 	}
-	return operand
+	return nil, fmt.Errorf("expectation failed: %s not supported", n.Operator)
 }
 
-func (n *LiteralNode) Evaluate(ctx Context) Value {
-	return n.Value
+func (n *LiteralNode) Evaluate(ctx Context) (Value, error) {
+	return n.Value, nil
 }
 
-func (n *VariableNode) Evaluate(ctx Context) Value {
-	return ctx.GetVariable(n.Name)
+func (n *VariableNode) Evaluate(ctx Context) (Value, error) {
+	return ctx.GetVariable(n.Name), nil
 }
 
-func (n *FieldAccessNode) Evaluate(ctx Context) Value {
-	obj := n.Object.Evaluate(ctx)
-	return n.evaluate(obj)
+func (n *FieldAccessNode) Evaluate(ctx Context) (Value, error) {
+	obj, err := n.Object.Evaluate(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return n.evaluate(obj), nil
 }
 
 func (n *FieldAccessNode) evaluate(obj Value) Value {
@@ -139,9 +151,16 @@ func (n *FieldAccessNode) evaluate(obj Value) Value {
 	}
 }
 
-func (n *IndexAccessNode) Evaluate(ctx Context) Value {
-	obj := n.Object.Evaluate(ctx)
-	index := n.Index.Evaluate(ctx)
+func (n *IndexAccessNode) Evaluate(ctx Context) (Value, error) {
+	obj, err := n.Object.Evaluate(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	index, err := n.Index.Evaluate(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	switch obj := obj.(type) {
 	case MapValue:
@@ -152,7 +171,7 @@ func (n *IndexAccessNode) Evaluate(ctx Context) Value {
 				expr.Object = n.Object
 				return expr.Evaluate(ctx)
 			}
-			return nil
+			return nil, fmt.Errorf("expectation failed: %T not supported", index)
 		}
 	case ListValue:
 		{
@@ -161,9 +180,9 @@ func (n *IndexAccessNode) Evaluate(ctx Context) Value {
 				{
 					idx := int(index)
 					if idx >= 0 && idx < len(obj) {
-						return obj[idx]
+						return obj[idx], nil
 					}
-					return nil
+					return nil, fmt.Errorf("expectation failed: index %d is out of range", idx)
 				}
 			case StringValue:
 				{
@@ -174,49 +193,57 @@ func (n *IndexAccessNode) Evaluate(ctx Context) Value {
 				}
 			case EachValue:
 				{
-					return obj
+					return obj, nil
 				}
 			default:
 				{
-					return nil
+					return nil, fmt.Errorf("expectation failed: %T not supported", index)
 				}
 			}
 		}
 	default:
 		{
-			return nil
+			return nil, fmt.Errorf("expectation failed: %T not supported", obj)
 		}
 	}
 }
 
-func (n *FunctionCallNode) Evaluate(ctx Context) Value {
+func (n *FunctionCallNode) Evaluate(ctx Context) (Value, error) {
 	fn := ctx.GetFunction(n.Name)
 	if fn == nil {
-		return BoolValue(false)
+		return BoolValue(false), nil
 	}
 
 	args := make([]Value, len(n.Args))
 	for i, arg := range n.Args {
-		args[i] = arg.Evaluate(ctx)
+		val, err := arg.Evaluate(ctx)
+		if err != nil {
+			return nil, err
+		}
+		args[i] = val
 	}
 
 	return fn(args)
 }
 
-func (n *ListNode) Evaluate(ctx Context) Value {
+func (n *ListNode) Evaluate(ctx Context) (Value, error) {
 	elements := make([]Value, len(n.Elements))
 	for i, elem := range n.Elements {
-		elements[i] = elem.Evaluate(ctx)
+		val, err := elem.Evaluate(ctx)
+		if err != nil {
+			return nil, err
+		}
+		elements[i] = val
 	}
-	return ListValue(elements)
+	return ListValue(elements), nil
 }
 
-func (n *EachNode) Evaluate(ctx Context) Value {
-	return EachValue(0)
+func (n *EachNode) Evaluate(ctx Context) (Value, error) {
+	return EachValue(0), nil
 }
 
-func (n *RangeNode) Evaluate(ctx Context) Value {
-	return EachValue(0)
+func (n *RangeNode) Evaluate(ctx Context) (Value, error) {
+	return EachValue(0), nil
 }
 
 func ToBool(v Value) bool {

@@ -32,7 +32,7 @@ func parseCookies(cookieHeader string) lang.MapValue {
 	return result
 }
 
-func header() (string, func([]lang.Value) (lang.Value, error)) {
+func header() (string, lang.Function) {
 	name := "header"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -61,7 +61,7 @@ func header() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func headers() (string, func([]lang.Value) (lang.Value, error)) {
+func headers() (string, lang.Function) {
 	name := "headers"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -81,7 +81,7 @@ func headers() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func method() (string, func([]lang.Value) (lang.Value, error)) {
+func method() (string, lang.Function) {
 	name := "method"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -99,7 +99,7 @@ func method() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func path() (string, func([]lang.Value) (lang.Value, error)) {
+func path() (string, lang.Function) {
 	name := "path"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -117,7 +117,7 @@ func path() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func query() (string, func([]lang.Value) (lang.Value, error)) {
+func query() (string, lang.Function) {
 	name := "query"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -137,7 +137,7 @@ func query() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func queryParam() (string, func([]lang.Value) (lang.Value, error)) {
+func queryParam() (string, lang.Function) {
 	name := "query_param"
 	_, Query := query()
 	fn := func(args []lang.Value) (lang.Value, error) {
@@ -161,7 +161,7 @@ func queryParam() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func body() (string, func([]lang.Value) (lang.Value, error)) {
+func body() (string, lang.Function) {
 	name := "body"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -179,7 +179,7 @@ func body() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func status() (string, func([]lang.Value) (lang.Value, error)) {
+func status() (string, lang.Function) {
 	name := "status"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -197,7 +197,7 @@ func status() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func ip() (string, func([]lang.Value) (lang.Value, error)) {
+func ip() (string, lang.Function) {
 	name := "ip"
 	_, Headers := headers()
 	fn := func(args []lang.Value) (lang.Value, error) {
@@ -241,7 +241,7 @@ func ip() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func userAgent() (string, func([]lang.Value) (lang.Value, error)) {
+func userAgent() (string, lang.Function) {
 	name := "user_agent"
 	_, Headers := headers()
 	fn := func(args []lang.Value) (lang.Value, error) {
@@ -260,7 +260,7 @@ func userAgent() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func contentType() (string, func([]lang.Value) (lang.Value, error)) {
+func contentType() (string, lang.Function) {
 	name := "content_type"
 	_, Headers := headers()
 	fn := func(args []lang.Value) (lang.Value, error) {
@@ -283,7 +283,7 @@ func contentType() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func contentLength() (string, func([]lang.Value) (lang.Value, error)) {
+func contentLength() (string, lang.Function) {
 	name := "content_length"
 	_, Headers := headers()
 	fn := func(args []lang.Value) (lang.Value, error) {
@@ -308,7 +308,7 @@ func contentLength() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func host() (string, func([]lang.Value) (lang.Value, error)) {
+func host() (string, lang.Function) {
 	name := "host"
 	_, Headers := headers()
 	fn := func(args []lang.Value) (lang.Value, error) {
@@ -327,7 +327,7 @@ func host() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func scheme() (string, func([]lang.Value) (lang.Value, error)) {
+func scheme() (string, lang.Function) {
 	name := "scheme"
 	_, Headers := headers()
 	fn := func(args []lang.Value) (lang.Value, error) {
@@ -357,7 +357,7 @@ func scheme() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func port() (string, func([]lang.Value) (lang.Value, error)) {
+func port() (string, lang.Function) {
 	name := "port"
 	_, Scheme := scheme()
 	fn := func(args []lang.Value) (lang.Value, error) {
@@ -382,7 +382,7 @@ func port() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func cookies() (string, func([]lang.Value) (lang.Value, error)) {
+func cookies() (string, lang.Function) {
 	name := "cookies"
 	_, Headers := headers()
 	fn := func(args []lang.Value) (lang.Value, error) {
@@ -404,7 +404,7 @@ func cookies() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func cookie() (string, func([]lang.Value) (lang.Value, error)) {
+func cookie() (string, lang.Function) {
 	name := "cookie"
 	_, Cookies := cookies()
 	fn := func(args []lang.Value) (lang.Value, error) {
@@ -428,7 +428,7 @@ func cookie() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func referer() (string, func([]lang.Value) (lang.Value, error)) {
+func referer() (string, lang.Function) {
 	name := "referer"
 	_, Headers := headers()
 	fn := func(args []lang.Value) (lang.Value, error) {
@@ -447,7 +447,7 @@ func referer() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func authorization() (string, func([]lang.Value) (lang.Value, error)) {
+func authorization() (string, lang.Function) {
 	name := "authorization"
 	_, Headers := headers()
 	fn := func(args []lang.Value) (lang.Value, error) {
@@ -466,7 +466,7 @@ func authorization() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func accept() (string, func([]lang.Value) (lang.Value, error)) {
+func accept() (string, lang.Function) {
 	name := "accept"
 	_, Headers := headers()
 	fn := func(args []lang.Value) (lang.Value, error) {
@@ -485,7 +485,7 @@ func accept() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-var HttpFunctions = []func() (string, func([]lang.Value) (lang.Value, error)){
+var HttpFunctions = []func() (string, lang.Function){
 	header,
 	headers,
 	method,

@@ -9,7 +9,7 @@ import (
 	"github.com/vedadiyan/exql/lib"
 )
 
-func isValidIP() (string, func([]lang.Value) (lang.Value, error)) {
+func isValidIP() (string, lang.Function) {
 	name := "is_valid_ip"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -25,7 +25,7 @@ func isValidIP() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func isIPv4() (string, func([]lang.Value) (lang.Value, error)) {
+func isIPv4() (string, lang.Function) {
 	name := "is_ipv4"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -44,7 +44,7 @@ func isIPv4() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func isIPv6() (string, func([]lang.Value) (lang.Value, error)) {
+func isIPv6() (string, lang.Function) {
 	name := "is_ipv6"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -63,7 +63,7 @@ func isIPv6() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func isPrivateIP() (string, func([]lang.Value) (lang.Value, error)) {
+func isPrivateIP() (string, lang.Function) {
 	name := "is_private_ip"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -82,7 +82,7 @@ func isPrivateIP() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func isLoopbackIP() (string, func([]lang.Value) (lang.Value, error)) {
+func isLoopbackIP() (string, lang.Function) {
 	name := "is_loopback_ip"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -101,7 +101,7 @@ func isLoopbackIP() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func isMulticastIP() (string, func([]lang.Value) (lang.Value, error)) {
+func isMulticastIP() (string, lang.Function) {
 	name := "is_multicast_ip"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -120,7 +120,7 @@ func isMulticastIP() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func isLinkLocalIP() (string, func([]lang.Value) (lang.Value, error)) {
+func isLinkLocalIP() (string, lang.Function) {
 	name := "is_link_local_ip"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -139,7 +139,7 @@ func isLinkLocalIP() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func cidrMatch() (string, func([]lang.Value) (lang.Value, error)) {
+func cidrMatch() (string, lang.Function) {
 	name := "cidr_match"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -168,7 +168,7 @@ func cidrMatch() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func cidrContains() (string, func([]lang.Value) (lang.Value, error)) {
+func cidrContains() (string, lang.Function) {
 	name := "cidr_contains"
 	_, cidrMatch := cidrMatch()
 	fn := func(args []lang.Value) (lang.Value, error) {
@@ -177,7 +177,7 @@ func cidrContains() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func ipInRange() (string, func([]lang.Value) (lang.Value, error)) {
+func ipInRange() (string, lang.Function) {
 	name := "ip_in_range"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 3 {
@@ -225,7 +225,7 @@ func ipInRange() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func cidrNetworkAddress() (string, func([]lang.Value) (lang.Value, error)) {
+func cidrNetworkAddress() (string, lang.Function) {
 	name := "cidr_network"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -246,7 +246,7 @@ func cidrNetworkAddress() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func cidrBroadcastAddress() (string, func([]lang.Value) (lang.Value, error)) {
+func cidrBroadcastAddress() (string, lang.Function) {
 	name := "cidr_broadcast"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -275,7 +275,7 @@ func cidrBroadcastAddress() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func cidrHostCount() (string, func([]lang.Value) (lang.Value, error)) {
+func cidrHostCount() (string, lang.Function) {
 	name := "cidr_host_count"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -312,7 +312,7 @@ func cidrHostCount() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func cidrSubnets() (string, func([]lang.Value) (lang.Value, error)) {
+func cidrSubnets() (string, lang.Function) {
 	name := "cidr_subnets"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -357,7 +357,7 @@ func cidrSubnets() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func normalizeIP() (string, func([]lang.Value) (lang.Value, error)) {
+func normalizeIP() (string, lang.Function) {
 	name := "normalize_ip"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -376,7 +376,7 @@ func normalizeIP() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func expandIPv6() (string, func([]lang.Value) (lang.Value, error)) {
+func expandIPv6() (string, lang.Function) {
 	name := "expand_ipv6"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -406,7 +406,7 @@ func expandIPv6() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func compressIPv6() (string, func([]lang.Value) (lang.Value, error)) {
+func compressIPv6() (string, lang.Function) {
 	name := "compress_ipv6"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -428,7 +428,7 @@ func compressIPv6() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func ipToInt() (string, func([]lang.Value) (lang.Value, error)) {
+func ipToInt() (string, lang.Function) {
 	name := "ip_to_int"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -447,7 +447,7 @@ func ipToInt() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func intToIP() (string, func([]lang.Value) (lang.Value, error)) {
+func intToIP() (string, lang.Function) {
 	name := "int_to_ip"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -464,7 +464,7 @@ func intToIP() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func reverseIP() (string, func([]lang.Value) (lang.Value, error)) {
+func reverseIP() (string, lang.Function) {
 	name := "reverse_ip"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -497,7 +497,7 @@ func reverseIP() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func isRFC1918() (string, func([]lang.Value) (lang.Value, error)) {
+func isRFC1918() (string, lang.Function) {
 	name := "is_rfc1918"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -548,7 +548,7 @@ func compareIPv6(a, b net.IP) int {
 	return 0
 }
 
-var IpFunctions = []func() (string, func([]lang.Value) (lang.Value, error)){
+var IpFunctions = []func() (string, lang.Function){
 	isValidIP,
 	isIPv4,
 	isIPv6,

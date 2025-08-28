@@ -11,7 +11,7 @@ import (
 )
 
 // Basic Map Operations
-func keys() (string, func([]lang.Value) (lang.Value, error)) {
+func keys() (string, lang.Function) {
 	name := "keys"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -37,7 +37,7 @@ func keys() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func values() (string, func([]lang.Value) (lang.Value, error)) {
+func values() (string, lang.Function) {
 	name := "values"
 	_, Keys := keys()
 	fn := func(args []lang.Value) (lang.Value, error) {
@@ -67,7 +67,7 @@ func values() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func size() (string, func([]lang.Value) (lang.Value, error)) {
+func size() (string, lang.Function) {
 	name := "map_size"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -82,7 +82,7 @@ func size() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func isEmpty() (string, func([]lang.Value) (lang.Value, error)) {
+func isEmpty() (string, lang.Function) {
 	name := "map_is_empty"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -97,7 +97,7 @@ func isEmpty() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func has() (string, func([]lang.Value) (lang.Value, error)) {
+func has() (string, lang.Function) {
 	name := "has"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -119,7 +119,7 @@ func has() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func get() (string, func([]lang.Value) (lang.Value, error)) {
+func get() (string, lang.Function) {
 	name := "map_get"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 2 || len(args) > 3 {
@@ -149,7 +149,7 @@ func get() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func set() (string, func([]lang.Value) (lang.Value, error)) {
+func set() (string, lang.Function) {
 	name := "map_set"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 3 {
@@ -179,7 +179,7 @@ func set() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func remove() (string, func([]lang.Value) (lang.Value, error)) {
+func remove() (string, lang.Function) {
 	name := "map_delete"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -209,7 +209,7 @@ func remove() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func merge() (string, func([]lang.Value) (lang.Value, error)) {
+func merge() (string, lang.Function) {
 	name := "merge"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) == 0 {
@@ -233,7 +233,7 @@ func merge() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func mergeDeep() (string, func([]lang.Value) (lang.Value, error)) {
+func mergeDeep() (string, lang.Function) {
 	name := "merge_deep"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) == 0 {
@@ -300,7 +300,7 @@ func deepCopyValue(v lang.Value) lang.Value {
 }
 
 // Map Transformation
-func invert() (string, func([]lang.Value) (lang.Value, error)) {
+func invert() (string, lang.Function) {
 	name := "map_invert"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -322,7 +322,7 @@ func invert() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func filter() (string, func([]lang.Value) (lang.Value, error)) {
+func filter() (string, lang.Function) {
 	name := "map_filter"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -346,7 +346,7 @@ func filter() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func filterKeys() (string, func([]lang.Value) (lang.Value, error)) {
+func filterKeys() (string, lang.Function) {
 	name := "map_filter_keys"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -385,7 +385,7 @@ func filterKeys() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func omitKeys() (string, func([]lang.Value) (lang.Value, error)) {
+func omitKeys() (string, lang.Function) {
 	name := "map_omit_keys"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -424,7 +424,7 @@ func omitKeys() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func rename() (string, func([]lang.Value) (lang.Value, error)) {
+func rename() (string, lang.Function) {
 	name := "map_rename"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -460,7 +460,7 @@ func rename() (string, func([]lang.Value) (lang.Value, error)) {
 }
 
 // Map Conversion
-func toList() (string, func([]lang.Value) (lang.Value, error)) {
+func toList() (string, lang.Function) {
 	name := "map_to_list"
 	_, Keys := keys()
 	fn := func(args []lang.Value) (lang.Value, error) {
@@ -491,7 +491,7 @@ func toList() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func fromList() (string, func([]lang.Value) (lang.Value, error)) {
+func fromList() (string, lang.Function) {
 	name := "map_from_list"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -526,7 +526,7 @@ func fromList() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func toQueryString() (string, func([]lang.Value) (lang.Value, error)) {
+func toQueryString() (string, lang.Function) {
 	name := "map_to_query_string"
 	_, Keys := keys()
 	fn := func(args []lang.Value) (lang.Value, error) {
@@ -574,7 +574,7 @@ func toQueryString() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func fromQueryString() (string, func([]lang.Value) (lang.Value, error)) {
+func fromQueryString() (string, lang.Function) {
 	name := "map_from_query_string"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -618,7 +618,7 @@ func fromQueryString() (string, func([]lang.Value) (lang.Value, error)) {
 }
 
 // Map Path Operations (dot notation)
-func getPath() (string, func([]lang.Value) (lang.Value, error)) {
+func getPath() (string, lang.Function) {
 	name := "map_get_path"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 2 || len(args) > 3 {
@@ -664,7 +664,7 @@ func getPath() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func setPath() (string, func([]lang.Value) (lang.Value, error)) {
+func setPath() (string, lang.Function) {
 	name := "map_set_path"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 3 {
@@ -720,7 +720,7 @@ func setPath() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func hasPath() (string, func([]lang.Value) (lang.Value, error)) {
+func hasPath() (string, lang.Function) {
 	name := "map_has_path"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -760,7 +760,7 @@ func hasPath() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func deletePath() (string, func([]lang.Value) (lang.Value, error)) {
+func deletePath() (string, lang.Function) {
 	name := "map_delete_path"
 	_, Delete := remove()
 	fn := func(args []lang.Value) (lang.Value, error) {
@@ -855,7 +855,7 @@ func isNullValueForMap(v lang.Value) bool {
 	}
 }
 
-var MapFunctions = []func() (string, func([]lang.Value) (lang.Value, error)){
+var MapFunctions = []func() (string, lang.Function){
 	// Basic operations
 	keys,
 	values,

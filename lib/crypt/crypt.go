@@ -18,7 +18,7 @@ import (
 )
 
 // Base64 Functions
-func base64Encode() (string, func([]lang.Value) (lang.Value, error)) {
+func base64Encode() (string, lang.Function) {
 	name := "base64_encode"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -33,7 +33,7 @@ func base64Encode() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func base64Decode() (string, func([]lang.Value) (lang.Value, error)) {
+func base64Decode() (string, lang.Function) {
 	name := "base64_decode"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -52,7 +52,7 @@ func base64Decode() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func base64UrlEncode() (string, func([]lang.Value) (lang.Value, error)) {
+func base64UrlEncode() (string, lang.Function) {
 	name := "base64_url_encode"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -67,7 +67,7 @@ func base64UrlEncode() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func base64UrlDecode() (string, func([]lang.Value) (lang.Value, error)) {
+func base64UrlDecode() (string, lang.Function) {
 	name := "base64_url_decode"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -87,7 +87,7 @@ func base64UrlDecode() (string, func([]lang.Value) (lang.Value, error)) {
 }
 
 // Hex Functions
-func hexEncode() (string, func([]lang.Value) (lang.Value, error)) {
+func hexEncode() (string, lang.Function) {
 	name := "hex_encode"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -102,7 +102,7 @@ func hexEncode() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func hexDecode() (string, func([]lang.Value) (lang.Value, error)) {
+func hexDecode() (string, lang.Function) {
 	name := "hex_decode"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -122,7 +122,7 @@ func hexDecode() (string, func([]lang.Value) (lang.Value, error)) {
 }
 
 // Hash Functions
-func hashMD5() (string, func([]lang.Value) (lang.Value, error)) {
+func hashMD5() (string, lang.Function) {
 	name := "hash_md5"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -138,7 +138,7 @@ func hashMD5() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func hashSHA1() (string, func([]lang.Value) (lang.Value, error)) {
+func hashSHA1() (string, lang.Function) {
 	name := "hash_sha1"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -154,7 +154,7 @@ func hashSHA1() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func hashSHA224() (string, func([]lang.Value) (lang.Value, error)) {
+func hashSHA224() (string, lang.Function) {
 	name := "hash_sha224"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -170,7 +170,7 @@ func hashSHA224() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func hashSHA256() (string, func([]lang.Value) (lang.Value, error)) {
+func hashSHA256() (string, lang.Function) {
 	name := "hash_sha256"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -186,7 +186,7 @@ func hashSHA256() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func hashSHA384() (string, func([]lang.Value) (lang.Value, error)) {
+func hashSHA384() (string, lang.Function) {
 	name := "hash_sha384"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -202,7 +202,7 @@ func hashSHA384() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func hashSHA512() (string, func([]lang.Value) (lang.Value, error)) {
+func hashSHA512() (string, lang.Function) {
 	name := "hash_sha512"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -218,7 +218,7 @@ func hashSHA512() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func hashCRC32() (string, func([]lang.Value) (lang.Value, error)) {
+func hashCRC32() (string, lang.Function) {
 	name := "hash_crc32"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -235,7 +235,7 @@ func hashCRC32() (string, func([]lang.Value) (lang.Value, error)) {
 }
 
 // HMAC Functions
-func hmacMD5() (string, func([]lang.Value) (lang.Value, error)) {
+func hmacMD5() (string, lang.Function) {
 	name := "hmac_md5"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -257,7 +257,7 @@ func hmacMD5() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func hmacSHA1() (string, func([]lang.Value) (lang.Value, error)) {
+func hmacSHA1() (string, lang.Function) {
 	name := "hmac_sha1"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -279,7 +279,7 @@ func hmacSHA1() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func hmacSHA256() (string, func([]lang.Value) (lang.Value, error)) {
+func hmacSHA256() (string, lang.Function) {
 	name := "hmac_sha256"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -301,7 +301,7 @@ func hmacSHA256() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func hmacSHA512() (string, func([]lang.Value) (lang.Value, error)) {
+func hmacSHA512() (string, lang.Function) {
 	name := "hmac_sha512"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -324,7 +324,7 @@ func hmacSHA512() (string, func([]lang.Value) (lang.Value, error)) {
 }
 
 // Binary/ASCII Functions
-func binary() (string, func([]lang.Value) (lang.Value, error)) {
+func binary() (string, lang.Function) {
 	name := "to_binary"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -350,7 +350,7 @@ func binary() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func fromBinary() (string, func([]lang.Value) (lang.Value, error)) {
+func fromBinary() (string, lang.Function) {
 	name := "from_binary"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -385,7 +385,7 @@ func fromBinary() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func octal() (string, func([]lang.Value) (lang.Value, error)) {
+func octal() (string, lang.Function) {
 	name := "to_octal"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -402,7 +402,7 @@ func octal() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func fromOctal() (string, func([]lang.Value) (lang.Value, error)) {
+func fromOctal() (string, lang.Function) {
 	name := "from_octal"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -424,7 +424,7 @@ func fromOctal() (string, func([]lang.Value) (lang.Value, error)) {
 }
 
 // ASCII Functions
-func toASCII() (string, func([]lang.Value) (lang.Value, error)) {
+func toASCII() (string, lang.Function) {
 	name := "to_ascii"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -446,7 +446,7 @@ func toASCII() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func fromASCII() (string, func([]lang.Value) (lang.Value, error)) {
+func fromASCII() (string, lang.Function) {
 	name := "from_ascii"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -477,7 +477,7 @@ func fromASCII() (string, func([]lang.Value) (lang.Value, error)) {
 }
 
 // URL-safe encoding functions
-func base32Encode() (string, func([]lang.Value) (lang.Value, error)) {
+func base32Encode() (string, lang.Function) {
 	name := "base32_encode"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -493,7 +493,7 @@ func base32Encode() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func base32Decode() (string, func([]lang.Value) (lang.Value, error)) {
+func base32Decode() (string, lang.Function) {
 	name := "base32_decode"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -513,7 +513,7 @@ func base32Decode() (string, func([]lang.Value) (lang.Value, error)) {
 }
 
 // Escape/Unescape Functions
-func htmlEscape() (string, func([]lang.Value) (lang.Value, error)) {
+func htmlEscape() (string, lang.Function) {
 	name := "html_escape"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -536,7 +536,7 @@ func htmlEscape() (string, func([]lang.Value) (lang.Value, error)) {
 	return name, fn
 }
 
-func htmlUnescape() (string, func([]lang.Value) (lang.Value, error)) {
+func htmlUnescape() (string, lang.Function) {
 	name := "html_unescape"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -561,7 +561,7 @@ func htmlUnescape() (string, func([]lang.Value) (lang.Value, error)) {
 }
 
 // Hash verification functions
-func hashVerify() (string, func([]lang.Value) (lang.Value, error)) {
+func hashVerify() (string, lang.Function) {
 	name := "hash_verify"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 3 {
@@ -672,7 +672,7 @@ func base32DecodeString(s string) []byte {
 	return result
 }
 
-var EncodingFunctions = []func() (string, func([]lang.Value) (lang.Value, error)){
+var EncodingFunctions = []func() (string, lang.Function){
 	base64Encode,
 	base64Decode,
 	base64UrlEncode,

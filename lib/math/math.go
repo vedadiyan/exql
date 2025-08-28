@@ -12,775 +12,957 @@ import (
 	"github.com/vedadiyan/exql/lib"
 )
 
-// Math Functions
-// These functions provide comprehensive mathematical operations and calculations
-
-// Basic Math Functions
-func mathAbs(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("abs: expected 1 argument")
-	}
-	num, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("abs: %w", err)
-	}
-	return lang.NumberValue(math.Abs(num)), nil
+func argumentError(name string, expected int) error {
+	return fmt.Errorf("%s: expected %d argument(s)", name, expected)
 }
 
-func mathSign(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("sign: expected 1 argument")
-	}
-	num, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("sign: %w", err)
-	}
-	if num > 0 {
-		return lang.NumberValue(1), nil
-	} else if num < 0 {
-		return lang.NumberValue(-1), nil
-	}
-	return lang.NumberValue(0), nil
+func argumentErrorMin(name string, expected int) error {
+	return fmt.Errorf("%s: expected at least %d argument(s)", name, expected)
 }
 
-func mathMax(args []lang.Value) (lang.Value, error) {
-	if len(args) == 0 {
-		return nil, errors.New("max: expected at least 1 argument")
-	}
-	max, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("max: argument 0 %w", err)
-	}
-	for i := 1; i < len(args); i++ {
-		val, err := lib.ToNumber(args[i])
+func argumentErrorRange(name string, min, max int) error {
+	return fmt.Errorf("%s: expected %d or %d arguments", name, min, max)
+}
+
+func argumentErrorMultiRange(name string, expected []int) error {
+	return fmt.Errorf("%s: expected %v arguments", name, expected)
+}
+
+func Abs() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "abs"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		num, err := lib.ToNumber(args[0])
 		if err != nil {
-			return nil, fmt.Errorf("max: argument %d %w", i, err)
+			return nil, fmt.Errorf("%s: %w", name, err)
 		}
-		if val > max {
-			max = val
-		}
+		return lang.NumberValue(math.Abs(num)), nil
 	}
-	return lang.NumberValue(max), nil
+	return name, fn
 }
 
-func mathMin(args []lang.Value) (lang.Value, error) {
-	if len(args) == 0 {
-		return nil, errors.New("min: expected at least 1 argument")
-	}
-	min, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("min: argument 0 %w", err)
-	}
-	for i := 1; i < len(args); i++ {
-		val, err := lib.ToNumber(args[i])
+func Sign() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "sign"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		num, err := lib.ToNumber(args[0])
 		if err != nil {
-			return nil, fmt.Errorf("min: argument %d %w", i, err)
+			return nil, fmt.Errorf("%s: %w", name, err)
 		}
-		if val < min {
-			min = val
+		if num > 0 {
+			return lang.NumberValue(1), nil
+		} else if num < 0 {
+			return lang.NumberValue(-1), nil
 		}
+		return lang.NumberValue(0), nil
 	}
-	return lang.NumberValue(min), nil
+	return name, fn
 }
 
-func mathClamp(args []lang.Value) (lang.Value, error) {
-	if len(args) != 3 {
-		return nil, errors.New("clamp: expected 3 arguments")
-	}
-	value, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("clamp: value %w", err)
-	}
-	min, err := lib.ToNumber(args[1])
-	if err != nil {
-		return nil, fmt.Errorf("clamp: min %w", err)
-	}
-	max, err := lib.ToNumber(args[2])
-	if err != nil {
-		return nil, fmt.Errorf("clamp: max %w", err)
-	}
-
-	if value < min {
-		return lang.NumberValue(min), nil
-	}
-	if value > max {
+func Max() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "max"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) == 0 {
+			return nil, argumentErrorMin(name, 1)
+		}
+		max, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: argument 0 %w", name, err)
+		}
+		for i := 1; i < len(args); i++ {
+			val, err := lib.ToNumber(args[i])
+			if err != nil {
+				return nil, fmt.Errorf("%s: argument %d %w", name, i, err)
+			}
+			if val > max {
+				max = val
+			}
+		}
 		return lang.NumberValue(max), nil
 	}
-	return lang.NumberValue(value), nil
+	return name, fn
 }
 
-// Rounding Functions
-func mathCeil(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("ceil: expected 1 argument")
-	}
-	num, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("ceil: %w", err)
-	}
-	return lang.NumberValue(math.Ceil(num)), nil
-}
-
-func mathFloor(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("floor: expected 1 argument")
-	}
-	num, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("floor: %w", err)
-	}
-	return lang.NumberValue(math.Floor(num)), nil
-}
-
-func mathRound(args []lang.Value) (lang.Value, error) {
-	if len(args) < 1 || len(args) > 2 {
-		return nil, errors.New("round: expected 1 or 2 arguments")
-	}
-
-	value, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("round: value %w", err)
-	}
-	precision := 0
-
-	if len(args) == 2 {
-		precisionFloat, err := lib.ToNumber(args[1])
-		if err != nil {
-			return nil, fmt.Errorf("round: precision %w", err)
+func Min() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "min"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) == 0 {
+			return nil, argumentErrorMin(name, 1)
 		}
-		precision = int(precisionFloat)
+		min, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: argument 0 %w", name, err)
+		}
+		for i := 1; i < len(args); i++ {
+			val, err := lib.ToNumber(args[i])
+			if err != nil {
+				return nil, fmt.Errorf("%s: argument %d %w", name, i, err)
+			}
+			if val < min {
+				min = val
+			}
+		}
+		return lang.NumberValue(min), nil
 	}
-
-	if precision == 0 {
-		return lang.NumberValue(math.Round(value)), nil
-	}
-
-	multiplier := math.Pow(10, float64(precision))
-	return lang.NumberValue(math.Round(value*multiplier) / multiplier), nil
+	return name, fn
 }
 
-func mathTrunc(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("trunc: expected 1 argument")
+func Clamp() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "clamp"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 3 {
+			return nil, argumentError(name, 3)
+		}
+		value, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: value %w", name, err)
+		}
+		min, err := lib.ToNumber(args[1])
+		if err != nil {
+			return nil, fmt.Errorf("%s: min %w", name, err)
+		}
+		max, err := lib.ToNumber(args[2])
+		if err != nil {
+			return nil, fmt.Errorf("%s: max %w", name, err)
+		}
+		if value < min {
+			return lang.NumberValue(min), nil
+		}
+		if value > max {
+			return lang.NumberValue(max), nil
+		}
+		return lang.NumberValue(value), nil
 	}
-	num, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("trunc: %w", err)
-	}
-	return lang.NumberValue(math.Trunc(num)), nil
+	return name, fn
 }
 
-// Power and Root Functions
-func mathPow(args []lang.Value) (lang.Value, error) {
-	if len(args) != 2 {
-		return nil, errors.New("pow: expected 2 arguments")
+func Ceil() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "ceil"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		num, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", name, err)
+		}
+		return lang.NumberValue(math.Ceil(num)), nil
 	}
-	base, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("pow: base %w", err)
-	}
-	exponent, err := lib.ToNumber(args[1])
-	if err != nil {
-		return nil, fmt.Errorf("pow: exponent %w", err)
-	}
-	return lang.NumberValue(math.Pow(base, exponent)), nil
+	return name, fn
 }
 
-func mathSqrt(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("sqrt: expected 1 argument")
+func Floor() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "floor"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		num, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", name, err)
+		}
+		return lang.NumberValue(math.Floor(num)), nil
 	}
-	num, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("sqrt: %w", err)
-	}
-	if num < 0 {
-		return lang.NumberValue(math.NaN()), nil
-	}
-	return lang.NumberValue(math.Sqrt(num)), nil
+	return name, fn
 }
 
-func mathCbrt(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("cbrt: expected 1 argument")
+func Round() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "round"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) < 1 || len(args) > 2 {
+			return nil, argumentErrorRange(name, 1, 2)
+		}
+		value, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: value %w", name, err)
+		}
+		precision := 0
+		if len(args) == 2 {
+			precisionFloat, err := lib.ToNumber(args[1])
+			if err != nil {
+				return nil, fmt.Errorf("%s: precision %w", name, err)
+			}
+			precision = int(precisionFloat)
+		}
+		if precision == 0 {
+			return lang.NumberValue(math.Round(value)), nil
+		}
+		multiplier := math.Pow(10, float64(precision))
+		return lang.NumberValue(math.Round(value*multiplier) / multiplier), nil
 	}
-	num, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("cbrt: %w", err)
-	}
-	return lang.NumberValue(math.Cbrt(num)), nil
+	return name, fn
 }
 
-func mathExp(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("exp: expected 1 argument")
+func Trunc() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "trunc"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		num, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", name, err)
+		}
+		return lang.NumberValue(math.Trunc(num)), nil
 	}
-	num, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("exp: %w", err)
-	}
-	return lang.NumberValue(math.Exp(num)), nil
+	return name, fn
 }
 
-func mathExp2(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("exp2: expected 1 argument")
+func Pow() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "pow"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 2 {
+			return nil, argumentError(name, 2)
+		}
+		base, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: base %w", name, err)
+		}
+		exponent, err := lib.ToNumber(args[1])
+		if err != nil {
+			return nil, fmt.Errorf("%s: exponent %w", name, err)
+		}
+		return lang.NumberValue(math.Pow(base, exponent)), nil
 	}
-	num, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("exp2: %w", err)
-	}
-	return lang.NumberValue(math.Exp2(num)), nil
+	return name, fn
 }
 
-// Logarithmic Functions
-func mathLog(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("log: expected 1 argument")
+func Sqrt() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "sqrt"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		num, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", name, err)
+		}
+		if num < 0 {
+			return lang.NumberValue(math.NaN()), nil
+		}
+		return lang.NumberValue(math.Sqrt(num)), nil
 	}
-	num, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("log: %w", err)
-	}
-	if num <= 0 {
-		return lang.NumberValue(math.NaN()), nil
-	}
-	return lang.NumberValue(math.Log(num)), nil
+	return name, fn
 }
 
-func mathLog10(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("log10: expected 1 argument")
+func Cbrt() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "cbrt"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		num, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", name, err)
+		}
+		return lang.NumberValue(math.Cbrt(num)), nil
 	}
-	num, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("log10: %w", err)
-	}
-	if num <= 0 {
-		return lang.NumberValue(math.NaN()), nil
-	}
-	return lang.NumberValue(math.Log10(num)), nil
+	return name, fn
 }
 
-func mathLog2(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("log2: expected 1 argument")
+func Exp() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "exp"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		num, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", name, err)
+		}
+		return lang.NumberValue(math.Exp(num)), nil
 	}
-	num, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("log2: %w", err)
-	}
-	if num <= 0 {
-		return lang.NumberValue(math.NaN()), nil
-	}
-	return lang.NumberValue(math.Log2(num)), nil
+	return name, fn
 }
 
-// Trigonometric Functions (angles in radians)
-func mathSin(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("sin: expected 1 argument")
+func Exp2() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "exp2"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		num, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", name, err)
+		}
+		return lang.NumberValue(math.Exp2(num)), nil
 	}
-	num, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("sin: %w", err)
-	}
-	return lang.NumberValue(math.Sin(num)), nil
+	return name, fn
 }
 
-func mathCos(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("cos: expected 1 argument")
+func Log() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "log"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		num, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", name, err)
+		}
+		if num <= 0 {
+			return lang.NumberValue(math.NaN()), nil
+		}
+		return lang.NumberValue(math.Log(num)), nil
 	}
-	num, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("cos: %w", err)
-	}
-	return lang.NumberValue(math.Cos(num)), nil
+	return name, fn
 }
 
-func mathTan(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("tan: expected 1 argument")
+func Log10() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "log10"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		num, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", name, err)
+		}
+		if num <= 0 {
+			return lang.NumberValue(math.NaN()), nil
+		}
+		return lang.NumberValue(math.Log10(num)), nil
 	}
-	num, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("tan: %w", err)
-	}
-	return lang.NumberValue(math.Tan(num)), nil
+	return name, fn
 }
 
-func mathAsin(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("asin: expected 1 argument")
+func Log2() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "log2"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		num, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", name, err)
+		}
+		if num <= 0 {
+			return lang.NumberValue(math.NaN()), nil
+		}
+		return lang.NumberValue(math.Log2(num)), nil
 	}
-	num, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("asin: %w", err)
-	}
-	if num < -1 || num > 1 {
-		return lang.NumberValue(math.NaN()), nil
-	}
-	return lang.NumberValue(math.Asin(num)), nil
+	return name, fn
 }
 
-func mathAcos(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("acos: expected 1 argument")
+func Sin() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "sin"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		num, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", name, err)
+		}
+		return lang.NumberValue(math.Sin(num)), nil
 	}
-	num, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("acos: %w", err)
-	}
-	if num < -1 || num > 1 {
-		return lang.NumberValue(math.NaN()), nil
-	}
-	return lang.NumberValue(math.Acos(num)), nil
+	return name, fn
 }
 
-func mathAtan(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("atan: expected 1 argument")
+func Cos() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "cos"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		num, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", name, err)
+		}
+		return lang.NumberValue(math.Cos(num)), nil
 	}
-	num, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("atan: %w", err)
-	}
-	return lang.NumberValue(math.Atan(num)), nil
+	return name, fn
 }
 
-func mathAtan2(args []lang.Value) (lang.Value, error) {
-	if len(args) != 2 {
-		return nil, errors.New("atan2: expected 2 arguments")
+func Tan() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "tan"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		num, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", name, err)
+		}
+		return lang.NumberValue(math.Tan(num)), nil
 	}
-	y, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("atan2: y %w", err)
-	}
-	x, err := lib.ToNumber(args[1])
-	if err != nil {
-		return nil, fmt.Errorf("atan2: x %w", err)
-	}
-	return lang.NumberValue(math.Atan2(y, x)), nil
+	return name, fn
 }
 
-// Hyperbolic Functions
-func mathSinh(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("sinh: expected 1 argument")
+func Asin() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "asin"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		num, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", name, err)
+		}
+		if num < -1 || num > 1 {
+			return lang.NumberValue(math.NaN()), nil
+		}
+		return lang.NumberValue(math.Asin(num)), nil
 	}
-	num, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("sinh: %w", err)
-	}
-	return lang.NumberValue(math.Sinh(num)), nil
+	return name, fn
 }
 
-func mathCosh(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("cosh: expected 1 argument")
+func Acos() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "acos"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		num, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", name, err)
+		}
+		if num < -1 || num > 1 {
+			return lang.NumberValue(math.NaN()), nil
+		}
+		return lang.NumberValue(math.Acos(num)), nil
 	}
-	num, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("cosh: %w", err)
-	}
-	return lang.NumberValue(math.Cosh(num)), nil
+	return name, fn
 }
 
-func mathTanh(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("tanh: expected 1 argument")
+func Atan() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "atan"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		num, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", name, err)
+		}
+		return lang.NumberValue(math.Atan(num)), nil
 	}
-	num, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("tanh: %w", err)
-	}
-	return lang.NumberValue(math.Tanh(num)), nil
+	return name, fn
 }
 
-// Angle Conversion
-func mathRadians(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("radians: expected 1 argument")
+func Atan2() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "atan2"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 2 {
+			return nil, argumentError(name, 2)
+		}
+		y, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: y %w", name, err)
+		}
+		x, err := lib.ToNumber(args[1])
+		if err != nil {
+			return nil, fmt.Errorf("%s: x %w", name, err)
+		}
+		return lang.NumberValue(math.Atan2(y, x)), nil
 	}
-	degrees, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("radians: %w", err)
-	}
-	return lang.NumberValue(degrees * math.Pi / 180), nil
+	return name, fn
 }
 
-func mathDegrees(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("degrees: expected 1 argument")
+func Sinh() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "sinh"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		num, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", name, err)
+		}
+		return lang.NumberValue(math.Sinh(num)), nil
 	}
-	radians, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("degrees: %w", err)
-	}
-	return lang.NumberValue(radians * 180 / math.Pi), nil
+	return name, fn
 }
 
-// Statistical Functions
-func mathSum(args []lang.Value) (lang.Value, error) {
-	sum := 0.0
-	for i, arg := range args {
-		if list, ok := arg.(lang.ListValue); ok {
-			for j, item := range list {
-				val, err := lib.ToNumber(item)
+func Cosh() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "cosh"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		num, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", name, err)
+		}
+		return lang.NumberValue(math.Cosh(num)), nil
+	}
+	return name, fn
+}
+
+func Tanh() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "tanh"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		num, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", name, err)
+		}
+		return lang.NumberValue(math.Tanh(num)), nil
+	}
+	return name, fn
+}
+
+func Radians() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "radians"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		degrees, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", name, err)
+		}
+		return lang.NumberValue(degrees * math.Pi / 180), nil
+	}
+	return name, fn
+}
+
+func Degrees() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "degrees"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		radians, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", name, err)
+		}
+		return lang.NumberValue(radians * 180 / math.Pi), nil
+	}
+	return name, fn
+}
+
+func Sum() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "sum"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		sum := 0.0
+		for i, arg := range args {
+			if list, ok := arg.(lang.ListValue); ok {
+				for j, item := range list {
+					val, err := lib.ToNumber(item)
+					if err != nil {
+						return nil, fmt.Errorf("%s: list argument %d item %d %w", name, i, j, err)
+					}
+					sum += val
+				}
+			} else {
+				val, err := lib.ToNumber(arg)
 				if err != nil {
-					return nil, fmt.Errorf("sum: list argument %d item %d %w", i, j, err)
+					return nil, fmt.Errorf("%s: argument %d %w", name, i, err)
 				}
 				sum += val
 			}
-		} else {
-			val, err := lib.ToNumber(arg)
-			if err != nil {
-				return nil, fmt.Errorf("sum: argument %d %w", i, err)
-			}
-			sum += val
 		}
+		return lang.NumberValue(sum), nil
 	}
-	return lang.NumberValue(sum), nil
+	return name, fn
 }
 
-func mathMean(args []lang.Value) (lang.Value, error) {
-	if len(args) == 0 {
-		return nil, errors.New("mean: expected at least 1 argument")
-	}
-
-	count := 0
-	sum := 0.0
-
-	for i, arg := range args {
-		if list, ok := arg.(lang.ListValue); ok {
-			for j, item := range list {
-				val, err := lib.ToNumber(item)
+func Mean() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "mean"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) == 0 {
+			return nil, argumentErrorMin(name, 1)
+		}
+		count := 0
+		sum := 0.0
+		for i, arg := range args {
+			if list, ok := arg.(lang.ListValue); ok {
+				for j, item := range list {
+					val, err := lib.ToNumber(item)
+					if err != nil {
+						return nil, fmt.Errorf("%s: list argument %d item %d %w", name, i, j, err)
+					}
+					sum += val
+					count++
+				}
+			} else {
+				val, err := lib.ToNumber(arg)
 				if err != nil {
-					return nil, fmt.Errorf("mean: list argument %d item %d %w", i, j, err)
+					return nil, fmt.Errorf("%s: argument %d %w", name, i, err)
 				}
 				sum += val
 				count++
 			}
-		} else {
-			val, err := lib.ToNumber(arg)
-			if err != nil {
-				return nil, fmt.Errorf("mean: argument %d %w", i, err)
-			}
-			sum += val
-			count++
 		}
+		if count == 0 {
+			return nil, fmt.Errorf("%s: no numeric values found", name)
+		}
+		return lang.NumberValue(sum / float64(count)), nil
 	}
-
-	if count == 0 {
-		return nil, errors.New("mean: no numeric values found")
-	}
-	return lang.NumberValue(sum / float64(count)), nil
+	return name, fn
 }
 
-func mathMedian(args []lang.Value) (lang.Value, error) {
-	var values []float64
-
-	for i, arg := range args {
-		if list, ok := arg.(lang.ListValue); ok {
-			for j, item := range list {
-				val, err := lib.ToNumber(item)
+func Median() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "median"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		var values []float64
+		for i, arg := range args {
+			if list, ok := arg.(lang.ListValue); ok {
+				for j, item := range list {
+					val, err := lib.ToNumber(item)
+					if err != nil {
+						return nil, fmt.Errorf("%s: list argument %d item %d %w", name, i, j, err)
+					}
+					values = append(values, val)
+				}
+			} else {
+				val, err := lib.ToNumber(arg)
 				if err != nil {
-					return nil, fmt.Errorf("median: list argument %d item %d %w", i, j, err)
+					return nil, fmt.Errorf("%s: argument %d %w", name, i, err)
 				}
 				values = append(values, val)
 			}
-		} else {
-			val, err := lib.ToNumber(arg)
-			if err != nil {
-				return nil, fmt.Errorf("median: argument %d %w", i, err)
-			}
-			values = append(values, val)
 		}
+		if len(values) == 0 {
+			return nil, fmt.Errorf("%s: no numeric values found", name)
+		}
+		sort.Float64s(values)
+		n := len(values)
+		if n%2 == 0 {
+			return lang.NumberValue((values[n/2-1] + values[n/2]) / 2), nil
+		}
+		return lang.NumberValue(values[n/2]), nil
 	}
-
-	if len(values) == 0 {
-		return nil, errors.New("median: no numeric values found")
-	}
-
-	sort.Float64s(values)
-	n := len(values)
-
-	if n%2 == 0 {
-		return lang.NumberValue((values[n/2-1] + values[n/2]) / 2), nil
-	}
-	return lang.NumberValue(values[n/2]), nil
+	return name, fn
 }
 
-func mathMode(args []lang.Value) (lang.Value, error) {
-	frequency := make(map[float64]int)
-
-	for i, arg := range args {
-		if list, ok := arg.(lang.ListValue); ok {
-			for j, item := range list {
-				val, err := lib.ToNumber(item)
+func Mode() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "mode"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		frequency := make(map[float64]int)
+		for i, arg := range args {
+			if list, ok := arg.(lang.ListValue); ok {
+				for j, item := range list {
+					val, err := lib.ToNumber(item)
+					if err != nil {
+						return nil, fmt.Errorf("%s: list argument %d item %d %w", name, i, j, err)
+					}
+					frequency[val]++
+				}
+			} else {
+				val, err := lib.ToNumber(arg)
 				if err != nil {
-					return nil, fmt.Errorf("mode: list argument %d item %d %w", i, j, err)
+					return nil, fmt.Errorf("%s: argument %d %w", name, i, err)
 				}
 				frequency[val]++
 			}
-		} else {
-			val, err := lib.ToNumber(arg)
-			if err != nil {
-				return nil, fmt.Errorf("mode: argument %d %w", i, err)
+		}
+		if len(frequency) == 0 {
+			return nil, errors.New("mode: no numeric values found")
+		}
+		var mode float64
+		maxFreq := 0
+		for val, freq := range frequency {
+			if freq > maxFreq {
+				maxFreq = freq
+				mode = val
 			}
-			frequency[val]++
 		}
+		return lang.NumberValue(mode), nil
 	}
-
-	if len(frequency) == 0 {
-		return nil, errors.New("mode: no numeric values found")
-	}
-
-	var mode float64
-	maxFreq := 0
-
-	for val, freq := range frequency {
-		if freq > maxFreq {
-			maxFreq = freq
-			mode = val
-		}
-	}
-
-	return lang.NumberValue(mode), nil
+	return name, fn
 }
 
-func mathVariance(args []lang.Value) (lang.Value, error) {
-	meanVal, err := mathMean(args)
-	if err != nil {
-		return nil, fmt.Errorf("variance: %w", err)
-	}
-	mean, _ := lib.ToNumber(meanVal)
-
-	var values []float64
-	for i, arg := range args {
-		if list, ok := arg.(lang.ListValue); ok {
-			for j, item := range list {
-				val, err := lib.ToNumber(item)
+func Variance() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "variance"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		_, meanFunc := Mean()
+		meanVal, err := meanFunc(args)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", name, err)
+		}
+		mean, _ := lib.ToNumber(meanVal)
+		var values []float64
+		for i, arg := range args {
+			if list, ok := arg.(lang.ListValue); ok {
+				for j, item := range list {
+					val, err := lib.ToNumber(item)
+					if err != nil {
+						return nil, fmt.Errorf("%s: list argument %d item %d %w", name, i, j, err)
+					}
+					values = append(values, val)
+				}
+			} else {
+				val, err := lib.ToNumber(arg)
 				if err != nil {
-					return nil, fmt.Errorf("variance: list argument %d item %d %w", i, j, err)
+					return nil, fmt.Errorf("%s: argument %d %w", name, i, err)
 				}
 				values = append(values, val)
 			}
-		} else {
-			val, err := lib.ToNumber(arg)
-			if err != nil {
-				return nil, fmt.Errorf("variance: argument %d %w", i, err)
-			}
-			values = append(values, val)
 		}
-	}
-
-	if len(values) <= 1 {
-		return lang.NumberValue(0), nil
-	}
-
-	sumSquaredDiff := 0.0
-	for _, val := range values {
-		diff := val - mean
-		sumSquaredDiff += diff * diff
-	}
-
-	return lang.NumberValue(sumSquaredDiff / float64(len(values)-1)), nil
-}
-
-func mathStdDev(args []lang.Value) (lang.Value, error) {
-	varianceVal, err := mathVariance(args)
-	if err != nil {
-		return nil, fmt.Errorf("stddev: %w", err)
-	}
-	variance, _ := lib.ToNumber(varianceVal)
-	return lang.NumberValue(math.Sqrt(variance)), nil
-}
-
-// Random Functions
-func mathRandom(args []lang.Value) (lang.Value, error) {
-	if len(args) == 0 {
-		return lang.NumberValue(rand.Float64()), nil
-	}
-	if len(args) == 1 {
-		maxVal, err := lib.ToNumber(args[0])
-		if err != nil {
-			return nil, fmt.Errorf("random: max %w", err)
-		}
-		max := int(maxVal)
-		if max <= 0 {
+		if len(values) <= 1 {
 			return lang.NumberValue(0), nil
 		}
-		return lang.NumberValue(float64(rand.Intn(max))), nil
+		sumSquaredDiff := 0.0
+		for _, val := range values {
+			diff := val - mean
+			sumSquaredDiff += diff * diff
+		}
+		return lang.NumberValue(sumSquaredDiff / float64(len(values)-1)), nil
 	}
-	if len(args) == 2 {
-		minVal, err := lib.ToNumber(args[0])
+	return name, fn
+}
+
+func StdDev() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "stddev"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		_, varianceFunc := Variance()
+		varianceVal, err := varianceFunc(args)
 		if err != nil {
-			return nil, fmt.Errorf("random: min %w", err)
+			return nil, fmt.Errorf("%s: %w", name, err)
 		}
-		maxVal, err := lib.ToNumber(args[1])
+		variance, _ := lib.ToNumber(varianceVal)
+		return lang.NumberValue(math.Sqrt(variance)), nil
+	}
+	return name, fn
+}
+
+func Random() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "random"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) == 0 {
+			return lang.NumberValue(rand.Float64()), nil
+		}
+		if len(args) == 1 {
+			maxVal, err := lib.ToNumber(args[0])
+			if err != nil {
+				return nil, fmt.Errorf("%s: max %w", name, err)
+			}
+			max := int(maxVal)
+			if max <= 0 {
+				return lang.NumberValue(0), nil
+			}
+			return lang.NumberValue(float64(rand.Intn(max))), nil
+		}
+		if len(args) == 2 {
+			minVal, err := lib.ToNumber(args[0])
+			if err != nil {
+				return nil, fmt.Errorf("%s: min %w", name, err)
+			}
+			maxVal, err := lib.ToNumber(args[1])
+			if err != nil {
+				return nil, fmt.Errorf("%s: max %w", name, err)
+			}
+			min := int(minVal)
+			max := int(maxVal)
+			if max <= min {
+				return lang.NumberValue(float64(min)), nil
+			}
+			return lang.NumberValue(float64(rand.Intn(max-min) + min)), nil
+		}
+		return nil, argumentErrorMultiRange(name, []int{0, 1, 2})
+	}
+	return name, fn
+}
+
+func RandomSeed() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "random_seed"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) == 0 {
+			rand.Seed(time.Now().UnixNano())
+		} else if len(args) == 1 {
+			seedVal, err := lib.ToNumber(args[0])
+			if err != nil {
+				return nil, fmt.Errorf("%s: %w", name, err)
+			}
+			seed := int64(seedVal)
+			rand.Seed(seed)
+		} else {
+			return nil, argumentErrorRange(name, 0, 1)
+		}
+		return lang.BoolValue(true), nil
+	}
+	return name, fn
+}
+
+func RandomFloat() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "random_float"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) == 0 {
+			return lang.NumberValue(rand.Float64()), nil
+		}
+		if len(args) == 1 {
+			maxVal, err := lib.ToNumber(args[0])
+			if err != nil {
+				return nil, fmt.Errorf("%s: max %w", name, err)
+			}
+			return lang.NumberValue(rand.Float64() * maxVal), nil
+		}
+		if len(args) == 2 {
+			minVal, err := lib.ToNumber(args[0])
+			if err != nil {
+				return nil, fmt.Errorf("%s: min %w", name, err)
+			}
+			maxVal, err := lib.ToNumber(args[1])
+			if err != nil {
+				return nil, fmt.Errorf("%s: max %w", name, err)
+			}
+			return lang.NumberValue(minVal + rand.Float64()*(maxVal-minVal)), nil
+		}
+		return nil, argumentErrorMultiRange(name, []int{0, 1, 2})
+	}
+	return name, fn
+}
+
+func IsNaN() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "is_nan"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		num, err := lib.ToNumber(args[0])
 		if err != nil {
-			return nil, fmt.Errorf("random: max %w", err)
+			return nil, fmt.Errorf("%s: %w", name, err)
 		}
-		min := int(minVal)
-		max := int(maxVal)
-		if max <= min {
-			return lang.NumberValue(float64(min)), nil
-		}
-		return lang.NumberValue(float64(rand.Intn(max-min) + min)), nil
+		return lang.BoolValue(math.IsNaN(num)), nil
 	}
-	return nil, errors.New("random: expected 0, 1, or 2 arguments")
+	return name, fn
 }
 
-func mathRandomSeed(args []lang.Value) (lang.Value, error) {
-	if len(args) == 0 {
-		rand.Seed(time.Now().UnixNano())
-	} else if len(args) == 1 {
-		seedVal, err := lib.ToNumber(args[0])
+func IsInf() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "is_inf"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		num, err := lib.ToNumber(args[0])
 		if err != nil {
-			return nil, fmt.Errorf("random_seed: %w", err)
+			return nil, fmt.Errorf("%s: %w", name, err)
 		}
-		seed := int64(seedVal)
-		rand.Seed(seed)
-	} else {
-		return nil, errors.New("random_seed: expected 0 or 1 argument")
+		return lang.BoolValue(math.IsInf(num, 0)), nil
 	}
-	return lang.BoolValue(true), nil
+	return name, fn
 }
 
-func mathRandomFloat(args []lang.Value) (lang.Value, error) {
-	if len(args) == 0 {
-		return lang.NumberValue(rand.Float64()), nil
-	}
-	if len(args) == 1 {
-		maxVal, err := lib.ToNumber(args[0])
+func IsFinite() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "is_finite"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		num, err := lib.ToNumber(args[0])
 		if err != nil {
-			return nil, fmt.Errorf("random_float: max %w", err)
+			return nil, fmt.Errorf("%s: %w", name, err)
 		}
-		return lang.NumberValue(rand.Float64() * maxVal), nil
+		return lang.BoolValue(!math.IsNaN(num) && !math.IsInf(num, 0)), nil
 	}
-	if len(args) == 2 {
-		minVal, err := lib.ToNumber(args[0])
+	return name, fn
+}
+
+func GCD() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "gcd"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) < 2 {
+			return nil, argumentErrorMin(name, 2)
+		}
+		firstVal, err := lib.ToNumber(args[0])
 		if err != nil {
-			return nil, fmt.Errorf("random_float: min %w", err)
+			return nil, fmt.Errorf("%s: argument 0 %w", name, err)
 		}
-		maxVal, err := lib.ToNumber(args[1])
+		result := int(math.Abs(firstVal))
+		for i := 1; i < len(args); i++ {
+			val, err := lib.ToNumber(args[i])
+			if err != nil {
+				return nil, fmt.Errorf("%s: argument %d %w", name, i, err)
+			}
+			b := int(math.Abs(val))
+			result = gcd(result, b)
+		}
+		return lang.NumberValue(float64(result)), nil
+	}
+	return name, fn
+}
+
+func LCM() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "lcm"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) < 2 {
+			return nil, argumentErrorMin(name, 2)
+		}
+		firstVal, err := lib.ToNumber(args[0])
 		if err != nil {
-			return nil, fmt.Errorf("random_float: max %w", err)
+			return nil, fmt.Errorf("%s: argument 0 %w", name, err)
 		}
-		return lang.NumberValue(minVal + rand.Float64()*(maxVal-minVal)), nil
+		result := int(math.Abs(firstVal))
+		for i := 1; i < len(args); i++ {
+			val, err := lib.ToNumber(args[i])
+			if err != nil {
+				return nil, fmt.Errorf("%s: argument %d %w", name, i, err)
+			}
+			b := int(math.Abs(val))
+			result = lcm(result, b)
+		}
+		return lang.NumberValue(float64(result)), nil
 	}
-	return nil, errors.New("random_float: expected 0, 1, or 2 arguments")
+	return name, fn
 }
 
-// Utility Functions
-func mathIsNaN(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("is_nan: expected 1 argument")
-	}
-	num, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("is_nan: %w", err)
-	}
-	return lang.BoolValue(math.IsNaN(num)), nil
-}
-
-func mathIsInf(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("is_inf: expected 1 argument")
-	}
-	num, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("is_inf: %w", err)
-	}
-	return lang.BoolValue(math.IsInf(num, 0)), nil
-}
-
-func mathIsFinite(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("is_finite: expected 1 argument")
-	}
-	num, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("is_finite: %w", err)
-	}
-	return lang.BoolValue(!math.IsNaN(num) && !math.IsInf(num, 0)), nil
-}
-
-func mathGCD(args []lang.Value) (lang.Value, error) {
-	if len(args) < 2 {
-		return nil, errors.New("gcd: expected at least 2 arguments")
-	}
-
-	firstVal, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("gcd: argument 0 %w", err)
-	}
-	result := int(math.Abs(firstVal))
-
-	for i := 1; i < len(args); i++ {
-		val, err := lib.ToNumber(args[i])
+func Factorial() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "factorial"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		num, err := lib.ToNumber(args[0])
 		if err != nil {
-			return nil, fmt.Errorf("gcd: argument %d %w", i, err)
+			return nil, fmt.Errorf("%s: %w", name, err)
 		}
-		b := int(math.Abs(val))
-		result = gcd(result, b)
-	}
-
-	return lang.NumberValue(float64(result)), nil
-}
-
-func mathLCM(args []lang.Value) (lang.Value, error) {
-	if len(args) < 2 {
-		return nil, errors.New("lcm: expected at least 2 arguments")
-	}
-
-	firstVal, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("lcm: argument 0 %w", err)
-	}
-	result := int(math.Abs(firstVal))
-
-	for i := 1; i < len(args); i++ {
-		val, err := lib.ToNumber(args[i])
-		if err != nil {
-			return nil, fmt.Errorf("lcm: argument %d %w", i, err)
+		n := int(num)
+		if n < 0 {
+			return lang.NumberValue(math.NaN()), nil
 		}
-		b := int(math.Abs(val))
-		result = lcm(result, b)
+		if n == 0 || n == 1 {
+			return lang.NumberValue(1), nil
+		}
+		result := 1
+		for i := 2; i <= n; i++ {
+			result *= i
+		}
+		return lang.NumberValue(float64(result)), nil
 	}
-
-	return lang.NumberValue(float64(result)), nil
+	return name, fn
 }
 
-func mathFactorial(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("factorial: expected 1 argument")
+func Pi() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "pi"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 0 {
+			return nil, argumentError(name, 0)
+		}
+		return lang.NumberValue(math.Pi), nil
 	}
-
-	num, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("factorial: %w", err)
-	}
-	n := int(num)
-
-	if n < 0 {
-		return lang.NumberValue(math.NaN()), nil
-	}
-	if n == 0 || n == 1 {
-		return lang.NumberValue(1), nil
-	}
-
-	result := 1
-	for i := 2; i <= n; i++ {
-		result *= i
-	}
-
-	return lang.NumberValue(float64(result)), nil
+	return name, fn
 }
 
-// Helper functions
+func E() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "e"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 0 {
+			return nil, argumentError(name, 0)
+		}
+		return lang.NumberValue(math.E), nil
+	}
+	return name, fn
+}
+
+func Phi() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "phi"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 0 {
+			return nil, argumentError(name, 0)
+		}
+		return lang.NumberValue(math.Phi), nil
+	}
+	return name, fn
+}
+
 func gcd(a, b int) int {
 	for b != 0 {
 		a, b = b, a%b
@@ -795,97 +977,52 @@ func lcm(a, b int) int {
 	return a * b / gcd(a, b)
 }
 
-// Math Constants
-func mathPi(args []lang.Value) (lang.Value, error) {
-	if len(args) != 0 {
-		return nil, errors.New("pi: expected 0 arguments")
-	}
-	return lang.NumberValue(math.Pi), nil
-}
-
-func mathE(args []lang.Value) (lang.Value, error) {
-	if len(args) != 0 {
-		return nil, errors.New("e: expected 0 arguments")
-	}
-	return lang.NumberValue(math.E), nil
-}
-
-func mathPhi(args []lang.Value) (lang.Value, error) {
-	if len(args) != 0 {
-		return nil, errors.New("phi: expected 0 arguments")
-	}
-	return lang.NumberValue(math.Phi), nil
-}
-
-// Functions that would be in the BuiltinFunctions map:
-var MathFunctions = map[string]func([]lang.Value) (lang.Value, error){
-	// Basic operations
-	"abs":   mathAbs,
-	"sign":  mathSign,
-	"max":   mathMax,
-	"min":   mathMin,
-	"clamp": mathClamp,
-
-	// Rounding
-	"ceil":  mathCeil,
-	"floor": mathFloor,
-	"round": mathRound,
-	"trunc": mathTrunc,
-
-	// Power and roots
-	"pow":  mathPow,
-	"sqrt": mathSqrt,
-	"cbrt": mathCbrt,
-	"exp":  mathExp,
-	"exp2": mathExp2,
-
-	// Logarithms
-	"log":   mathLog,
-	"log10": mathLog10,
-	"log2":  mathLog2,
-
-	// Trigonometry
-	"sin":   mathSin,
-	"cos":   mathCos,
-	"tan":   mathTan,
-	"asin":  mathAsin,
-	"acos":  mathAcos,
-	"atan":  mathAtan,
-	"atan2": mathAtan2,
-
-	// Hyperbolic
-	"sinh": mathSinh,
-	"cosh": mathCosh,
-	"tanh": mathTanh,
-
-	// Angle conversion
-	"radians": mathRadians,
-	"degrees": mathDegrees,
-
-	// Statistics
-	"sum":      mathSum,
-	"mean":     mathMean,
-	"avg":      mathMean, // Alias
-	"median":   mathMedian,
-	"mode":     mathMode,
-	"variance": mathVariance,
-	"stddev":   mathStdDev,
-
-	// Random
-	"random":       mathRandom,
-	"random_seed":  mathRandomSeed,
-	"random_float": mathRandomFloat,
-
-	// Utilities
-	"is_nan":    mathIsNaN,
-	"is_inf":    mathIsInf,
-	"is_finite": mathIsFinite,
-	"gcd":       mathGCD,
-	"lcm":       mathLCM,
-	"factorial": mathFactorial,
-
-	// Constants
-	"pi":  mathPi,
-	"e":   mathE,
-	"phi": mathPhi,
+var MathFunctions = []func() (string, func([]lang.Value) (lang.Value, error)){
+	Abs,
+	Sign,
+	Max,
+	Min,
+	Clamp,
+	Ceil,
+	Floor,
+	Round,
+	Trunc,
+	Pow,
+	Sqrt,
+	Cbrt,
+	Exp,
+	Exp2,
+	Log,
+	Log10,
+	Log2,
+	Sin,
+	Cos,
+	Tan,
+	Asin,
+	Acos,
+	Atan,
+	Atan2,
+	Sinh,
+	Cosh,
+	Tanh,
+	Radians,
+	Degrees,
+	Sum,
+	Mean,
+	Median,
+	Mode,
+	Variance,
+	StdDev,
+	Random,
+	RandomSeed,
+	RandomFloat,
+	IsNaN,
+	IsInf,
+	IsFinite,
+	GCD,
+	LCM,
+	Factorial,
+	Pi,
+	E,
+	Phi,
 }

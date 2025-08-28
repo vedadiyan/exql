@@ -10,589 +10,695 @@ import (
 	"github.com/vedadiyan/exql/lib"
 )
 
-// Time/Date Functions
-// These functions provide comprehensive time and date manipulation capabilities
-
-func timeNow(args []lang.Value) (lang.Value, error) {
-	if len(args) != 0 {
-		return nil, errors.New("time_now: expected 0 arguments")
-	}
-	return lang.NumberValue(float64(time.Now().Unix())), nil
+func argumentError(name string, expected int) error {
+	return fmt.Errorf("%s: expected %d argument(s)", name, expected)
 }
 
-func timeNowMillis(args []lang.Value) (lang.Value, error) {
-	if len(args) != 0 {
-		return nil, errors.New("time_now_millis: expected 0 arguments")
-	}
-	return lang.NumberValue(float64(time.Now().UnixMilli())), nil
+func timeError(name string, value lang.Value) error {
+	return fmt.Errorf("%s: expected time, got %T", name, value)
 }
 
-func timeNowNanos(args []lang.Value) (lang.Value, error) {
-	if len(args) != 0 {
-		return nil, errors.New("time_now_nanos: expected 0 arguments")
-	}
-	return lang.NumberValue(float64(time.Now().UnixNano())), nil
-}
-
-func timeParse(args []lang.Value) (lang.Value, error) {
-	if len(args) < 1 || len(args) > 2 {
-		return nil, errors.New("time_parse: expected 1 or 2 arguments")
-	}
-
-	timeStr, err := lib.ToString(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("time_parse: time string %w", err)
-	}
-
-	layout := time.RFC3339 // Default layout
-	if len(args) == 2 {
-		layoutStr, err := lib.ToString(args[1])
-		if err != nil {
-			return nil, fmt.Errorf("time_parse: layout %w", err)
+func now() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "now"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 0 {
+			return nil, argumentError(name, 0)
 		}
-		layout = convertTimeLayout(string(layoutStr))
+		return lang.NumberValue(float64(time.Now().Unix())), nil
 	}
-
-	t, err := time.Parse(layout, string(timeStr))
-	if err != nil {
-		return nil, fmt.Errorf("time_parse: failed to parse time '%s' with layout '%s': %w", string(timeStr), layout, err)
-	}
-	return lang.NumberValue(float64(t.Unix())), nil
+	return name, fn
 }
 
-func timeFormat(args []lang.Value) (lang.Value, error) {
-	if len(args) < 1 || len(args) > 2 {
-		return nil, errors.New("time_format: expected 1 or 2 arguments")
-	}
-
-	timestamp, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("time_format: timestamp %w", err)
-	}
-
-	layout := time.RFC3339 // Default layout
-	if len(args) == 2 {
-		layoutStr, err := lib.ToString(args[1])
-		if err != nil {
-			return nil, fmt.Errorf("time_format: layout %w", err)
+func nowMillis() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "now_millis"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 0 {
+			return nil, argumentError(name, 0)
 		}
-		layout = convertTimeLayout(string(layoutStr))
+		return lang.NumberValue(float64(time.Now().UnixMilli())), nil
 	}
-
-	t := time.Unix(int64(timestamp), 0).UTC()
-	return lang.StringValue(t.Format(layout)), nil
+	return name, fn
 }
 
-func timeAdd(args []lang.Value) (lang.Value, error) {
-	if len(args) != 2 {
-		return nil, errors.New("time_add: expected 2 arguments")
-	}
-	timestamp, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("time_add: timestamp %w", err)
-	}
-	seconds, err := lib.ToNumber(args[1])
-	if err != nil {
-		return nil, fmt.Errorf("time_add: seconds %w", err)
-	}
-	return lang.NumberValue(timestamp + seconds), nil
-}
-
-func timeAddDays(args []lang.Value) (lang.Value, error) {
-	if len(args) != 2 {
-		return nil, errors.New("time_add_days: expected 2 arguments")
-	}
-	timestamp, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("time_add_days: timestamp %w", err)
-	}
-	days, err := lib.ToNumber(args[1])
-	if err != nil {
-		return nil, fmt.Errorf("time_add_days: days %w", err)
-	}
-	return lang.NumberValue(timestamp + (days * 86400)), nil // 86400 seconds in a day
-}
-
-func timeAddHours(args []lang.Value) (lang.Value, error) {
-	if len(args) != 2 {
-		return nil, errors.New("time_add_hours: expected 2 arguments")
-	}
-	timestamp, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("time_add_hours: timestamp %w", err)
-	}
-	hours, err := lib.ToNumber(args[1])
-	if err != nil {
-		return nil, fmt.Errorf("time_add_hours: hours %w", err)
-	}
-	return lang.NumberValue(timestamp + (hours * 3600)), nil // 3600 seconds in an hour
-}
-
-func timeAddMinutes(args []lang.Value) (lang.Value, error) {
-	if len(args) != 2 {
-		return nil, errors.New("time_add_minutes: expected 2 arguments")
-	}
-	timestamp, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("time_add_minutes: timestamp %w", err)
-	}
-	minutes, err := lib.ToNumber(args[1])
-	if err != nil {
-		return nil, fmt.Errorf("time_add_minutes: minutes %w", err)
-	}
-	return lang.NumberValue(timestamp + (minutes * 60)), nil // 60 seconds in a minute
-}
-
-func timeDiff(args []lang.Value) (lang.Value, error) {
-	if len(args) != 2 {
-		return nil, errors.New("time_diff: expected 2 arguments")
-	}
-	time1, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("time_diff: first time %w", err)
-	}
-	time2, err := lib.ToNumber(args[1])
-	if err != nil {
-		return nil, fmt.Errorf("time_diff: second time %w", err)
-	}
-	return lang.NumberValue(time1 - time2), nil
-}
-
-func timeDiffDays(args []lang.Value) (lang.Value, error) {
-	diff, err := timeDiff(args)
-	if err != nil {
-		return nil, fmt.Errorf("time_diff_days: %w", err)
-	}
-	diffNum, err := lib.ToNumber(diff)
-	if err != nil {
-		return nil, fmt.Errorf("time_diff_days: %w", err)
-	}
-	return lang.NumberValue(diffNum / 86400), nil
-}
-
-func timeDiffHours(args []lang.Value) (lang.Value, error) {
-	diff, err := timeDiff(args)
-	if err != nil {
-		return nil, fmt.Errorf("time_diff_hours: %w", err)
-	}
-	diffNum, err := lib.ToNumber(diff)
-	if err != nil {
-		return nil, fmt.Errorf("time_diff_hours: %w", err)
-	}
-	return lang.NumberValue(diffNum / 3600), nil
-}
-
-func timeDiffMinutes(args []lang.Value) (lang.Value, error) {
-	diff, err := timeDiff(args)
-	if err != nil {
-		return nil, fmt.Errorf("time_diff_minutes: %w", err)
-	}
-	diffNum, err := lib.ToNumber(diff)
-	if err != nil {
-		return nil, fmt.Errorf("time_diff_minutes: %w", err)
-	}
-	return lang.NumberValue(diffNum / 60), nil
-}
-
-func timeYear(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("time_year: expected 1 argument")
-	}
-	timestamp, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("time_year: timestamp %w", err)
-	}
-	t := time.Unix(int64(timestamp), 0).UTC()
-	return lang.NumberValue(float64(t.Year())), nil
-}
-
-func timeMonth(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("time_month: expected 1 argument")
-	}
-	timestamp, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("time_month: timestamp %w", err)
-	}
-	t := time.Unix(int64(timestamp), 0).UTC()
-	return lang.NumberValue(float64(t.Month())), nil
-}
-
-func timeDay(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("time_day: expected 1 argument")
-	}
-	timestamp, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("time_day: timestamp %w", err)
-	}
-	t := time.Unix(int64(timestamp), 0).UTC()
-	return lang.NumberValue(float64(t.Day())), nil
-}
-
-func timeHour(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("time_hour: expected 1 argument")
-	}
-	timestamp, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("time_hour: timestamp %w", err)
-	}
-	t := time.Unix(int64(timestamp), 0).UTC()
-	return lang.NumberValue(float64(t.Hour())), nil
-}
-
-func timeMinute(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("time_minute: expected 1 argument")
-	}
-	timestamp, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("time_minute: timestamp %w", err)
-	}
-	t := time.Unix(int64(timestamp), 0).UTC()
-	return lang.NumberValue(float64(t.Minute())), nil
-}
-
-func timeSecond(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("time_second: expected 1 argument")
-	}
-	timestamp, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("time_second: timestamp %w", err)
-	}
-	t := time.Unix(int64(timestamp), 0).UTC()
-	return lang.NumberValue(float64(t.Second())), nil
-}
-
-func timeWeekday(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("time_weekday: expected 1 argument")
-	}
-	timestamp, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("time_weekday: timestamp %w", err)
-	}
-	t := time.Unix(int64(timestamp), 0).UTC()
-	return lang.NumberValue(float64(t.Weekday())), nil // 0=Sunday, 1=Monday, etc.
-}
-
-func timeYearday(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("time_yearday: expected 1 argument")
-	}
-	timestamp, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("time_yearday: timestamp %w", err)
-	}
-	t := time.Unix(int64(timestamp), 0).UTC()
-	return lang.NumberValue(float64(t.YearDay())), nil
-}
-
-func timeWeek(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("time_week: expected 1 argument")
-	}
-	timestamp, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("time_week: timestamp %w", err)
-	}
-	t := time.Unix(int64(timestamp), 0).UTC()
-	_, week := t.ISOWeek()
-	return lang.NumberValue(float64(week)), nil
-}
-
-func timeStartOfDay(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("time_start_of_day: expected 1 argument")
-	}
-	timestamp, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("time_start_of_day: timestamp %w", err)
-	}
-	t := time.Unix(int64(timestamp), 0).UTC()
-	startOfDay := time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.UTC)
-	return lang.NumberValue(float64(startOfDay.Unix())), nil
-}
-
-func timeEndOfDay(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("time_end_of_day: expected 1 argument")
-	}
-	timestamp, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("time_end_of_day: timestamp %w", err)
-	}
-	t := time.Unix(int64(timestamp), 0).UTC()
-	endOfDay := time.Date(t.Year(), t.Month(), t.Day(), 23, 59, 59, 999999999, time.UTC)
-	return lang.NumberValue(float64(endOfDay.Unix())), nil
-}
-
-func timeStartOfWeek(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("time_start_of_week: expected 1 argument")
-	}
-	timestamp, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("time_start_of_week: timestamp %w", err)
-	}
-	t := time.Unix(int64(timestamp), 0).UTC()
-
-	// Find Monday of this week
-	days := int(t.Weekday())
-	if days == 0 {
-		days = 7 // Sunday
-	}
-	days-- // Make Monday = 0
-
-	startOfWeek := t.AddDate(0, 0, -days)
-	startOfWeek = time.Date(startOfWeek.Year(), startOfWeek.Month(), startOfWeek.Day(), 0, 0, 0, 0, time.UTC)
-	return lang.NumberValue(float64(startOfWeek.Unix())), nil
-}
-
-func timeStartOfMonth(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("time_start_of_month: expected 1 argument")
-	}
-	timestamp, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("time_start_of_month: timestamp %w", err)
-	}
-	t := time.Unix(int64(timestamp), 0).UTC()
-	startOfMonth := time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.UTC)
-	return lang.NumberValue(float64(startOfMonth.Unix())), nil
-}
-
-func timeStartOfYear(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("time_start_of_year: expected 1 argument")
-	}
-	timestamp, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("time_start_of_year: timestamp %w", err)
-	}
-	t := time.Unix(int64(timestamp), 0).UTC()
-	startOfYear := time.Date(t.Year(), 1, 1, 0, 0, 0, 0, time.UTC)
-	return lang.NumberValue(float64(startOfYear.Unix())), nil
-}
-
-func timeIsWeekend(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("time_is_weekend: expected 1 argument")
-	}
-	timestamp, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("time_is_weekend: timestamp %w", err)
-	}
-	t := time.Unix(int64(timestamp), 0).UTC()
-	weekday := t.Weekday()
-	return lang.BoolValue(weekday == time.Saturday || weekday == time.Sunday), nil
-}
-
-func timeIsLeapYear(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("time_is_leap_year: expected 1 argument")
-	}
-	timestamp, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("time_is_leap_year: timestamp %w", err)
-	}
-	t := time.Unix(int64(timestamp), 0).UTC()
-	year := t.Year()
-	return lang.BoolValue((year%4 == 0 && year%100 != 0) || (year%400 == 0)), nil
-}
-
-func timeDaysInMonth(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("time_days_in_month: expected 1 argument")
-	}
-	timestamp, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("time_days_in_month: timestamp %w", err)
-	}
-	t := time.Unix(int64(timestamp), 0).UTC()
-
-	// Get first day of next month, then subtract one day
-	nextMonth := t.AddDate(0, 1, 0)
-	firstOfNextMonth := time.Date(nextMonth.Year(), nextMonth.Month(), 1, 0, 0, 0, 0, time.UTC)
-	lastOfThisMonth := firstOfNextMonth.AddDate(0, 0, -1)
-
-	return lang.NumberValue(float64(lastOfThisMonth.Day())), nil
-}
-
-func timeAge(args []lang.Value) (lang.Value, error) {
-	if len(args) < 1 || len(args) > 2 {
-		return nil, errors.New("time_age: expected 1 or 2 arguments")
-	}
-
-	birthTimestamp, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("time_age: birth timestamp %w", err)
-	}
-
-	currentTimestamp := float64(time.Now().Unix())
-	if len(args) == 2 {
-		currentTimestamp, err = lib.ToNumber(args[1])
-		if err != nil {
-			return nil, fmt.Errorf("time_age: current timestamp %w", err)
+func nowNanos() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "now_nanos"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 0 {
+			return nil, argumentError(name, 0)
 		}
+		return lang.NumberValue(float64(time.Now().UnixNano())), nil
 	}
-
-	birth := time.Unix(int64(birthTimestamp), 0).UTC()
-	current := time.Unix(int64(currentTimestamp), 0).UTC()
-
-	years := current.Year() - birth.Year()
-
-	// Adjust if birthday hasn't occurred this year
-	if current.Month() < birth.Month() ||
-		(current.Month() == birth.Month() && current.Day() < birth.Day()) {
-		years--
-	}
-
-	return lang.NumberValue(float64(years)), nil
+	return name, fn
 }
 
-func timeToTimezone(args []lang.Value) (lang.Value, error) {
-	if len(args) != 2 {
-		return nil, errors.New("time_to_timezone: expected 2 arguments")
-	}
-
-	timestamp, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("time_to_timezone: timestamp %w", err)
-	}
-
-	timezone, err := lib.ToString(args[1])
-	if err != nil {
-		return nil, fmt.Errorf("time_to_timezone: timezone %w", err)
-	}
-
-	t := time.Unix(int64(timestamp), 0).UTC()
-
-	if string(timezone) == "UTC" || string(timezone) == "" {
-		return lang.NumberValue(timestamp), nil
-	}
-
-	loc, err := time.LoadLocation(string(timezone))
-	if err != nil {
-		return nil, fmt.Errorf("time_to_timezone: invalid timezone '%s': %w", string(timezone), err)
-	}
-
-	localTime := t.In(loc)
-	return lang.NumberValue(float64(localTime.Unix())), nil
-}
-
-func timeFromTimezone(args []lang.Value) (lang.Value, error) {
-	if len(args) != 2 {
-		return nil, errors.New("time_from_timezone: expected 2 arguments")
-	}
-
-	timestamp, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("time_from_timezone: timestamp %w", err)
-	}
-
-	timezone, err := lib.ToString(args[1])
-	if err != nil {
-		return nil, fmt.Errorf("time_from_timezone: timezone %w", err)
-	}
-
-	if string(timezone) == "UTC" || string(timezone) == "" {
-		return lang.NumberValue(timestamp), nil
-	}
-
-	loc, err := time.LoadLocation(string(timezone))
-	if err != nil {
-		return nil, fmt.Errorf("time_from_timezone: invalid timezone '%s': %w", string(timezone), err)
-	}
-
-	localTime := time.Unix(int64(timestamp), 0).In(loc)
-	utcTime := localTime.UTC()
-	return lang.NumberValue(float64(utcTime.Unix())), nil
-}
-
-func timeSleep(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("time_sleep: expected 1 argument")
-	}
-
-	seconds, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("time_sleep: seconds %w", err)
-	}
-
-	if seconds < 0 {
-		return nil, errors.New("time_sleep: seconds cannot be negative")
-	}
-
-	duration := time.Duration(seconds * float64(time.Second))
-	time.Sleep(duration)
-	return lang.BoolValue(true), nil
-}
-
-func timeValidate(args []lang.Value) (lang.Value, error) {
-	if len(args) < 1 || len(args) > 2 {
-		return nil, errors.New("time_validate: expected 1 or 2 arguments")
-	}
-
-	timeStr, err := lib.ToString(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("time_validate: time string %w", err)
-	}
-
-	layout := time.RFC3339
-	if len(args) == 2 {
-		layoutStr, err := lib.ToString(args[1])
-		if err != nil {
-			return nil, fmt.Errorf("time_validate: layout %w", err)
+func parse() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "parse"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) < 1 || len(args) > 2 {
+			return nil, fmt.Errorf("%s: expected 1 or 2 arguments", name)
 		}
-		layout = convertTimeLayout(string(layoutStr))
+		timeStr, err := lib.ToString(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: time string %w", name, err)
+		}
+		layout := time.RFC3339
+		if len(args) == 2 {
+			layoutStr, err := lib.ToString(args[1])
+			if err != nil {
+				return nil, fmt.Errorf("%s: layout %w", name, err)
+			}
+			layout = convertTimeLayout(string(layoutStr))
+		}
+		t, err := time.Parse(layout, string(timeStr))
+		if err != nil {
+			return nil, fmt.Errorf("%s: failed to parse time '%s' with layout '%s': %w", name, string(timeStr), layout, err)
+		}
+		return lang.NumberValue(float64(t.Unix())), nil
 	}
-
-	_, err = time.Parse(layout, string(timeStr))
-	return lang.BoolValue(err == nil), nil
+	return name, fn
 }
 
-func timeRange(args []lang.Value) (lang.Value, error) {
-	if len(args) != 3 {
-		return nil, errors.New("time_range: expected 3 arguments")
+func toFormat() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "format"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) < 1 || len(args) > 2 {
+			return nil, fmt.Errorf("%s: expected 1 or 2 arguments", name)
+		}
+		timestamp, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: timestamp %w", name, err)
+		}
+		layout := time.RFC3339
+		if len(args) == 2 {
+			layoutStr, err := lib.ToString(args[1])
+			if err != nil {
+				return nil, fmt.Errorf("%s: layout %w", name, err)
+			}
+			layout = convertTimeLayout(string(layoutStr))
+		}
+		t := time.Unix(int64(timestamp), 0).UTC()
+		return lang.StringValue(t.Format(layout)), nil
 	}
-
-	start, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("time_range: start %w", err)
-	}
-
-	end, err := lib.ToNumber(args[1])
-	if err != nil {
-		return nil, fmt.Errorf("time_range: end %w", err)
-	}
-
-	step, err := lib.ToNumber(args[2])
-	if err != nil {
-		return nil, fmt.Errorf("time_range: step %w", err)
-	}
-
-	if step <= 0 {
-		return nil, errors.New("time_range: step must be positive")
-	}
-
-	if start > end {
-		return nil, errors.New("time_range: start must be less than or equal to end")
-	}
-
-	var result lang.ListValue
-	for current := start; current <= end; current += step {
-		result = append(result, lang.NumberValue(current))
-	}
-
-	return result, nil
+	return name, fn
 }
 
-// Helper function to convert common time format patterns to Go's format
+func add() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "add"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 2 {
+			return nil, argumentError(name, 2)
+		}
+		timestamp, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: timestamp %w", name, err)
+		}
+		seconds, err := lib.ToNumber(args[1])
+		if err != nil {
+			return nil, fmt.Errorf("%s: seconds %w", name, err)
+		}
+		return lang.NumberValue(timestamp + seconds), nil
+	}
+	return name, fn
+}
+
+func addDays() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "add_days"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 2 {
+			return nil, argumentError(name, 2)
+		}
+		timestamp, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: timestamp %w", name, err)
+		}
+		days, err := lib.ToNumber(args[1])
+		if err != nil {
+			return nil, fmt.Errorf("%s: days %w", name, err)
+		}
+		return lang.NumberValue(timestamp + (days * 86400)), nil
+	}
+	return name, fn
+}
+
+func addHours() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "add_hours"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 2 {
+			return nil, argumentError(name, 2)
+		}
+		timestamp, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: timestamp %w", name, err)
+		}
+		hours, err := lib.ToNumber(args[1])
+		if err != nil {
+			return nil, fmt.Errorf("%s: hours %w", name, err)
+		}
+		return lang.NumberValue(timestamp + (hours * 3600)), nil
+	}
+	return name, fn
+}
+
+func addMinutes() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "add_minutes"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 2 {
+			return nil, argumentError(name, 2)
+		}
+		timestamp, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: timestamp %w", name, err)
+		}
+		minutes, err := lib.ToNumber(args[1])
+		if err != nil {
+			return nil, fmt.Errorf("%s: minutes %w", name, err)
+		}
+		return lang.NumberValue(timestamp + (minutes * 60)), nil
+	}
+	return name, fn
+}
+
+func diff() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "diff"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 2 {
+			return nil, argumentError(name, 2)
+		}
+		time1, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: first time %w", name, err)
+		}
+		time2, err := lib.ToNumber(args[1])
+		if err != nil {
+			return nil, fmt.Errorf("%s: second time %w", name, err)
+		}
+		return lang.NumberValue(time1 - time2), nil
+	}
+	return name, fn
+}
+
+func diffDays() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "diff_days"
+	_, diff := diff()
+	fn := func(args []lang.Value) (lang.Value, error) {
+		diff, err := diff(args)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", name, err)
+		}
+		diffNum, err := lib.ToNumber(diff)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", name, err)
+		}
+		return lang.NumberValue(diffNum / 86400), nil
+	}
+	return name, fn
+}
+
+func diffHours() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "diff_hours"
+	_, diff := diff()
+	fn := func(args []lang.Value) (lang.Value, error) {
+		diff, err := diff(args)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", name, err)
+		}
+		diffNum, err := lib.ToNumber(diff)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", name, err)
+		}
+		return lang.NumberValue(diffNum / 3600), nil
+	}
+	return name, fn
+}
+
+func diffMinutes() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "diff_minutes"
+	_, diff := diff()
+	fn := func(args []lang.Value) (lang.Value, error) {
+		diff, err := diff(args)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", name, err)
+		}
+		diffNum, err := lib.ToNumber(diff)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", name, err)
+		}
+		return lang.NumberValue(diffNum / 60), nil
+	}
+	return name, fn
+}
+
+func year() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "year"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		timestamp, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: timestamp %w", name, err)
+		}
+		t := time.Unix(int64(timestamp), 0).UTC()
+		return lang.NumberValue(float64(t.Year())), nil
+	}
+	return name, fn
+}
+
+func month() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "month"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		timestamp, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: timestamp %w", name, err)
+		}
+		t := time.Unix(int64(timestamp), 0).UTC()
+		return lang.NumberValue(float64(t.Month())), nil
+	}
+	return name, fn
+}
+
+func day() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "day"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		timestamp, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: timestamp %w", name, err)
+		}
+		t := time.Unix(int64(timestamp), 0).UTC()
+		return lang.NumberValue(float64(t.Day())), nil
+	}
+	return name, fn
+}
+
+func hour() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "hour"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		timestamp, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: timestamp %w", name, err)
+		}
+		t := time.Unix(int64(timestamp), 0).UTC()
+		return lang.NumberValue(float64(t.Hour())), nil
+	}
+	return name, fn
+}
+
+func minute() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "minute"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		timestamp, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: timestamp %w", name, err)
+		}
+		t := time.Unix(int64(timestamp), 0).UTC()
+		return lang.NumberValue(float64(t.Minute())), nil
+	}
+	return name, fn
+}
+
+func second() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "second"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		timestamp, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: timestamp %w", name, err)
+		}
+		t := time.Unix(int64(timestamp), 0).UTC()
+		return lang.NumberValue(float64(t.Second())), nil
+	}
+	return name, fn
+}
+
+func weekday() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "weekday"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		timestamp, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: timestamp %w", name, err)
+		}
+		t := time.Unix(int64(timestamp), 0).UTC()
+		return lang.NumberValue(float64(t.Weekday())), nil
+	}
+	return name, fn
+}
+
+func yearday() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "yearday"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		timestamp, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: timestamp %w", name, err)
+		}
+		t := time.Unix(int64(timestamp), 0).UTC()
+		return lang.NumberValue(float64(t.YearDay())), nil
+	}
+	return name, fn
+}
+
+func week() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "week"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		timestamp, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: timestamp %w", name, err)
+		}
+		t := time.Unix(int64(timestamp), 0).UTC()
+		_, week := t.ISOWeek()
+		return lang.NumberValue(float64(week)), nil
+	}
+	return name, fn
+}
+
+func startOfDay() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "start_of_day"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		timestamp, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: timestamp %w", name, err)
+		}
+		t := time.Unix(int64(timestamp), 0).UTC()
+		startOfDay := time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.UTC)
+		return lang.NumberValue(float64(startOfDay.Unix())), nil
+	}
+	return name, fn
+}
+
+func toEndOfDay() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "end_of_day"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		timestamp, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: timestamp %w", name, err)
+		}
+		t := time.Unix(int64(timestamp), 0).UTC()
+		endOfDay := time.Date(t.Year(), t.Month(), t.Day(), 23, 59, 59, 999999999, time.UTC)
+		return lang.NumberValue(float64(endOfDay.Unix())), nil
+	}
+	return name, fn
+}
+
+func startOfWeek() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "start_of_week"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		timestamp, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: timestamp %w", name, err)
+		}
+		t := time.Unix(int64(timestamp), 0).UTC()
+		days := int(t.Weekday())
+		if days == 0 {
+			days = 7
+		}
+		days--
+		startOfWeek := t.AddDate(0, 0, -days)
+		startOfWeek = time.Date(startOfWeek.Year(), startOfWeek.Month(), startOfWeek.Day(), 0, 0, 0, 0, time.UTC)
+		return lang.NumberValue(float64(startOfWeek.Unix())), nil
+	}
+	return name, fn
+}
+
+func startOfMonth() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "start_of_month"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		timestamp, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: timestamp %w", name, err)
+		}
+		t := time.Unix(int64(timestamp), 0).UTC()
+		startOfMonth := time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.UTC)
+		return lang.NumberValue(float64(startOfMonth.Unix())), nil
+	}
+	return name, fn
+}
+
+func startOfYear() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "start_of_year"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		timestamp, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: timestamp %w", name, err)
+		}
+		t := time.Unix(int64(timestamp), 0).UTC()
+		startOfYear := time.Date(t.Year(), 1, 1, 0, 0, 0, 0, time.UTC)
+		return lang.NumberValue(float64(startOfYear.Unix())), nil
+	}
+	return name, fn
+}
+
+func isWeekend() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "is_weekend"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		timestamp, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: timestamp %w", name, err)
+		}
+		t := time.Unix(int64(timestamp), 0).UTC()
+		weekday := t.Weekday()
+		return lang.BoolValue(weekday == time.Saturday || weekday == time.Sunday), nil
+	}
+	return name, fn
+}
+
+func isLeapYear() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "is_leap_year"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		timestamp, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: timestamp %w", name, err)
+		}
+		t := time.Unix(int64(timestamp), 0).UTC()
+		year := t.Year()
+		return lang.BoolValue((year%4 == 0 && year%100 != 0) || (year%400 == 0)), nil
+	}
+	return name, fn
+}
+
+func daysInMonth() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "days_in_month"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		timestamp, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: timestamp %w", name, err)
+		}
+		t := time.Unix(int64(timestamp), 0).UTC()
+		nextMonth := t.AddDate(0, 1, 0)
+		firstOfNextMonth := time.Date(nextMonth.Year(), nextMonth.Month(), 1, 0, 0, 0, 0, time.UTC)
+		lastOfThisMonth := firstOfNextMonth.AddDate(0, 0, -1)
+		return lang.NumberValue(float64(lastOfThisMonth.Day())), nil
+	}
+	return name, fn
+}
+
+func age() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "age"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) < 1 || len(args) > 2 {
+			return nil, fmt.Errorf("%s: expected 1 or 2 arguments", name)
+		}
+		birthTimestamp, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: birth timestamp %w", name, err)
+		}
+		currentTimestamp := float64(time.Now().Unix())
+		if len(args) == 2 {
+			currentTimestamp, err = lib.ToNumber(args[1])
+			if err != nil {
+				return nil, fmt.Errorf("%s: current timestamp %w", name, err)
+			}
+		}
+		birth := time.Unix(int64(birthTimestamp), 0).UTC()
+		current := time.Unix(int64(currentTimestamp), 0).UTC()
+		years := current.Year() - birth.Year()
+		if current.Month() < birth.Month() || (current.Month() == birth.Month() && current.Day() < birth.Day()) {
+			years--
+		}
+		return lang.NumberValue(float64(years)), nil
+	}
+	return name, fn
+}
+
+func toTimezone() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "to_timezone"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 2 {
+			return nil, argumentError(name, 2)
+		}
+		timestamp, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: timestamp %w", name, err)
+		}
+		timezone, err := lib.ToString(args[1])
+		if err != nil {
+			return nil, fmt.Errorf("%s: timezone %w", name, err)
+		}
+		t := time.Unix(int64(timestamp), 0).UTC()
+		if string(timezone) == "UTC" || string(timezone) == "" {
+			return lang.NumberValue(timestamp), nil
+		}
+		loc, err := time.LoadLocation(string(timezone))
+		if err != nil {
+			return nil, fmt.Errorf("%s: invalid timezone '%s': %w", name, string(timezone), err)
+		}
+		localTime := t.In(loc)
+		return lang.NumberValue(float64(localTime.Unix())), nil
+	}
+	return name, fn
+}
+
+func toFromTimezone() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "from_timezone"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 2 {
+			return nil, argumentError(name, 2)
+		}
+		timestamp, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: timestamp %w", name, err)
+		}
+		timezone, err := lib.ToString(args[1])
+		if err != nil {
+			return nil, fmt.Errorf("%s: timezone %w", name, err)
+		}
+		if string(timezone) == "UTC" || string(timezone) == "" {
+			return lang.NumberValue(timestamp), nil
+		}
+		loc, err := time.LoadLocation(string(timezone))
+		if err != nil {
+			return nil, fmt.Errorf("%s: invalid timezone '%s': %w", name, string(timezone), err)
+		}
+		localTime := time.Unix(int64(timestamp), 0).In(loc)
+		utcTime := localTime.UTC()
+		return lang.NumberValue(float64(utcTime.Unix())), nil
+	}
+	return name, fn
+}
+
+func sleep() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "sleep"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, argumentError(name, 1)
+		}
+		seconds, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: seconds %w", name, err)
+		}
+		if seconds < 0 {
+			return nil, errors.New("sleep: seconds cannot be negative")
+		}
+		duration := time.Duration(seconds * float64(time.Second))
+		time.Sleep(duration)
+		return lang.BoolValue(true), nil
+	}
+	return name, fn
+}
+
+func validate() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "validate"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) < 1 || len(args) > 2 {
+			return nil, fmt.Errorf("%s: expected 1 or 2 arguments", name)
+		}
+		timeStr, err := lib.ToString(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: time string %w", name, err)
+		}
+		layout := time.RFC3339
+		if len(args) == 2 {
+			layoutStr, err := lib.ToString(args[1])
+			if err != nil {
+				return nil, fmt.Errorf("%s: layout %w", name, err)
+			}
+			layout = convertTimeLayout(string(layoutStr))
+		}
+		_, err = time.Parse(layout, string(timeStr))
+		return lang.BoolValue(err == nil), nil
+	}
+	return name, fn
+}
+
+func rrange() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "range"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 3 {
+			return nil, argumentError(name, 3)
+		}
+		start, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: start %w", name, err)
+		}
+		end, err := lib.ToNumber(args[1])
+		if err != nil {
+			return nil, fmt.Errorf("%s: end %w", name, err)
+		}
+		step, err := lib.ToNumber(args[2])
+		if err != nil {
+			return nil, fmt.Errorf("%s: step %w", name, err)
+		}
+		if step <= 0 {
+			return nil, errors.New("range: step must be positive")
+		}
+		if start > end {
+			return nil, errors.New("range: start must be less than or equal to end")
+		}
+		var result lang.ListValue
+		for current := start; current <= end; current += step {
+			result = append(result, lang.NumberValue(current))
+		}
+		return result, nil
+	}
+	return name, fn
+}
+
 func convertTimeLayout(layout string) string {
-	// Convert common patterns to Go's reference time format
 	layout = strings.ReplaceAll(layout, "YYYY", "2006")
 	layout = strings.ReplaceAll(layout, "YY", "06")
 	layout = strings.ReplaceAll(layout, "MM", "01")
@@ -601,8 +707,6 @@ func convertTimeLayout(layout string) string {
 	layout = strings.ReplaceAll(layout, "mm", "04")
 	layout = strings.ReplaceAll(layout, "ss", "05")
 	layout = strings.ReplaceAll(layout, "SSS", "000")
-
-	// Common formats
 	switch layout {
 	case "ISO8601":
 		return time.RFC3339
@@ -633,57 +737,41 @@ func convertTimeLayout(layout string) string {
 	}
 }
 
-// Functions that would be in the BuiltinFunctions map:
-var TimeFunctions = map[string]func([]lang.Value) (lang.Value, error){
-	// Current time
-	"time_now":        timeNow,
-	"time_now_millis": timeNowMillis,
-	"time_now_nanos":  timeNowNanos,
-
-	// Parsing and formatting
-	"time_parse":    timeParse,
-	"time_format":   timeFormat,
-	"time_validate": timeValidate,
-
-	// Arithmetic
-	"time_add":          timeAdd,
-	"time_add_days":     timeAddDays,
-	"time_add_hours":    timeAddHours,
-	"time_add_minutes":  timeAddMinutes,
-	"time_diff":         timeDiff,
-	"time_diff_days":    timeDiffDays,
-	"time_diff_hours":   timeDiffHours,
-	"time_diff_minutes": timeDiffMinutes,
-
-	// Component extraction
-	"time_year":    timeYear,
-	"time_month":   timeMonth,
-	"time_day":     timeDay,
-	"time_hour":    timeHour,
-	"time_minute":  timeMinute,
-	"time_second":  timeSecond,
-	"time_weekday": timeWeekday,
-	"time_yearday": timeYearday,
-	"time_week":    timeWeek,
-
-	// Time boundaries
-	"time_start_of_day":   timeStartOfDay,
-	"time_end_of_day":     timeEndOfDay,
-	"time_start_of_week":  timeStartOfWeek,
-	"time_start_of_month": timeStartOfMonth,
-	"time_start_of_year":  timeStartOfYear,
-
-	// Time properties
-	"time_is_weekend":    timeIsWeekend,
-	"time_is_leap_year":  timeIsLeapYear,
-	"time_days_in_month": timeDaysInMonth,
-	"time_age":           timeAge,
-
-	// Timezone operations
-	"time_to_timezone":   timeToTimezone,
-	"time_from_timezone": timeFromTimezone,
-
-	// Utilities
-	"time_sleep": timeSleep,
-	"time_range": timeRange,
+var TimeFunctions = []func() (string, func([]lang.Value) (lang.Value, error)){
+	now,
+	nowMillis,
+	nowNanos,
+	parse,
+	toFormat,
+	add,
+	addDays,
+	addHours,
+	addMinutes,
+	diff,
+	diffDays,
+	diffHours,
+	diffMinutes,
+	year,
+	month,
+	day,
+	hour,
+	minute,
+	second,
+	weekday,
+	yearday,
+	week,
+	startOfDay,
+	toEndOfDay,
+	startOfWeek,
+	startOfMonth,
+	startOfYear,
+	isWeekend,
+	isLeapYear,
+	daysInMonth,
+	age,
+	toTimezone,
+	toFromTimezone,
+	sleep,
+	validate,
+	rrange,
 }

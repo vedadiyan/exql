@@ -20,9 +20,7 @@ type (
 		GetVariable(name string) Value
 		GetFunction(name string) Function
 	}
-	Function interface {
-		Call(args []Value) Value
-	}
+	Function     func(args []Value) Value
 	BinaryOpNode struct {
 		Left, Right ExprNode
 		Operator    string
@@ -202,7 +200,7 @@ func (n *FunctionCallNode) Evaluate(ctx Context) Value {
 		args[i] = arg.Evaluate(ctx)
 	}
 
-	return fn.Call(args)
+	return fn(args)
 }
 
 func (n *ListNode) Evaluate(ctx Context) Value {

@@ -11,7 +11,7 @@ import (
 )
 
 func parse() (string, lang.Function) {
-	name := "json_parse"
+	name := "parse"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -31,7 +31,7 @@ func parse() (string, lang.Function) {
 }
 
 func sstring() (string, lang.Function) {
-	name := "json_string"
+	name := "string"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 1 || len(args) > 2 {
 			return nil, fmt.Errorf("%s: expected 1 or 2 arguments (data, pretty?)", name)
@@ -62,7 +62,7 @@ func sstring() (string, lang.Function) {
 }
 
 func valid() (string, lang.Function) {
-	name := "json_valid"
+	name := "valid"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -79,7 +79,7 @@ func valid() (string, lang.Function) {
 }
 
 func get() (string, lang.Function) {
-	name := "json_get"
+	name := "get"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
 			return nil, lib.ArgumentError(name, 2)
@@ -105,7 +105,7 @@ func get() (string, lang.Function) {
 }
 
 func set() (string, lang.Function) {
-	name := "json_set"
+	name := "set"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 3 {
 			return nil, lib.ArgumentError(name, 3)
@@ -132,7 +132,7 @@ func set() (string, lang.Function) {
 }
 
 func remove() (string, lang.Function) {
-	name := "json_delete"
+	name := "delete"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
 			return nil, lib.ArgumentError(name, 2)
@@ -158,7 +158,7 @@ func remove() (string, lang.Function) {
 }
 
 func has() (string, lang.Function) {
-	name := "json_has"
+	name := "has"
 	_, Get := get()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -174,7 +174,7 @@ func has() (string, lang.Function) {
 }
 
 func keys() (string, lang.Function) {
-	name := "json_keys"
+	name := "keys"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -203,7 +203,7 @@ func keys() (string, lang.Function) {
 }
 
 func values() (string, lang.Function) {
-	name := "json_values"
+	name := "values"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -238,7 +238,7 @@ func values() (string, lang.Function) {
 }
 
 func length() (string, lang.Function) {
-	name := "json_length"
+	name := "length"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -267,7 +267,7 @@ func length() (string, lang.Function) {
 }
 
 func merge() (string, lang.Function) {
-	name := "json_merge"
+	name := "merge"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 2 {
 			return nil, fmt.Errorf("%s: expected at least 2 arguments", name)
@@ -297,7 +297,7 @@ func merge() (string, lang.Function) {
 }
 
 func ttype() (string, lang.Function) {
-	name := "json_type"
+	name := "type"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)

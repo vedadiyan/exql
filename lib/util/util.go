@@ -688,7 +688,7 @@ func formatValueForInspect(v lang.Value) string {
 	}
 }
 
-var UtilityFunctions = []func() (string, lang.Function){
+var utilityFunctions = []func() (string, lang.Function){
 	conditionalIf,
 	conditionalUnless,
 	conditionalSwitch,
@@ -722,4 +722,13 @@ var UtilityFunctions = []func() (string, lang.Function){
 	randomString,
 	memoize,
 	benchmark,
+}
+
+func Export() map[string]lang.Function {
+	out := make(map[string]lang.Function)
+	for _, value := range utilityFunctions {
+		name, fn := value()
+		out[name] = fn
+	}
+	return out
 }

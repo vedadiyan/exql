@@ -485,7 +485,7 @@ func accept() (string, lang.Function) {
 	return name, fn
 }
 
-var HttpFunctions = []func() (string, lang.Function){
+var httpFunctions = []func() (string, lang.Function){
 	header,
 	headers,
 	method,
@@ -506,4 +506,13 @@ var HttpFunctions = []func() (string, lang.Function){
 	referer,
 	authorization,
 	accept,
+}
+
+func Export() map[string]lang.Function {
+	out := make(map[string]lang.Function)
+	for _, value := range httpFunctions {
+		name, fn := value()
+		out[name] = fn
+	}
+	return out
 }

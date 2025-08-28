@@ -961,7 +961,7 @@ func lcm(a, b int) int {
 	return a * b / gcd(a, b)
 }
 
-var MathFunctions = []func() (string, lang.Function){
+var mathFunctions = []func() (string, lang.Function){
 	Abs,
 	Sign,
 	Max,
@@ -1009,4 +1009,13 @@ var MathFunctions = []func() (string, lang.Function){
 	Pi,
 	E,
 	Phi,
+}
+
+func Export() map[string]lang.Function {
+	out := make(map[string]lang.Function)
+	for _, value := range mathFunctions {
+		name, fn := value()
+		out[name] = fn
+	}
+	return out
 }

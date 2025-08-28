@@ -672,7 +672,7 @@ func base32DecodeString(s string) []byte {
 	return result
 }
 
-var EncodingFunctions = []func() (string, lang.Function){
+var encodingFunctions = []func() (string, lang.Function){
 	base64Encode,
 	base64Decode,
 	base64UrlEncode,
@@ -701,4 +701,13 @@ var EncodingFunctions = []func() (string, lang.Function){
 	htmlEscape,
 	htmlUnescape,
 	hashVerify,
+}
+
+func Export() map[string]lang.Function {
+	out := make(map[string]lang.Function)
+	for _, value := range encodingFunctions {
+		name, fn := value()
+		out[name] = fn
+	}
+	return out
 }

@@ -729,7 +729,7 @@ func convertTimeLayout(layout string) string {
 	}
 }
 
-var TimeFunctions = []func() (string, lang.Function){
+var timeFunctions = []func() (string, lang.Function){
 	now,
 	nowMillis,
 	nowNanos,
@@ -766,4 +766,13 @@ var TimeFunctions = []func() (string, lang.Function){
 	sleep,
 	validate,
 	rrange,
+}
+
+func Export() map[string]lang.Function {
+	out := make(map[string]lang.Function)
+	for _, value := range timeFunctions {
+		name, fn := value()
+		out[name] = fn
+	}
+	return out
 }

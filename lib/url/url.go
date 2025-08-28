@@ -564,7 +564,7 @@ func cleanURLPath(path string) string {
 	return result
 }
 
-var UrlFunctions = []func() (string, lang.Function){
+var urlFunctions = []func() (string, lang.Function){
 	urlParse,
 	urlEncode,
 	urlDecode,
@@ -582,4 +582,13 @@ var UrlFunctions = []func() (string, lang.Function){
 	urlPathSegments,
 	urlQueryString,
 	urlClean,
+}
+
+func Export() map[string]lang.Function {
+	out := make(map[string]lang.Function)
+	for _, value := range urlFunctions {
+		name, fn := value()
+		out[name] = fn
+	}
+	return out
 }

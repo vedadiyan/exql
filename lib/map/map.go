@@ -855,7 +855,7 @@ func isNullValueForMap(v lang.Value) bool {
 	}
 }
 
-var MapFunctions = []func() (string, lang.Function){
+var mapFunctions = []func() (string, lang.Function){
 	// Basic operations
 	keys,
 	values,
@@ -888,4 +888,13 @@ var MapFunctions = []func() (string, lang.Function){
 	setPath,
 	hasPath,
 	deletePath,
+}
+
+func Export() map[string]lang.Function {
+	out := make(map[string]lang.Function)
+	for _, value := range mapFunctions {
+		name, fn := value()
+		out[name] = fn
+	}
+	return out
 }

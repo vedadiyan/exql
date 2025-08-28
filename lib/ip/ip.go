@@ -548,7 +548,7 @@ func compareIPv6(a, b net.IP) int {
 	return 0
 }
 
-var IpFunctions = []func() (string, lang.Function){
+var ipFunctions = []func() (string, lang.Function){
 	isValidIP,
 	isIPv4,
 	isIPv6,
@@ -570,4 +570,13 @@ var IpFunctions = []func() (string, lang.Function){
 	intToIP,
 	reverseIP,
 	isRFC1918,
+}
+
+func Export() map[string]lang.Function {
+	out := make(map[string]lang.Function)
+	for _, value := range ipFunctions {
+		name, fn := value()
+		out[name] = fn
+	}
+	return out
 }

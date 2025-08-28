@@ -1088,7 +1088,7 @@ func toNumber() (string, lang.Function) {
 	return name, fn
 }
 
-var StringFunctions = []func() (string, lang.Function){
+var stringFunctions = []func() (string, lang.Function){
 
 	length,
 	size,
@@ -1142,4 +1142,13 @@ var StringFunctions = []func() (string, lang.Function){
 
 	toStr,
 	toNumber,
+}
+
+func Export() map[string]lang.Function {
+	out := make(map[string]lang.Function)
+	for _, value := range stringFunctions {
+		name, fn := value()
+		out[name] = fn
+	}
+	return out
 }

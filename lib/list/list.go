@@ -880,7 +880,7 @@ func isNullValue(v lang.Value) bool {
 	}
 }
 
-var ListFunctions = []func() (string, lang.Function){
+var listFunctions = []func() (string, lang.Function){
 	length,
 	isEmpty,
 	get,
@@ -914,4 +914,13 @@ var ListFunctions = []func() (string, lang.Function){
 	zip,
 	filter,
 	mmap,
+}
+
+func Export() map[string]lang.Function {
+	out := make(map[string]lang.Function)
+	for _, value := range listFunctions {
+		name, fn := value()
+		out[name] = fn
+	}
+	return out
 }

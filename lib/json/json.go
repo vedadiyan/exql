@@ -531,7 +531,7 @@ func convertValueToJSON(v lang.Value) interface{} {
 	}
 }
 
-var JsonFunctions = []func() (string, lang.Function){
+var jsonFunctions = []func() (string, lang.Function){
 	parse,
 	sstring,
 	valid,
@@ -544,4 +544,13 @@ var JsonFunctions = []func() (string, lang.Function){
 	length,
 	merge,
 	ttype,
+}
+
+func Export() map[string]lang.Function {
+	out := make(map[string]lang.Function)
+	for _, value := range jsonFunctions {
+		name, fn := value()
+		out[name] = fn
+	}
+	return out
 }

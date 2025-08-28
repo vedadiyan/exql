@@ -886,7 +886,7 @@ func areStrictEqual() (string, lang.Function) {
 	return name, fn
 }
 
-var TypeFunctions = []func() (string, lang.Function){
+var typeFunctions = []func() (string, lang.Function){
 	// Basic type checking
 	typeOf,
 	isNull,
@@ -948,4 +948,13 @@ var TypeFunctions = []func() (string, lang.Function){
 	// Comparison
 	areEqual,
 	areStrictEqual,
+}
+
+func Export() map[string]lang.Function {
+	out := make(map[string]lang.Function)
+	for _, value := range typeFunctions {
+		name, fn := value()
+		out[name] = fn
+	}
+	return out
 }

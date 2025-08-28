@@ -10,17 +10,17 @@ import (
 	"github.com/vedadiyan/exql/lib"
 )
 
-func urlParse() (string, lang.Function) {
-	name := "url_parse"
+func parse() (string, lang.Function) {
+	name := "parse"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
 		}
-		urlStr, err := lib.ToString(args[0])
+		str, err := lib.ToString(args[0])
 		if err != nil {
 			return nil, lib.StringError(name, args[0])
 		}
-		u, err := url.Parse(string(urlStr))
+		u, err := url.Parse(string(str))
 		if err != nil {
 			return nil, fmt.Errorf("%s: invalid URL string: %w", name, err)
 		}
@@ -46,7 +46,7 @@ func urlParse() (string, lang.Function) {
 }
 
 func urlEncode() (string, lang.Function) {
-	name := "url_encode"
+	name := "encode"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -61,7 +61,7 @@ func urlEncode() (string, lang.Function) {
 }
 
 func urlDecode() (string, lang.Function) {
-	name := "url_decode"
+	name := "decode"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -80,7 +80,7 @@ func urlDecode() (string, lang.Function) {
 }
 
 func urlHost() (string, lang.Function) {
-	name := "url_host"
+	name := "host"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -102,8 +102,8 @@ func urlHost() (string, lang.Function) {
 	return name, fn
 }
 
-func urlPort() (string, lang.Function) {
-	name := "url_port"
+func port() (string, lang.Function) {
+	name := "port"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -141,8 +141,8 @@ func urlPort() (string, lang.Function) {
 	return name, fn
 }
 
-func urlPath() (string, lang.Function) {
-	name := "url_path"
+func path() (string, lang.Function) {
+	name := "path"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -160,8 +160,8 @@ func urlPath() (string, lang.Function) {
 	return name, fn
 }
 
-func urlQuery() (string, lang.Function) {
-	name := "url_query"
+func query() (string, lang.Function) {
+	name := "query"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -192,14 +192,14 @@ func urlQuery() (string, lang.Function) {
 	return name, fn
 }
 
-func urlQueryParam() (string, lang.Function) {
-	name := "url_query_param"
-	_, urlQuery := urlQuery()
+func queryParam() (string, lang.Function) {
+	name := "query_param"
+	_, query := query()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
 			return nil, lib.ArgumentError(name, 2)
 		}
-		queryParams, err := urlQuery(args[:1])
+		queryParams, err := query(args[:1])
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", name, err)
 		}
@@ -216,8 +216,8 @@ func urlQueryParam() (string, lang.Function) {
 	return name, fn
 }
 
-func urlFragment() (string, lang.Function) {
-	name := "url_fragment"
+func fragment() (string, lang.Function) {
+	name := "fragment"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -235,8 +235,8 @@ func urlFragment() (string, lang.Function) {
 	return name, fn
 }
 
-func urlScheme() (string, lang.Function) {
-	name := "url_scheme"
+func scheme() (string, lang.Function) {
+	name := "scheme"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -254,8 +254,8 @@ func urlScheme() (string, lang.Function) {
 	return name, fn
 }
 
-func urlUser() (string, lang.Function) {
-	name := "url_user"
+func user() (string, lang.Function) {
+	name := "user"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -273,8 +273,8 @@ func urlUser() (string, lang.Function) {
 	return name, fn
 }
 
-func urlBuild() (string, lang.Function) {
-	name := "url_build"
+func build() (string, lang.Function) {
+	name := "build"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -362,8 +362,8 @@ func urlBuild() (string, lang.Function) {
 	return name, fn
 }
 
-func urlJoin() (string, lang.Function) {
-	name := "url_join"
+func join() (string, lang.Function) {
+	name := "join"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 2 {
 			return nil, fmt.Errorf("%s: expected at least 2 arguments", name)
@@ -400,8 +400,8 @@ func urlJoin() (string, lang.Function) {
 	return name, fn
 }
 
-func urlIsAbsolute() (string, lang.Function) {
-	name := "url_is_absolute"
+func isAbsolute() (string, lang.Function) {
+	name := "is_absolute"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -422,8 +422,8 @@ func urlIsAbsolute() (string, lang.Function) {
 	return name, fn
 }
 
-func urlPathSegments() (string, lang.Function) {
-	name := "url_path_segments"
+func pathSegments() (string, lang.Function) {
+	name := "path_segments"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -463,8 +463,8 @@ func urlPathSegments() (string, lang.Function) {
 	return name, fn
 }
 
-func urlQueryString() (string, lang.Function) {
-	name := "url_query_string"
+func queryString() (string, lang.Function) {
+	name := "query_string"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -500,23 +500,23 @@ func urlQueryString() (string, lang.Function) {
 	return name, fn
 }
 
-func urlClean() (string, lang.Function) {
-	name := "url_clean"
+func clean() (string, lang.Function) {
+	name := "clean"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
 		}
 
-		urlStr, err := lib.ToString(args[0])
+		str, err := lib.ToString(args[0])
 		if err != nil {
 			return nil, lib.StringError(name, args[0])
 		}
-		u, err := url.Parse(string(urlStr))
+		u, err := url.Parse(string(str))
 		if err != nil {
 			return nil, fmt.Errorf("%s: invalid URL string: %w", name, err)
 		}
 
-		u.Path = cleanURLPath(u.Path)
+		u.Path = cleanpath(u.Path)
 
 		return lang.StringValue(u.String()), nil
 	}
@@ -530,7 +530,7 @@ func getUserInfo(userInfo *url.Userinfo) string {
 	return userInfo.Username()
 }
 
-func cleanURLPath(path string) string {
+func cleanpath(path string) string {
 	if path == "" {
 		return "/"
 	}
@@ -564,29 +564,29 @@ func cleanURLPath(path string) string {
 	return result
 }
 
-var urlFunctions = []func() (string, lang.Function){
-	urlParse,
+var functions = []func() (string, lang.Function){
+	parse,
 	urlEncode,
 	urlDecode,
 	urlHost,
-	urlPort,
-	urlPath,
-	urlQuery,
-	urlQueryParam,
-	urlFragment,
-	urlScheme,
-	urlUser,
-	urlBuild,
-	urlJoin,
-	urlIsAbsolute,
-	urlPathSegments,
-	urlQueryString,
-	urlClean,
+	port,
+	path,
+	query,
+	queryParam,
+	fragment,
+	scheme,
+	user,
+	build,
+	join,
+	isAbsolute,
+	pathSegments,
+	queryString,
+	clean,
 }
 
 func Export() map[string]lang.Function {
 	out := make(map[string]lang.Function)
-	for _, value := range urlFunctions {
+	for _, value := range functions {
 		name, fn := value()
 		out[name] = fn
 	}

@@ -305,13 +305,3 @@ func (l *yyLex) Error(s string) {
 	l.error = fmt.Errorf("%s near token '%s' at position %d\n%s\n%s",
 		s, token, l.pos-len(token), context, pointer)
 }
-
-func ParseExpression(input string) (ExprNode, error) {
-	yyErrorVerbose = true
-	lexer := &yyLex{input: input}
-	yyParse(lexer)
-	if lexer.error != nil {
-		return nil, lexer.error
-	}
-	return lexer.result, nil
-}

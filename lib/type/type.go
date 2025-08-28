@@ -13,24 +13,12 @@ import (
 	"github.com/vedadiyan/exql/lib"
 )
 
-// This file provides comprehensive type validation and checking capabilities.
-// The functions are designed to be used within a larger system, likely an expression
-// evaluation engine, where `lang.Value` represents a generic value type.
-
-func argumentError(name string, expected int) error {
-	return fmt.Errorf("%s: expected %d argument(s)", name, expected)
-}
-
-func argumentRangeError(name string, min, max int) error {
-	return fmt.Errorf("%s: expected %d to %d arguments", name, min, max)
-}
-
 // Basic Type Checking
 func typeOf() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "type"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		switch args[0].(type) {
 		case nil:
@@ -56,7 +44,7 @@ func isNull() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_null"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		return lang.BoolValue(args[0] == nil), nil
 	}
@@ -67,7 +55,7 @@ func isDefined() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_defined"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		return lang.BoolValue(args[0] != nil), nil
 	}
@@ -78,7 +66,7 @@ func isEmpty() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_empty"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		switch v := args[0].(type) {
 		case nil:
@@ -121,7 +109,7 @@ func isBool() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_bool"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		_, ok := args[0].(lang.BoolValue)
 		return lang.BoolValue(ok), nil
@@ -133,7 +121,7 @@ func isNumber() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_number"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		_, ok := args[0].(lang.NumberValue)
 		return lang.BoolValue(ok), nil
@@ -145,7 +133,7 @@ func isString() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_string"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		_, ok := args[0].(lang.StringValue)
 		return lang.BoolValue(ok), nil
@@ -157,7 +145,7 @@ func isList() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_list"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		_, ok := args[0].(lang.ListValue)
 		return lang.BoolValue(ok), nil
@@ -169,7 +157,7 @@ func isMap() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_map"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		_, ok := args[0].(lang.MapValue)
 		return lang.BoolValue(ok), nil
@@ -200,7 +188,7 @@ func isInteger() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_integer"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		if num, ok := args[0].(lang.NumberValue); ok {
 			val := float64(num)
@@ -215,7 +203,7 @@ func isFloat() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_float"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		if num, ok := args[0].(lang.NumberValue); ok {
 			val := float64(num)
@@ -230,7 +218,7 @@ func isPositive() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_positive"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		if num, ok := args[0].(lang.NumberValue); ok {
 			return lang.BoolValue(float64(num) > 0), nil
@@ -244,7 +232,7 @@ func isNegative() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_negative"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		if num, ok := args[0].(lang.NumberValue); ok {
 			return lang.BoolValue(float64(num) < 0), nil
@@ -258,7 +246,7 @@ func isZero() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_zero"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		if num, ok := args[0].(lang.NumberValue); ok {
 			return lang.BoolValue(float64(num) == 0), nil
@@ -272,7 +260,7 @@ func isEven() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_even"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		if num, ok := args[0].(lang.NumberValue); ok {
 			val := float64(num)
@@ -289,7 +277,7 @@ func isOdd() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_odd"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		if num, ok := args[0].(lang.NumberValue); ok {
 			val := float64(num)
@@ -306,7 +294,7 @@ func isNaN() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_nan"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		if num, ok := args[0].(lang.NumberValue); ok {
 			return lang.BoolValue(math.IsNaN(float64(num))), nil
@@ -320,7 +308,7 @@ func isInfinite() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_infinite"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		if num, ok := args[0].(lang.NumberValue); ok {
 			return lang.BoolValue(math.IsInf(float64(num), 0)), nil
@@ -334,7 +322,7 @@ func isFinite() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_finite"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		if num, ok := args[0].(lang.NumberValue); ok {
 			val := float64(num)
@@ -350,7 +338,7 @@ func isNumericString() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_numeric_string"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		if str, ok := args[0].(lang.StringValue); ok {
 			s := strings.TrimSpace(string(str))
@@ -369,7 +357,7 @@ func isAlpha() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_alpha"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		if str, ok := args[0].(lang.StringValue); ok {
 			s := string(str)
@@ -392,7 +380,7 @@ func isAlphaNumeric() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_alphanumeric"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		if str, ok := args[0].(lang.StringValue); ok {
 			s := string(str)
@@ -415,7 +403,7 @@ func isDigit() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_digit"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		if str, ok := args[0].(lang.StringValue); ok {
 			s := string(str)
@@ -438,7 +426,7 @@ func isLower() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_lower"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		if str, ok := args[0].(lang.StringValue); ok {
 			s := string(str)
@@ -456,7 +444,7 @@ func isUpper() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_upper"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		if str, ok := args[0].(lang.StringValue); ok {
 			s := string(str)
@@ -474,7 +462,7 @@ func isWhitespace() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_whitespace"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		if str, ok := args[0].(lang.StringValue); ok {
 			s := string(str)
@@ -498,7 +486,7 @@ func isEmail() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_email"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		if str, ok := args[0].(lang.StringValue); ok {
 			s := string(str)
@@ -519,7 +507,7 @@ func isURL() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_url"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		if str, ok := args[0].(lang.StringValue); ok {
 			s := string(str)
@@ -540,7 +528,7 @@ func isIPAddress() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_ip_address"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		if str, ok := args[0].(lang.StringValue); ok {
 			s := string(str)
@@ -569,7 +557,7 @@ func isUUID() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_uuid"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		if str, ok := args[0].(lang.StringValue); ok {
 			s := string(str)
@@ -591,7 +579,7 @@ func isJSON() (string, func([]lang.Value) (lang.Value, error)) {
 	_, isNumericString := isNumericString()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		if str, ok := args[0].(lang.StringValue); ok {
 			s := strings.TrimSpace(string(str))
@@ -627,7 +615,7 @@ func isBase64() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_base64"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		if str, ok := args[0].(lang.StringValue); ok {
 			s := string(str)
@@ -652,7 +640,7 @@ func isHex() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_hex"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		if str, ok := args[0].(lang.StringValue); ok {
 			s := string(str)
@@ -677,7 +665,7 @@ func hasLength() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "has_length"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		switch args[0].(type) {
 		case lang.StringValue, lang.ListValue, lang.MapValue:
@@ -694,7 +682,7 @@ func isInRange() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_in_range"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 3 {
-			return nil, argumentError(name, 3)
+			return nil, lib.ArgumentError(name, 3)
 		}
 		value, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -720,7 +708,7 @@ func isLengthInRange() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_length_in_range"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 3 {
-			return nil, argumentError(name, 3)
+			return nil, lib.ArgumentError(name, 3)
 		}
 		var length float64
 		switch v := args[0].(type) {
@@ -757,7 +745,7 @@ func canConvertToNumber() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "can_convert_to_number"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		switch v := args[0].(type) {
 		case lang.NumberValue:
@@ -782,7 +770,7 @@ func canConvertToString() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "can_convert_to_string"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		switch args[0].(type) {
 		case nil:
@@ -798,7 +786,7 @@ func canConvertToBool() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "can_convert_to_bool"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		switch args[0].(type) {
 		case nil:
@@ -867,7 +855,7 @@ func areEqual() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "are_equal"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		return lang.BoolValue(deepEqual(args[0], args[1])), nil
 	}
@@ -879,7 +867,7 @@ func areStrictEqual() (string, func([]lang.Value) (lang.Value, error)) {
 	_, toTypeOf := typeOf()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		// Check type first
 		type1, err := toTypeOf([]lang.Value{args[0]})

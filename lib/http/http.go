@@ -9,14 +9,6 @@ import (
 	"github.com/vedadiyan/exql/lib"
 )
 
-func argumentError(name string, expected int) error {
-	return fmt.Errorf("%s: expected %d arguments", name, expected)
-}
-
-func contextError(name string, value lang.Value) error {
-	return fmt.Errorf("%s: first argument must be map, got %T", name, value)
-}
-
 func getHeaderValue(headers lang.MapValue, headerName string) string {
 	for key, value := range headers {
 		if strings.EqualFold(key, headerName) {
@@ -44,11 +36,11 @@ func header() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "header"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		contextMap, ok := args[0].(lang.MapValue)
 		if !ok {
-			return nil, contextError(name, args[0])
+			return nil, lib.ContextError(name, args[0])
 		}
 		headerName, err := lib.ToString(args[1])
 		if err != nil {
@@ -73,11 +65,11 @@ func headers() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "headers"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		contextMap, ok := args[0].(lang.MapValue)
 		if !ok {
-			return nil, contextError(name, args[0])
+			return nil, lib.ContextError(name, args[0])
 		}
 		if headers, exists := contextMap["headers"]; exists {
 			if headersMap, ok := headers.(lang.MapValue); ok {
@@ -93,11 +85,11 @@ func method() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "method"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		contextMap, ok := args[0].(lang.MapValue)
 		if !ok {
-			return nil, contextError(name, args[0])
+			return nil, lib.ContextError(name, args[0])
 		}
 		if method, exists := contextMap["method"]; exists {
 			return method, nil
@@ -111,11 +103,11 @@ func path() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "path"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		contextMap, ok := args[0].(lang.MapValue)
 		if !ok {
-			return nil, contextError(name, args[0])
+			return nil, lib.ContextError(name, args[0])
 		}
 		if path, exists := contextMap["path"]; exists {
 			return path, nil
@@ -129,11 +121,11 @@ func query() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "query"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		contextMap, ok := args[0].(lang.MapValue)
 		if !ok {
-			return nil, contextError(name, args[0])
+			return nil, lib.ContextError(name, args[0])
 		}
 		if query, exists := contextMap["query"]; exists {
 			if queryMap, ok := query.(lang.MapValue); ok {
@@ -150,7 +142,7 @@ func queryParam() (string, func([]lang.Value) (lang.Value, error)) {
 	_, Query := query()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		queryParams, err := Query(args[:1])
 		if err != nil {
@@ -173,11 +165,11 @@ func body() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "body"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		contextMap, ok := args[0].(lang.MapValue)
 		if !ok {
-			return nil, contextError(name, args[0])
+			return nil, lib.ContextError(name, args[0])
 		}
 		if body, exists := contextMap["body"]; exists {
 			return body, nil
@@ -191,11 +183,11 @@ func status() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "status"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		contextMap, ok := args[0].(lang.MapValue)
 		if !ok {
-			return nil, contextError(name, args[0])
+			return nil, lib.ContextError(name, args[0])
 		}
 		if status, exists := contextMap["status"]; exists {
 			return status, nil
@@ -210,11 +202,11 @@ func ip() (string, func([]lang.Value) (lang.Value, error)) {
 	_, Headers := headers()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		contextMap, ok := args[0].(lang.MapValue)
 		if !ok {
-			return nil, contextError(name, args[0])
+			return nil, lib.ContextError(name, args[0])
 		}
 
 		ipFields := []string{"remote_ip", "client_ip", "x_forwarded_for", "x_real_ip", "ip"}
@@ -254,7 +246,7 @@ func userAgent() (string, func([]lang.Value) (lang.Value, error)) {
 	_, Headers := headers()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		headers, err := Headers(args)
 		if err != nil {
@@ -273,7 +265,7 @@ func contentType() (string, func([]lang.Value) (lang.Value, error)) {
 	_, Headers := headers()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		headers, err := Headers(args)
 		if err != nil {
@@ -296,7 +288,7 @@ func contentLength() (string, func([]lang.Value) (lang.Value, error)) {
 	_, Headers := headers()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		headers, err := Headers(args)
 		if err != nil {
@@ -321,7 +313,7 @@ func host() (string, func([]lang.Value) (lang.Value, error)) {
 	_, Headers := headers()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		headers, err := Headers(args)
 		if err != nil {
@@ -340,11 +332,11 @@ func scheme() (string, func([]lang.Value) (lang.Value, error)) {
 	_, Headers := headers()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		contextMap, ok := args[0].(lang.MapValue)
 		if !ok {
-			return nil, contextError(name, args[0])
+			return nil, lib.ContextError(name, args[0])
 		}
 
 		if scheme, exists := contextMap["scheme"]; exists {
@@ -370,11 +362,11 @@ func port() (string, func([]lang.Value) (lang.Value, error)) {
 	_, Scheme := scheme()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		contextMap, ok := args[0].(lang.MapValue)
 		if !ok {
-			return nil, contextError(name, args[0])
+			return nil, lib.ContextError(name, args[0])
 		}
 		if port, exists := contextMap["port"]; exists {
 			return port, nil
@@ -395,7 +387,7 @@ func cookies() (string, func([]lang.Value) (lang.Value, error)) {
 	_, Headers := headers()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		headers, err := Headers(args)
 		if err != nil {
@@ -417,7 +409,7 @@ func cookie() (string, func([]lang.Value) (lang.Value, error)) {
 	_, Cookies := cookies()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		cookies, err := Cookies(args[:1])
 		if err != nil {
@@ -441,7 +433,7 @@ func referer() (string, func([]lang.Value) (lang.Value, error)) {
 	_, Headers := headers()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		headers, err := Headers(args)
 		if err != nil {
@@ -460,7 +452,7 @@ func authorization() (string, func([]lang.Value) (lang.Value, error)) {
 	_, Headers := headers()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		headers, err := Headers(args)
 		if err != nil {
@@ -479,7 +471,7 @@ func accept() (string, func([]lang.Value) (lang.Value, error)) {
 	_, Headers := headers()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		headers, err := Headers(args)
 		if err != nil {

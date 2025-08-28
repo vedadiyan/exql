@@ -10,27 +10,15 @@ import (
 	"github.com/vedadiyan/exql/lib"
 )
 
-func argumentError(name string, expected int) error {
-	return fmt.Errorf("%s: expected %d argument(s)", name, expected)
-}
-
-func mapError(name string, value lang.Value) error {
-	return fmt.Errorf("%s: expected map, got %T", name, value)
-}
-
-func stringError(name string, value lang.Value) error {
-	return fmt.Errorf("%s: expected string, got %T", name, value)
-}
-
 func urlParse() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "url_parse"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		urlStr, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		u, err := url.Parse(string(urlStr))
 		if err != nil {
@@ -61,11 +49,11 @@ func urlEncode() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "url_encode"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		return lang.StringValue(url.QueryEscape(string(str))), nil
 	}
@@ -76,11 +64,11 @@ func urlDecode() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "url_decode"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		decoded, err := url.QueryUnescape(string(str))
 		if err != nil {
@@ -95,11 +83,11 @@ func urlHost() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "url_host"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		u, err := url.Parse(string(str))
 		if err != nil {
@@ -118,11 +106,11 @@ func urlPort() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "url_port"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		u, err := url.Parse(string(str))
 		if err != nil {
@@ -157,11 +145,11 @@ func urlPath() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "url_path"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		u, err := url.Parse(string(str))
 		if err != nil {
@@ -176,11 +164,11 @@ func urlQuery() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "url_query"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		u, err := url.Parse(string(str))
 		if err != nil {
@@ -209,7 +197,7 @@ func urlQueryParam() (string, func([]lang.Value) (lang.Value, error)) {
 	_, urlQuery := urlQuery()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		queryParams, err := urlQuery(args[:1])
 		if err != nil {
@@ -217,7 +205,7 @@ func urlQueryParam() (string, func([]lang.Value) (lang.Value, error)) {
 		}
 		paramName, err := lib.ToString(args[1])
 		if err != nil {
-			return nil, stringError(name, args[1])
+			return nil, lib.StringError(name, args[1])
 		}
 
 		if queryMap, ok := queryParams.(lang.MapValue); ok {
@@ -232,11 +220,11 @@ func urlFragment() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "url_fragment"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		u, err := url.Parse(string(str))
 		if err != nil {
@@ -251,11 +239,11 @@ func urlScheme() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "url_scheme"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		u, err := url.Parse(string(str))
 		if err != nil {
@@ -270,11 +258,11 @@ func urlUser() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "url_user"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		u, err := url.Parse(string(str))
 		if err != nil {
@@ -289,12 +277,12 @@ func urlBuild() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "url_build"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 
 		parts, ok := args[0].(lang.MapValue)
 		if !ok {
-			return nil, mapError(name, args[0])
+			return nil, lib.MapError(name, args[0])
 		}
 
 		var u url.URL
@@ -416,12 +404,12 @@ func urlIsAbsolute() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "url_is_absolute"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 
 		u, err := url.Parse(string(str))
@@ -438,12 +426,12 @@ func urlPathSegments() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "url_path_segments"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 
 		path, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		pathStr := string(path)
 
@@ -479,12 +467,12 @@ func urlQueryString() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "url_query_string"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 
 		params, ok := args[0].(lang.MapValue)
 		if !ok {
-			return nil, mapError(name, args[0])
+			return nil, lib.MapError(name, args[0])
 		}
 
 		values := url.Values{}
@@ -516,12 +504,12 @@ func urlClean() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "url_clean"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 
 		urlStr, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		u, err := url.Parse(string(urlStr))
 		if err != nil {

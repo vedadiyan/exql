@@ -10,19 +10,11 @@ import (
 	"github.com/vedadiyan/exql/lib"
 )
 
-func argumentError(name string, expected int) error {
-	return fmt.Errorf("%s: expected %d argument(s)", name, expected)
-}
-
-func timeError(name string, value lang.Value) error {
-	return fmt.Errorf("%s: expected time, got %T", name, value)
-}
-
 func now() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "now"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 0 {
-			return nil, argumentError(name, 0)
+			return nil, lib.ArgumentError(name, 0)
 		}
 		return lang.NumberValue(float64(time.Now().Unix())), nil
 	}
@@ -33,7 +25,7 @@ func nowMillis() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "now_millis"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 0 {
-			return nil, argumentError(name, 0)
+			return nil, lib.ArgumentError(name, 0)
 		}
 		return lang.NumberValue(float64(time.Now().UnixMilli())), nil
 	}
@@ -44,7 +36,7 @@ func nowNanos() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "now_nanos"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 0 {
-			return nil, argumentError(name, 0)
+			return nil, lib.ArgumentError(name, 0)
 		}
 		return lang.NumberValue(float64(time.Now().UnixNano())), nil
 	}
@@ -106,7 +98,7 @@ func add() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "add"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		timestamp, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -125,7 +117,7 @@ func addDays() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "add_days"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		timestamp, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -144,7 +136,7 @@ func addHours() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "add_hours"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		timestamp, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -163,7 +155,7 @@ func addMinutes() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "add_minutes"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		timestamp, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -182,7 +174,7 @@ func diff() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "diff"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		time1, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -252,7 +244,7 @@ func year() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "year"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		timestamp, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -268,7 +260,7 @@ func month() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "month"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		timestamp, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -284,7 +276,7 @@ func day() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "day"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		timestamp, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -300,7 +292,7 @@ func hour() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "hour"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		timestamp, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -316,7 +308,7 @@ func minute() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "minute"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		timestamp, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -332,7 +324,7 @@ func second() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "second"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		timestamp, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -348,7 +340,7 @@ func weekday() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "weekday"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		timestamp, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -364,7 +356,7 @@ func yearday() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "yearday"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		timestamp, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -380,7 +372,7 @@ func week() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "week"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		timestamp, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -397,7 +389,7 @@ func startOfDay() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "start_of_day"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		timestamp, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -414,7 +406,7 @@ func toEndOfDay() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "end_of_day"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		timestamp, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -431,7 +423,7 @@ func startOfWeek() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "start_of_week"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		timestamp, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -454,7 +446,7 @@ func startOfMonth() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "start_of_month"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		timestamp, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -471,7 +463,7 @@ func startOfYear() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "start_of_year"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		timestamp, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -488,7 +480,7 @@ func isWeekend() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_weekend"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		timestamp, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -505,7 +497,7 @@ func isLeapYear() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_leap_year"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		timestamp, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -522,7 +514,7 @@ func daysInMonth() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "days_in_month"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		timestamp, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -569,7 +561,7 @@ func toTimezone() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "to_timezone"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		timestamp, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -597,7 +589,7 @@ func toFromTimezone() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "from_timezone"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		timestamp, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -625,7 +617,7 @@ func sleep() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "sleep"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		seconds, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -669,7 +661,7 @@ func rrange() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "range"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 3 {
-			return nil, argumentError(name, 3)
+			return nil, lib.ArgumentError(name, 3)
 		}
 		start, err := lib.ToNumber(args[0])
 		if err != nil {

@@ -11,24 +11,16 @@ import (
 	"github.com/vedadiyan/exql/lib"
 )
 
-func argumentError(name string, expected int) error {
-	return fmt.Errorf("%s: expected %d argument(s)", name, expected)
-}
-
-func listError(name string, value lang.Value) error {
-	return fmt.Errorf("%s: expected list, got %T", name, value)
-}
-
 func length() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "list_length"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		if list, ok := args[0].(lang.ListValue); ok {
 			return lang.NumberValue(float64(len(list))), nil
 		}
-		return nil, listError(name, args[0])
+		return nil, lib.ListError(name, args[0])
 	}
 	return name, fn
 }
@@ -37,12 +29,12 @@ func isEmpty() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "list_is_empty"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		if list, ok := args[0].(lang.ListValue); ok {
 			return lang.BoolValue(len(list) == 0), nil
 		}
-		return nil, listError(name, args[0])
+		return nil, lib.ListError(name, args[0])
 	}
 	return name, fn
 }
@@ -55,7 +47,7 @@ func get() (string, func([]lang.Value) (lang.Value, error)) {
 		}
 		list, ok := args[0].(lang.ListValue)
 		if !ok {
-			return nil, listError(name, args[0])
+			return nil, lib.ListError(name, args[0])
 		}
 		indexNum, err := lib.ToNumber(args[1])
 		if err != nil {
@@ -80,11 +72,11 @@ func set() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "list_set"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 3 {
-			return nil, argumentError(name, 3)
+			return nil, lib.ArgumentError(name, 3)
 		}
 		list, ok := args[0].(lang.ListValue)
 		if !ok {
-			return nil, listError(name, args[0])
+			return nil, lib.ListError(name, args[0])
 		}
 		indexNum, err := lib.ToNumber(args[1])
 		if err != nil {
@@ -114,7 +106,7 @@ func aappend() (string, func([]lang.Value) (lang.Value, error)) {
 		}
 		list, ok := args[0].(lang.ListValue)
 		if !ok {
-			return nil, listError(name, args[0])
+			return nil, lib.ListError(name, args[0])
 		}
 		result := make(lang.ListValue, len(list))
 		copy(result, list)
@@ -134,7 +126,7 @@ func prepend() (string, func([]lang.Value) (lang.Value, error)) {
 		}
 		list, ok := args[0].(lang.ListValue)
 		if !ok {
-			return nil, listError(name, args[0])
+			return nil, lib.ListError(name, args[0])
 		}
 		var result lang.ListValue
 		for i := 1; i < len(args); i++ {
@@ -150,11 +142,11 @@ func insert() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "list_insert"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 3 {
-			return nil, argumentError(name, 3)
+			return nil, lib.ArgumentError(name, 3)
 		}
 		list, ok := args[0].(lang.ListValue)
 		if !ok {
-			return nil, listError(name, args[0])
+			return nil, lib.ListError(name, args[0])
 		}
 		indexNum, err := lib.ToNumber(args[1])
 		if err != nil {
@@ -184,11 +176,11 @@ func remove() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "list_remove"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		list, ok := args[0].(lang.ListValue)
 		if !ok {
-			return nil, listError(name, args[0])
+			return nil, lib.ListError(name, args[0])
 		}
 		indexNum, err := lib.ToNumber(args[1])
 		if err != nil {
@@ -233,7 +225,7 @@ func first() (string, func([]lang.Value) (lang.Value, error)) {
 		}
 		list, ok := args[0].(lang.ListValue)
 		if !ok {
-			return nil, listError(name, args[0])
+			return nil, lib.ListError(name, args[0])
 		}
 		if len(list) == 0 {
 			if len(args) == 2 {
@@ -254,7 +246,7 @@ func last() (string, func([]lang.Value) (lang.Value, error)) {
 		}
 		list, ok := args[0].(lang.ListValue)
 		if !ok {
-			return nil, listError(name, args[0])
+			return nil, lib.ListError(name, args[0])
 		}
 		if len(list) == 0 {
 			if len(args) == 2 {
@@ -280,11 +272,11 @@ func tail() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "tail"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		list, ok := args[0].(lang.ListValue)
 		if !ok {
-			return nil, listError(name, args[0])
+			return nil, lib.ListError(name, args[0])
 		}
 		if len(list) <= 1 {
 			return lang.ListValue{}, nil
@@ -309,11 +301,11 @@ func iinit() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "list_init"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		list, ok := args[0].(lang.ListValue)
 		if !ok {
-			return nil, listError(name, args[0])
+			return nil, lib.ListError(name, args[0])
 		}
 		if len(list) <= 1 {
 			return lang.ListValue{}, nil
@@ -333,7 +325,7 @@ func slice() (string, func([]lang.Value) (lang.Value, error)) {
 		}
 		list, ok := args[0].(lang.ListValue)
 		if !ok {
-			return nil, listError(name, args[0])
+			return nil, lib.ListError(name, args[0])
 		}
 		startNum, err := lib.ToNumber(args[1])
 		if err != nil {
@@ -374,11 +366,11 @@ func take() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "take"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		list, ok := args[0].(lang.ListValue)
 		if !ok {
-			return nil, listError(name, args[0])
+			return nil, lib.ListError(name, args[0])
 		}
 		countNum, err := lib.ToNumber(args[1])
 		if err != nil {
@@ -407,11 +399,11 @@ func drop() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "drop"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		list, ok := args[0].(lang.ListValue)
 		if !ok {
-			return nil, listError(name, args[0])
+			return nil, lib.ListError(name, args[0])
 		}
 		countNum, err := lib.ToNumber(args[1])
 		if err != nil {
@@ -440,11 +432,11 @@ func reverse() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "reverse"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		list, ok := args[0].(lang.ListValue)
 		if !ok {
-			return nil, listError(name, args[0])
+			return nil, lib.ListError(name, args[0])
 		}
 		result := make(lang.ListValue, len(list))
 		for i, v := range list {
@@ -459,11 +451,11 @@ func ssort() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "sort"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		list, ok := args[0].(lang.ListValue)
 		if !ok {
-			return nil, listError(name, args[0])
+			return nil, lib.ListError(name, args[0])
 		}
 		result := make(lang.ListValue, len(list))
 		copy(result, list)
@@ -479,11 +471,11 @@ func sortDesc() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "sort_desc"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		list, ok := args[0].(lang.ListValue)
 		if !ok {
-			return nil, listError(name, args[0])
+			return nil, lib.ListError(name, args[0])
 		}
 		result := make(lang.ListValue, len(list))
 		copy(result, list)
@@ -499,11 +491,11 @@ func shuffle() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "shuffle"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		list, ok := args[0].(lang.ListValue)
 		if !ok {
-			return nil, listError(name, args[0])
+			return nil, lib.ListError(name, args[0])
 		}
 		result := make(lang.ListValue, len(list))
 		copy(result, list)
@@ -520,11 +512,11 @@ func unique() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "unique"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		list, ok := args[0].(lang.ListValue)
 		if !ok {
-			return nil, listError(name, args[0])
+			return nil, lib.ListError(name, args[0])
 		}
 		seen := make(map[string]bool)
 		var result lang.ListValue
@@ -548,7 +540,7 @@ func flatten() (string, func([]lang.Value) (lang.Value, error)) {
 		}
 		list, ok := args[0].(lang.ListValue)
 		if !ok {
-			return nil, listError(name, args[0])
+			return nil, lib.ListError(name, args[0])
 		}
 		depth := 1
 		if len(args) == 2 {
@@ -586,11 +578,11 @@ func contains() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "list_contains"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		list, ok := args[0].(lang.ListValue)
 		if !ok {
-			return nil, listError(name, args[0])
+			return nil, lib.ListError(name, args[0])
 		}
 		searchValue := args[1]
 		for _, item := range list {
@@ -611,7 +603,7 @@ func indexOf() (string, func([]lang.Value) (lang.Value, error)) {
 		}
 		list, ok := args[0].(lang.ListValue)
 		if !ok {
-			return nil, listError(name, args[0])
+			return nil, lib.ListError(name, args[0])
 		}
 		searchValue := args[1]
 		start := 0
@@ -639,11 +631,11 @@ func lastIndexOf() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "list_last_index_of"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		list, ok := args[0].(lang.ListValue)
 		if !ok {
-			return nil, listError(name, args[0])
+			return nil, lib.ListError(name, args[0])
 		}
 		searchValue := args[1]
 		for i := len(list) - 1; i >= 0; i-- {
@@ -660,11 +652,11 @@ func count() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "list_count"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		list, ok := args[0].(lang.ListValue)
 		if !ok {
-			return nil, listError(name, args[0])
+			return nil, lib.ListError(name, args[0])
 		}
 		searchValue := args[1]
 		count := 0
@@ -733,7 +725,7 @@ func repeat() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "list_repeat"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		value := args[0]
 		countNum, err := lib.ToNumber(args[1])
@@ -794,11 +786,11 @@ func filter() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "filter"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		list, ok := args[0].(lang.ListValue)
 		if !ok {
-			return nil, listError(name, args[0])
+			return nil, lib.ListError(name, args[0])
 		}
 		var result lang.ListValue
 		for _, item := range list {
@@ -815,11 +807,11 @@ func mmap() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "map"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		list, ok := args[0].(lang.ListValue)
 		if !ok {
-			return nil, listError(name, args[0])
+			return nil, lib.ListError(name, args[0])
 		}
 		result := make(lang.ListValue, len(list))
 		copy(result, list)

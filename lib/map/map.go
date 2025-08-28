@@ -10,24 +10,16 @@ import (
 	"github.com/vedadiyan/exql/lib"
 )
 
-func argumentError(name string, expected int) error {
-	return fmt.Errorf("%s: expected %d argument(s)", name, expected)
-}
-
-func mapError(name string, value lang.Value) error {
-	return fmt.Errorf("%s: expected map, got %T", name, value)
-}
-
 // Basic Map Operations
 func keys() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "keys"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		m, ok := args[0].(lang.MapValue)
 		if !ok {
-			return nil, mapError(name, args[0])
+			return nil, lib.MapError(name, args[0])
 		}
 
 		keys := make(lang.ListValue, 0, len(m))
@@ -50,11 +42,11 @@ func values() (string, func([]lang.Value) (lang.Value, error)) {
 	_, Keys := keys()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		m, ok := args[0].(lang.MapValue)
 		if !ok {
-			return nil, mapError(name, args[0])
+			return nil, lib.MapError(name, args[0])
 		}
 
 		// Get keys in sorted order for consistent results
@@ -79,11 +71,11 @@ func size() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "map_size"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		m, ok := args[0].(lang.MapValue)
 		if !ok {
-			return nil, mapError(name, args[0])
+			return nil, lib.MapError(name, args[0])
 		}
 		return lang.NumberValue(float64(len(m))), nil
 	}
@@ -94,11 +86,11 @@ func isEmpty() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "map_is_empty"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		m, ok := args[0].(lang.MapValue)
 		if !ok {
-			return nil, mapError(name, args[0])
+			return nil, lib.MapError(name, args[0])
 		}
 		return lang.BoolValue(len(m) == 0), nil
 	}
@@ -113,7 +105,7 @@ func has() (string, func([]lang.Value) (lang.Value, error)) {
 		}
 		m, ok := args[0].(lang.MapValue)
 		if !ok {
-			return nil, mapError(name, args[0])
+			return nil, lib.MapError(name, args[0])
 		}
 
 		keyStr, err := lib.ToString(args[1])
@@ -135,7 +127,7 @@ func get() (string, func([]lang.Value) (lang.Value, error)) {
 		}
 		m, ok := args[0].(lang.MapValue)
 		if !ok {
-			return nil, mapError(name, args[0])
+			return nil, lib.MapError(name, args[0])
 		}
 
 		keyStr, err := lib.ToString(args[1])
@@ -161,11 +153,11 @@ func set() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "map_set"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 3 {
-			return nil, argumentError(name, 3)
+			return nil, lib.ArgumentError(name, 3)
 		}
 		m, ok := args[0].(lang.MapValue)
 		if !ok {
-			return nil, mapError(name, args[0])
+			return nil, lib.MapError(name, args[0])
 		}
 
 		keyStr, err := lib.ToString(args[1])
@@ -191,11 +183,11 @@ func remove() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "map_delete"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		m, ok := args[0].(lang.MapValue)
 		if !ok {
-			return nil, mapError(name, args[0])
+			return nil, lib.MapError(name, args[0])
 		}
 
 		keyStr, err := lib.ToString(args[1])
@@ -312,11 +304,11 @@ func invert() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "map_invert"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		m, ok := args[0].(lang.MapValue)
 		if !ok {
-			return nil, mapError(name, args[0])
+			return nil, lib.MapError(name, args[0])
 		}
 
 		result := make(lang.MapValue, len(m))
@@ -334,11 +326,11 @@ func filter() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "map_filter"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		m, ok := args[0].(lang.MapValue)
 		if !ok {
-			return nil, mapError(name, args[0])
+			return nil, lib.MapError(name, args[0])
 		}
 
 		// Filter out nil/null values
@@ -358,11 +350,11 @@ func filterKeys() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "map_filter_keys"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		m, ok := args[0].(lang.MapValue)
 		if !ok {
-			return nil, mapError(name, args[0])
+			return nil, lib.MapError(name, args[0])
 		}
 
 		keysToKeep, ok := args[1].(lang.ListValue)
@@ -397,11 +389,11 @@ func omitKeys() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "map_omit_keys"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		m, ok := args[0].(lang.MapValue)
 		if !ok {
-			return nil, mapError(name, args[0])
+			return nil, lib.MapError(name, args[0])
 		}
 
 		keysToOmit, ok := args[1].(lang.ListValue)
@@ -436,11 +428,11 @@ func rename() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "map_rename"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		m, ok := args[0].(lang.MapValue)
 		if !ok {
-			return nil, mapError(name, args[0])
+			return nil, lib.MapError(name, args[0])
 		}
 
 		renameMap, ok := args[1].(lang.MapValue)
@@ -473,11 +465,11 @@ func toList() (string, func([]lang.Value) (lang.Value, error)) {
 	_, Keys := keys()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		m, ok := args[0].(lang.MapValue)
 		if !ok {
-			return nil, mapError(name, args[0])
+			return nil, lib.MapError(name, args[0])
 		}
 
 		// Get keys in sorted order for consistent results
@@ -503,7 +495,7 @@ func fromList() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "map_from_list"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		list, ok := args[0].(lang.ListValue)
 		if !ok {
@@ -539,11 +531,11 @@ func toQueryString() (string, func([]lang.Value) (lang.Value, error)) {
 	_, Keys := keys()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		m, ok := args[0].(lang.MapValue)
 		if !ok {
-			return nil, mapError(name, args[0])
+			return nil, lib.MapError(name, args[0])
 		}
 
 		var parts []string
@@ -586,7 +578,7 @@ func fromQueryString() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "map_from_query_string"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		queryStr, err := lib.ToString(args[0])
 		if err != nil {
@@ -634,7 +626,7 @@ func getPath() (string, func([]lang.Value) (lang.Value, error)) {
 		}
 		m, ok := args[0].(lang.MapValue)
 		if !ok {
-			return nil, mapError(name, args[0])
+			return nil, lib.MapError(name, args[0])
 		}
 
 		pathStr, err := lib.ToString(args[1])
@@ -676,11 +668,11 @@ func setPath() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "map_set_path"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 3 {
-			return nil, argumentError(name, 3)
+			return nil, lib.ArgumentError(name, 3)
 		}
 		m, ok := args[0].(lang.MapValue)
 		if !ok {
-			return nil, mapError(name, args[0])
+			return nil, lib.MapError(name, args[0])
 		}
 
 		pathStr, err := lib.ToString(args[1])
@@ -732,11 +724,11 @@ func hasPath() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "map_has_path"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		m, ok := args[0].(lang.MapValue)
 		if !ok {
-			return nil, mapError(name, args[0])
+			return nil, lib.MapError(name, args[0])
 		}
 
 		pathStr, err := lib.ToString(args[1])
@@ -773,11 +765,11 @@ func deletePath() (string, func([]lang.Value) (lang.Value, error)) {
 	_, Delete := remove()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		m, ok := args[0].(lang.MapValue)
 		if !ok {
-			return nil, mapError(name, args[0])
+			return nil, lib.MapError(name, args[0])
 		}
 
 		pathStr, err := lib.ToString(args[1])

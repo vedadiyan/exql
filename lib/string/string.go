@@ -12,27 +12,15 @@ import (
 	"github.com/vedadiyan/exql/lib"
 )
 
-func argumentError(name string, expected int) error {
-	return fmt.Errorf("%s: expected %d argument(s)", name, expected)
-}
-
-func stringError(name string, value lang.Value) error {
-	return fmt.Errorf("%s: expected string, got %T", name, value)
-}
-
-func listError(name string, value lang.Value) error {
-	return fmt.Errorf("%s: expected list, got %T", name, value)
-}
-
 func length() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "len"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		return lang.NumberValue(float64(utf8.RuneCountInString(string(str)))), nil
 	}
@@ -43,11 +31,11 @@ func size() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "size"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		return lang.NumberValue(float64(len(string(str)))), nil
 	}
@@ -74,7 +62,7 @@ func repeat() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "repeat"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
@@ -97,11 +85,11 @@ func reverse() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "reverse"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		runes := []rune(string(str))
 		for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
@@ -116,11 +104,11 @@ func toUpper() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "upper"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		return lang.StringValue(strings.ToUpper(string(str))), nil
 	}
@@ -131,11 +119,11 @@ func toLower() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "lower"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		return lang.StringValue(strings.ToLower(string(str))), nil
 	}
@@ -146,11 +134,11 @@ func title() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "title"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		return lang.StringValue(strings.Title(string(str))), nil
 	}
@@ -161,11 +149,11 @@ func capitalize() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "capitalize"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		s := string(str)
 		if len(s) == 0 {
@@ -185,11 +173,11 @@ func swapCase() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "swap_case"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		runes := []rune(string(str))
 		for i, r := range runes {
@@ -212,7 +200,7 @@ func trim() (string, func([]lang.Value) (lang.Value, error)) {
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		if len(args) == 1 {
 			return lang.StringValue(strings.TrimSpace(string(str))), nil
@@ -234,7 +222,7 @@ func trimLeft() (string, func([]lang.Value) (lang.Value, error)) {
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		if len(args) == 1 {
 			return lang.StringValue(strings.TrimLeftFunc(string(str), unicode.IsSpace)), nil
@@ -256,7 +244,7 @@ func trimRight() (string, func([]lang.Value) (lang.Value, error)) {
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		if len(args) == 1 {
 			return lang.StringValue(strings.TrimRightFunc(string(str), unicode.IsSpace)), nil
@@ -278,7 +266,7 @@ func padLeft() (string, func([]lang.Value) (lang.Value, error)) {
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		totalLenVal, err := lib.ToNumber(args[1])
 		if err != nil {
@@ -318,7 +306,7 @@ func padRight() (string, func([]lang.Value) (lang.Value, error)) {
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		totalLenVal, err := lib.ToNumber(args[1])
 		if err != nil {
@@ -358,7 +346,7 @@ func padCenter() (string, func([]lang.Value) (lang.Value, error)) {
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		totalLenVal, err := lib.ToNumber(args[1])
 		if err != nil {
@@ -403,7 +391,7 @@ func substr() (string, func([]lang.Value) (lang.Value, error)) {
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		startVal, err := lib.ToNumber(args[1])
 		if err != nil {
@@ -448,11 +436,11 @@ func left() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "left"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		countVal, err := lib.ToNumber(args[1])
 		if err != nil {
@@ -478,11 +466,11 @@ func right() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "right"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		countVal, err := lib.ToNumber(args[1])
 		if err != nil {
@@ -508,11 +496,11 @@ func contains() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "contains"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		substr, err := lib.ToString(args[1])
 		if err != nil {
@@ -527,11 +515,11 @@ func startsWith() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "startswith"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		prefix, err := lib.ToString(args[1])
 		if err != nil {
@@ -546,11 +534,11 @@ func endsWith() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "endswith"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		suffix, err := lib.ToString(args[1])
 		if err != nil {
@@ -569,7 +557,7 @@ func indexOf() (string, func([]lang.Value) (lang.Value, error)) {
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		substr, err := lib.ToString(args[1])
 		if err != nil {
@@ -608,11 +596,11 @@ func lastIndexOf() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "last_index_of"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		substr, err := lib.ToString(args[1])
 		if err != nil {
@@ -639,7 +627,7 @@ func replace() (string, func([]lang.Value) (lang.Value, error)) {
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		old, err := lib.ToString(args[1])
 		if err != nil {
@@ -668,11 +656,11 @@ func replaceAll() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "replace_all"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 3 {
-			return nil, argumentError(name, 3)
+			return nil, lib.ArgumentError(name, 3)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		old, err := lib.ToString(args[1])
 		if err != nil {
@@ -695,7 +683,7 @@ func split() (string, func([]lang.Value) (lang.Value, error)) {
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		sep, err := lib.ToString(args[1])
 		if err != nil {
@@ -731,7 +719,7 @@ func join() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "join"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		sep, err := lib.ToString(args[0])
 		if err != nil {
@@ -739,7 +727,7 @@ func join() (string, func([]lang.Value) (lang.Value, error)) {
 		}
 		list, ok := args[1].(lang.ListValue)
 		if !ok {
-			return nil, listError(name, args[1])
+			return nil, lib.ListError(name, args[1])
 		}
 
 		parts := make([]string, len(list))
@@ -759,11 +747,11 @@ func lines() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "lines"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		lines := strings.Split(string(str), "\n")
 		result := make(lang.ListValue, len(lines))
@@ -779,11 +767,11 @@ func fields() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "fields"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		fields := strings.Fields(string(str))
 		result := make(lang.ListValue, len(fields))
@@ -799,11 +787,11 @@ func match() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "match"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		pattern, err := lib.ToString(args[1])
 		if err != nil {
@@ -827,7 +815,7 @@ func findAll() (string, func([]lang.Value) (lang.Value, error)) {
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		pattern, err := lib.ToString(args[1])
 		if err != nil {
@@ -862,11 +850,11 @@ func replaceRegex() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "replace_regex"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 3 {
-			return nil, argumentError(name, 3)
+			return nil, lib.ArgumentError(name, 3)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		pattern, err := lib.ToString(args[1])
 		if err != nil {
@@ -891,11 +879,11 @@ func charAt() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "char_at"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		indexVal, err := lib.ToNumber(args[1])
 		if err != nil {
@@ -917,11 +905,11 @@ func charCode() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "char_code"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		indexVal, err := lib.ToNumber(args[1])
 		if err != nil {
@@ -965,11 +953,11 @@ func isEmpty() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_empty"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		return lang.BoolValue(len(strings.TrimSpace(string(str))) == 0), nil
 	}
@@ -980,11 +968,11 @@ func isNumeric() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_numeric"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		_, parseErr := strconv.ParseFloat(string(str), 64)
 		return lang.BoolValue(parseErr == nil), nil
@@ -996,11 +984,11 @@ func isAlpha() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_alpha"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		s := string(str)
 		if len(s) == 0 {
@@ -1021,11 +1009,11 @@ func isAlphaNumeric() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_alphanumeric"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		s := string(str)
 		if len(s) == 0 {
@@ -1046,11 +1034,11 @@ func isSpace() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_space"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		s := string(str)
 		if len(s) == 0 {
@@ -1071,11 +1059,11 @@ func toStr() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "tostring"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		return str, nil
 	}
@@ -1086,11 +1074,11 @@ func toNumber() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "tonumber"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
-			return nil, stringError(name, args[0])
+			return nil, lib.StringError(name, args[0])
 		}
 		if f, parseErr := strconv.ParseFloat(string(str), 64); parseErr == nil {
 			return lang.NumberValue(f), nil

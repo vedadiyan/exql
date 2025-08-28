@@ -10,15 +10,11 @@ import (
 	"github.com/vedadiyan/exql/lib"
 )
 
-func argumentError(name string, expected int) error {
-	return fmt.Errorf("%s: expected %d arguments", name, expected)
-}
-
 func parse() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "json_parse"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
@@ -69,7 +65,7 @@ func valid() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "json_valid"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		str, err := lib.ToString(args[0])
 		if err != nil {
@@ -86,7 +82,7 @@ func get() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "json_get"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		var data interface{}
 		if jsonStr, ok := args[0].(lang.StringValue); ok {
@@ -112,7 +108,7 @@ func set() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "json_set"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 3 {
-			return nil, argumentError(name, 3)
+			return nil, lib.ArgumentError(name, 3)
 		}
 		var data interface{}
 		if jsonStr, ok := args[0].(lang.StringValue); ok {
@@ -139,7 +135,7 @@ func remove() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "json_delete"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		var data interface{}
 		if jsonStr, ok := args[0].(lang.StringValue); ok {
@@ -166,7 +162,7 @@ func has() (string, func([]lang.Value) (lang.Value, error)) {
 	_, Get := get()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		result, err := Get(args)
 		if err != nil {
@@ -181,7 +177,7 @@ func keys() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "json_keys"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		var data interface{}
 		if jsonStr, ok := args[0].(lang.StringValue); ok {
@@ -210,7 +206,7 @@ func values() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "json_values"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		var data interface{}
 		if jsonStr, ok := args[0].(lang.StringValue); ok {
@@ -245,7 +241,7 @@ func length() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "json_length"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		var data interface{}
 		if jsonStr, ok := args[0].(lang.StringValue); ok {
@@ -304,7 +300,7 @@ func ttype() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "json_type"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		var data interface{}
 		if jsonStr, ok := args[0].(lang.StringValue); ok {

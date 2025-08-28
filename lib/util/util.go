@@ -1,7 +1,6 @@
 package util
 
 import (
-	"errors"
 	"fmt"
 	"math/rand"
 	"strconv"
@@ -13,449 +12,575 @@ import (
 	"github.com/vedadiyan/exql/lib"
 )
 
-// Utility/Control Functions
-// These functions provide general utility operations and control flow capabilities
-
 // Conditional Functions
-func conditionalIf(args []lang.Value) (lang.Value, error) {
-	if len(args) < 2 || len(args) > 3 {
-		return nil, errors.New("if: expected 2 or 3 arguments")
-	}
-
-	condition, err := lib.ToBool(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("if: condition argument: %w", err)
-	}
-
-	trueValue := args[1]
-
-	if condition {
-		return trueValue, nil
-	}
-
-	if len(args) == 3 {
-		return args[2], nil // false value
-	}
-
-	return nil, nil
-}
-
-func conditionalUnless(args []lang.Value) (lang.Value, error) {
-	if len(args) < 2 || len(args) > 3 {
-		return nil, errors.New("unless: expected 2 or 3 arguments")
-	}
-
-	condition, err := lib.ToBool(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("unless: condition argument: %w", err)
-	}
-
-	trueValue := args[1]
-
-	if !condition {
-		return trueValue, nil
-	}
-
-	if len(args) == 3 {
-		return args[2], nil // false value
-	}
-
-	return nil, nil
-}
-
-func conditionalSwitch(args []lang.Value) (lang.Value, error) {
-	if len(args) < 3 || len(args)%2 == 0 {
-		return nil, errors.New("switch: expected an odd number of arguments (value, case1, result1, ... , default)")
-	}
-
-	testValue := args[0]
-
-	// Check each case pair
-	for i := 1; i < len(args)-1; i += 2 {
-		caseValue := args[i]
-		result := args[i+1]
-
-		if deepEqual(testValue, caseValue) {
-			return result, nil
+func conditionalIf() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "if"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) < 2 || len(args) > 3 {
+			return nil, lib.RangeError(name, 2, 3)
 		}
-	}
 
-	// Return default value (last argument)
-	return args[len(args)-1], nil
+		condition, err := lib.ToBool(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: condition argument: %w", name, err)
+		}
+
+		if condition {
+			return args[1], nil
+		}
+
+		if len(args) == 3 {
+			return args[2], nil
+		}
+
+		return nil, nil
+	}
+	return name, fn
+}
+
+func conditionalUnless() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "unless"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) < 2 || len(args) > 3 {
+			return nil, lib.RangeError(name, 2, 3)
+		}
+
+		condition, err := lib.ToBool(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: condition argument: %w", name, err)
+		}
+
+		if !condition {
+			return args[1], nil
+		}
+
+		if len(args) == 3 {
+			return args[2], nil
+		}
+
+		return nil, nil
+	}
+	return name, fn
+}
+
+func conditionalSwitch() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "switch"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) < 3 || len(args)%2 == 0 {
+			return nil, fmt.Errorf("%s: expected an odd number of arguments (value, case1, result1, ... , default)", name)
+		}
+
+		testValue := args[0]
+
+		// Check each case pair
+		for i := 1; i < len(args)-1; i += 2 {
+			caseValue := args[i]
+			result := args[i+1]
+
+			if deepEqual(testValue, caseValue) {
+				return result, nil
+			}
+		}
+
+		// Return default value (last argument)
+		return args[len(args)-1], nil
+	}
+	return name, fn
 }
 
 // Null Coalescing Functions
-func coalesce(args []lang.Value) (lang.Value, error) {
-	for _, arg := range args {
-		if arg != nil && !isNull(arg) {
-			return arg, nil
+func coalesce() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "coalesce"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		for _, arg := range args {
+			if arg != nil && !isNull(arg) {
+				return arg, nil
+			}
 		}
+		return nil, nil
 	}
-	return nil, nil
+	return name, fn
 }
 
-func defaultValue(args []lang.Value) (lang.Value, error) {
-	if len(args) != 2 {
-		return nil, errors.New("default: expected 2 arguments")
-	}
-
-	value := args[0]
-	defaultVal := args[1]
-
-	if value == nil || isNull(value) {
-		return defaultVal, nil
-	}
-
-	return value, nil
-}
-
-func firstNonNull(args []lang.Value) (lang.Value, error) {
-	return coalesce(args)
-}
-
-func firstNonEmpty(args []lang.Value) (lang.Value, error) {
-	for _, arg := range args {
-		if arg != nil && !isEmpty(arg) {
-			return arg, nil
+func defaultValue() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "default"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 2 {
+			return nil, lib.ArgumentError(name, 2)
 		}
+
+		value := args[0]
+		defaultVal := args[1]
+
+		if value == nil || isNull(value) {
+			return defaultVal, nil
+		}
+
+		return value, nil
 	}
-	return nil, nil
+	return name, fn
+}
+
+func firstNonNull() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "first_non_null"
+	_, coalesceFunc := coalesce()
+	fn := func(args []lang.Value) (lang.Value, error) {
+		return coalesceFunc(args)
+	}
+	return name, fn
+}
+
+func firstNonEmpty() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "first_non_empty"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		for _, arg := range args {
+			if arg != nil && !isEmpty(arg) {
+				return arg, nil
+			}
+		}
+		return nil, nil
+	}
+	return name, fn
 }
 
 // Comparison and Selection
-func greatest(args []lang.Value) (lang.Value, error) {
-	if len(args) == 0 {
-		return nil, nil
-	}
+func greatest() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "greatest"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) == 0 {
+			return nil, nil
+		}
 
-	max := args[0]
-	for i := 1; i < len(args); i++ {
-		comparison, err := compare(args[i], max)
-		if err != nil {
-			return nil, fmt.Errorf("greatest: comparison failed: %w", err)
+		max := args[0]
+		for i := 1; i < len(args); i++ {
+			comparison, err := compare(args[i], max)
+			if err != nil {
+				return nil, fmt.Errorf("%s: comparison failed: %w", name, err)
+			}
+			if comparison > 0 {
+				max = args[i]
+			}
 		}
-		if comparison > 0 {
-			max = args[i]
-		}
+		return max, nil
 	}
-	return max, nil
+	return name, fn
 }
 
-func least(args []lang.Value) (lang.Value, error) {
-	if len(args) == 0 {
-		return nil, nil
-	}
+func least() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "least"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) == 0 {
+			return nil, nil
+		}
 
-	min := args[0]
-	for i := 1; i < len(args); i++ {
-		comparison, err := compare(args[i], min)
-		if err != nil {
-			return nil, fmt.Errorf("least: comparison failed: %w", err)
+		min := args[0]
+		for i := 1; i < len(args); i++ {
+			comparison, err := compare(args[i], min)
+			if err != nil {
+				return nil, fmt.Errorf("%s: comparison failed: %w", name, err)
+			}
+			if comparison < 0 {
+				min = args[i]
+			}
 		}
-		if comparison < 0 {
-			min = args[i]
-		}
+		return min, nil
 	}
-	return min, nil
+	return name, fn
 }
 
-func choose(args []lang.Value) (lang.Value, error) {
-	if len(args) < 2 {
-		return nil, errors.New("choose: expected at least 2 arguments")
-	}
+func choose() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "choose"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) < 2 {
+			return nil, fmt.Errorf("%s: expected at least 2 arguments", name)
+		}
 
-	index, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("choose: index argument: %w", err)
-	}
+		index, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: index argument: %w", name, err)
+		}
 
-	intIndex := int(index)
-	if intIndex < 1 || intIndex > len(args)-1 {
-		return nil, errors.New("choose: index out of bounds")
-	}
+		intIndex := int(index)
+		if intIndex < 1 || intIndex > len(args)-1 {
+			return nil, fmt.Errorf("%s: index out of bounds", name)
+		}
 
-	return args[intIndex], nil // 1-based indexing
+		return args[intIndex], nil // 1-based indexing
+	}
+	return name, fn
 }
 
 // Debugging and Inspection
-func debugPrint(args []lang.Value) (lang.Value, error) {
-	var parts []string
-	for _, arg := range args {
-		parts = append(parts, formatValueForDebug(arg))
-	}
+func debugPrint() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "debug"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		var parts []string
+		for _, arg := range args {
+			parts = append(parts, formatValueForDebug(arg))
+		}
 
-	message := strings.Join(parts, " ")
-	fmt.Println("[DEBUG]", message)
+		message := strings.Join(parts, " ")
+		fmt.Println("[DEBUG]", message)
 
-	// Return the first argument (or nil if no args)
-	if len(args) > 0 {
-		return args[0], nil
+		// Return the first argument (or nil if no args)
+		if len(args) > 0 {
+			return args[0], nil
+		}
+		return nil, nil
 	}
-	return nil, nil
+	return name, fn
 }
 
-func inspect(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("inspect: expected 1 argument")
-	}
+func inspect() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "inspect"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, lib.ArgumentError(name, 1)
+		}
 
-	return lang.StringValue(formatValueForInspect(args[0])), nil
+		return lang.StringValue(formatValueForInspect(args[0])), nil
+	}
+	return name, fn
 }
 
-func dump(args []lang.Value) (lang.Value, error) {
-	var parts []string
-	for _, arg := range args {
-		parts = append(parts, formatValueForInspect(arg))
-	}
+func dump() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "dump"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		var parts []string
+		for _, arg := range args {
+			parts = append(parts, formatValueForInspect(arg))
+		}
 
-	return lang.StringValue(strings.Join(parts, "\n")), nil
+		return lang.StringValue(strings.Join(parts, "\n")), nil
+	}
+	return name, fn
 }
 
 // Identity and Pass-through
-func identity(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("identity: expected 1 argument")
+func identity() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "identity"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, lib.ArgumentError(name, 1)
+		}
+		return args[0], nil
 	}
-	return args[0], nil
+	return name, fn
 }
 
-func noop(args []lang.Value) (lang.Value, error) {
-	return nil, nil
+func noop() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "noop"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		return nil, nil
+	}
+	return name, fn
 }
 
-func constant(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("constant: expected 1 argument")
+func constant() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "constant"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, lib.ArgumentError(name, 1)
+		}
+		return args[0], nil
 	}
-	return args[0], nil
+	return name, fn
 }
 
 // Error Handling
-func tryOr(args []lang.Value) (lang.Value, error) {
-	if len(args) != 2 {
-		return nil, errors.New("try_or: expected 2 arguments")
+func tryOr() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "try_or"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 2 {
+			return nil, lib.ArgumentError(name, 2)
+		}
+
+		value := args[0]
+		fallback := args[1]
+
+		if value == nil {
+			return fallback, nil
+		}
+
+		return value, nil
 	}
-
-	value := args[0]
-	fallback := args[1]
-
-	if value == nil {
-		return fallback, nil
-	}
-
-	return value, nil
+	return name, fn
 }
 
-func safe(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("safe: expected 1 argument")
-	}
+func safe() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "safe"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, lib.ArgumentError(name, 1)
+		}
 
-	value := args[0]
-	if value == nil {
-		return nil, nil
-	}
+		value := args[0]
+		if value == nil {
+			return nil, nil
+		}
 
-	return value, nil
+		return value, nil
+	}
+	return name, fn
 }
 
 // Type Conversion Utilities
-func toString(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("tostring: expected 1 argument")
-	}
-	val, err := lib.ToString(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("tostring: %w", err)
-	}
-	return val, nil
-}
-
-func toNumber(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("tonumber: expected 1 argument")
-	}
-	val, err := lib.ToNumber(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("tonumber: %w", err)
-	}
-	return lang.NumberValue(val), nil
-}
-
-func toBool(args []lang.Value) (lang.Value, error) {
-	if len(args) != 1 {
-		return nil, errors.New("tobool: expected 1 argument")
-	}
-	val, err := lib.ToBool(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("tobool: %w", err)
-	}
-	return lang.BoolValue(val), nil
-}
-
-func toList(args []lang.Value) (lang.Value, error) {
-	if len(args) == 0 {
-		return lang.ListValue{}, nil
-	}
-
-	if len(args) == 1 {
-		if list, ok := args[0].(lang.ListValue); ok {
-			return list, nil
+func toString() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "tostring"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, lib.ArgumentError(name, 1)
 		}
-		return lang.ListValue{args[0]}, nil
+		val, err := lib.ToString(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", name, err)
+		}
+		return val, nil
 	}
+	return name, fn
+}
 
-	result := make(lang.ListValue, len(args))
-	copy(result, args)
-	return result, nil
+func toNumber() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "tonumber"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, lib.ArgumentError(name, 1)
+		}
+		val, err := lib.ToNumber(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", name, err)
+		}
+		return lang.NumberValue(val), nil
+	}
+	return name, fn
+}
+
+func toBool() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "tobool"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, lib.ArgumentError(name, 1)
+		}
+		val, err := lib.ToBool(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", name, err)
+		}
+		return lang.BoolValue(val), nil
+	}
+	return name, fn
+}
+
+func toList() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "tolist"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) == 0 {
+			return lang.ListValue{}, nil
+		}
+
+		if len(args) == 1 {
+			if list, ok := args[0].(lang.ListValue); ok {
+				return list, nil
+			}
+			return lang.ListValue{args[0]}, nil
+		}
+
+		result := make(lang.ListValue, len(args))
+		copy(result, args)
+		return result, nil
+	}
+	return name, fn
 }
 
 // Validation Utilities
-func assert(args []lang.Value) (lang.Value, error) {
-	if len(args) < 1 || len(args) > 2 {
-		return nil, errors.New("assert: expected 1 or 2 arguments")
-	}
-
-	condition, err := lib.ToBool(args[0])
-	if err != nil {
-		return nil, fmt.Errorf("assert: condition argument: %w", err)
-	}
-
-	if !condition {
-		message := "Assertion failed"
-		if len(args) == 2 {
-			msg, err := lib.ToString(args[1])
-			if err != nil {
-				return nil, fmt.Errorf("assert: message argument: %w", err)
-			}
-			message = string(msg)
+func assert() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "assert"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) < 1 || len(args) > 2 {
+			return nil, lib.RangeError(name, 1, 2)
 		}
-		return nil, fmt.Errorf("assertion failed: %s", message)
-	}
 
-	return lang.BoolValue(true), nil
+		condition, err := lib.ToBool(args[0])
+		if err != nil {
+			return nil, fmt.Errorf("%s: condition argument: %w", name, err)
+		}
+
+		if !condition {
+			message := "Assertion failed"
+			if len(args) == 2 {
+				msg, err := lib.ToString(args[1])
+				if err != nil {
+					return nil, fmt.Errorf("%s: message argument: %w", name, err)
+				}
+				message = string(msg)
+			}
+			return nil, fmt.Errorf("assertion failed: %s", message)
+		}
+
+		return lang.BoolValue(true), nil
+	}
+	return name, fn
 }
 
-func validate(args []lang.Value) (lang.Value, error) {
-	if len(args) < 2 || len(args) > 3 {
-		return nil, errors.New("validate: expected 2 or 3 arguments")
-	}
+func validate() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "validate"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) < 2 || len(args) > 3 {
+			return nil, lib.RangeError(name, 2, 3)
+		}
 
-	value := args[0]
-	condition, err := lib.ToBool(args[1])
-	if err != nil {
-		return nil, fmt.Errorf("validate: condition argument: %w", err)
-	}
+		value := args[0]
+		condition, err := lib.ToBool(args[1])
+		if err != nil {
+			return nil, fmt.Errorf("%s: condition argument: %w", name, err)
+		}
 
-	if condition {
+		if condition {
+			return value, nil
+		}
+
+		if len(args) == 3 {
+			return args[2], nil // Return fallback
+		}
+
+		return nil, nil
+	}
+	return name, fn
+}
+
+func require() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "require"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) < 1 || len(args) > 2 {
+			return nil, lib.RangeError(name, 1, 2)
+		}
+
+		value := args[0]
+		if value == nil || isNull(value) {
+			message := "Required value is null"
+			if len(args) == 2 {
+				msg, err := lib.ToString(args[1])
+				if err != nil {
+					return nil, fmt.Errorf("%s: message argument: %w", name, err)
+				}
+				message = string(msg)
+			}
+			return nil, fmt.Errorf("required value missing: %s", message)
+		}
+
 		return value, nil
 	}
-
-	if len(args) == 3 {
-		return args[2], nil // Return fallback
-	}
-
-	return nil, nil
-}
-
-func require(args []lang.Value) (lang.Value, error) {
-	if len(args) < 1 || len(args) > 2 {
-		return nil, errors.New("require: expected 1 or 2 arguments")
-	}
-
-	value := args[0]
-	if value == nil || isNull(value) {
-		message := "Required value is null"
-		if len(args) == 2 {
-			msg, err := lib.ToString(args[1])
-			if err != nil {
-				return nil, fmt.Errorf("require: message argument: %w", err)
-			}
-			message = string(msg)
-		}
-		return nil, fmt.Errorf("required value missing: %s", message)
-	}
-
-	return value, nil
+	return name, fn
 }
 
 // Functional Utilities
-func apply(args []lang.Value) (lang.Value, error) {
-	if len(args) < 1 {
-		return nil, errors.New("apply: expected at least 1 argument")
+func apply() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "apply"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) < 1 {
+			return nil, fmt.Errorf("%s: expected at least 1 argument", name)
+		}
+		return args[0], nil
 	}
-	return args[0], nil
+	return name, fn
 }
 
-func pipe(args []lang.Value) (lang.Value, error) {
-	if len(args) < 1 {
-		return nil, errors.New("pipe: expected at least 1 argument")
+func pipe() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "pipe"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) < 1 {
+			return nil, fmt.Errorf("%s: expected at least 1 argument", name)
+		}
+		return args[0], nil
 	}
-	return args[0], nil
+	return name, fn
 }
 
-func compose(args []lang.Value) (lang.Value, error) {
-	if len(args) < 1 {
-		return nil, errors.New("compose: expected at least 1 argument")
+func compose() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "compose"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) < 1 {
+			return nil, fmt.Errorf("%s: expected at least 1 argument", name)
+		}
+		return args[0], nil
 	}
-	return args[0], nil
+	return name, fn
 }
 
 // Miscellaneous Utilities
-func uuid_(args []lang.Value) (lang.Value, error) {
-	if len(args) != 0 {
-		return nil, errors.New("uuid: expected 0 arguments")
-	}
-	return lang.StringValue(uuid.NewString()), nil
-}
-
-func timestamp(args []lang.Value) (lang.Value, error) {
-	if len(args) != 0 {
-		return nil, errors.New("timestamp: expected 0 arguments")
-	}
-	return lang.NumberValue(float64(time.Now().Unix())), nil
-}
-
-func randomString(args []lang.Value) (lang.Value, error) {
-	length := 10 // default length
-	if len(args) == 1 {
-		l, err := lib.ToNumber(args[0])
-		if err != nil {
-			return nil, fmt.Errorf("random_string: length argument: %w", err)
+func uuid_() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "uuid"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 0 {
+			return nil, lib.ArgumentError(name, 0)
 		}
-		length = int(l)
-		if length <= 0 {
-			length = 10
-		}
-		if length > 1000 {
-			length = 1000 // cap at 1000 chars
-		}
-	} else if len(args) != 0 {
-		return nil, errors.New("random_string: expected 0 or 1 argument")
+		return lang.StringValue(uuid.NewString()), nil
 	}
-
-	chars := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-	result := make([]byte, length)
-	rand.Seed(time.Now().UnixNano())
-	for i := range result {
-		result[i] = chars[rand.Intn(len(chars))]
-	}
-
-	return lang.StringValue(string(result)), nil
+	return name, fn
 }
 
-func memoize(args []lang.Value) (lang.Value, error) {
-	if len(args) < 1 {
-		return nil, errors.New("memoize: expected at least 1 argument")
+func timestamp() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "timestamp"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 0 {
+			return nil, lib.ArgumentError(name, 0)
+		}
+		return lang.NumberValue(float64(time.Now().Unix())), nil
 	}
-	return args[0], nil
+	return name, fn
 }
 
-func benchmark(args []lang.Value) (lang.Value, error) {
-	if len(args) < 1 {
-		return nil, errors.New("benchmark: expected at least 1 argument")
+func randomString() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "random_string"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		length := 10 // default length
+		if len(args) == 1 {
+			l, err := lib.ToNumber(args[0])
+			if err != nil {
+				return nil, fmt.Errorf("%s: length argument: %w", name, err)
+			}
+			length = int(l)
+			if length <= 0 {
+				length = 10
+			}
+			if length > 1000 {
+				length = 1000 // cap at 1000 chars
+			}
+		} else if len(args) != 0 {
+			return nil, lib.RangeError(name, 0, 1)
+		}
+
+		chars := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+		result := make([]byte, length)
+		rand.Seed(time.Now().UnixNano())
+		for i := range result {
+			result[i] = chars[rand.Intn(len(chars))]
+		}
+
+		return lang.StringValue(string(result)), nil
 	}
-	return lang.NumberValue(0.001), nil
+	return name, fn
+}
+
+func memoize() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "memoize"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) < 1 {
+			return nil, fmt.Errorf("%s: expected at least 1 argument", name)
+		}
+		return args[0], nil
+	}
+	return name, fn
+}
+
+func benchmark() (string, func([]lang.Value) (lang.Value, error)) {
+	name := "benchmark"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) < 1 {
+			return nil, fmt.Errorf("%s: expected at least 1 argument", name)
+		}
+		return lang.NumberValue(0.001), nil
+	}
+	return name, fn
 }
 
 // Helper functions for utility operations
@@ -563,60 +688,38 @@ func formatValueForInspect(v lang.Value) string {
 	}
 }
 
-// Functions that would be in the BuiltinFunctions map:
-type Function func(args []lang.Value) (lang.Value, error)
-
-var UtilityFunctions = map[string]Function{
-	// Conditional functions
-	"if":     conditionalIf,
-	"unless": conditionalUnless,
-	"switch": conditionalSwitch,
-
-	// Null coalescing
-	"coalesce":        coalesce,
-	"default":         defaultValue,
-	"first_non_null":  firstNonNull,
-	"first_non_empty": firstNonEmpty,
-
-	// Comparison and selection
-	"greatest": greatest,
-	"least":    least,
-	"choose":   choose,
-
-	// Debugging and inspection
-	"debug":   debugPrint,
-	"inspect": inspect,
-	"dump":    dump,
-
-	// Identity and pass-through
-	"identity": identity,
-	"noop":     noop,
-	"constant": constant,
-
-	// Error handling
-	"try_or": tryOr,
-	"safe":   safe,
-
-	// Type conversion utilities
-	"tostring": toString,
-	"tonumber": toNumber,
-	"tobool":   toBool,
-	"tolist":   toList,
-
-	// Validation utilities
-	"assert":   assert,
-	"validate": validate,
-	"require":  require,
-
-	// Functional utilities
-	"apply":   apply,
-	"pipe":    pipe,
-	"compose": compose,
-
-	// Miscellaneous utilities
-	"uuid":          uuid_,
-	"timestamp":     timestamp,
-	"random_string": randomString,
-	"memoize":       memoize,
-	"benchmark":     benchmark,
+var UtilityFunctions = []func() (string, func([]lang.Value) (lang.Value, error)){
+	conditionalIf,
+	conditionalUnless,
+	conditionalSwitch,
+	coalesce,
+	defaultValue,
+	firstNonNull,
+	firstNonEmpty,
+	greatest,
+	least,
+	choose,
+	debugPrint,
+	inspect,
+	dump,
+	identity,
+	noop,
+	constant,
+	tryOr,
+	safe,
+	toString,
+	toNumber,
+	toBool,
+	toList,
+	assert,
+	validate,
+	require,
+	apply,
+	pipe,
+	compose,
+	uuid_,
+	timestamp,
+	randomString,
+	memoize,
+	benchmark,
 }

@@ -12,27 +12,11 @@ import (
 	"github.com/vedadiyan/exql/lib"
 )
 
-func argumentError(name string, expected int) error {
-	return fmt.Errorf("%s: expected %d argument(s)", name, expected)
-}
-
-func argumentErrorMin(name string, expected int) error {
-	return fmt.Errorf("%s: expected at least %d argument(s)", name, expected)
-}
-
-func argumentErrorRange(name string, min, max int) error {
-	return fmt.Errorf("%s: expected %d or %d arguments", name, min, max)
-}
-
-func argumentErrorMultiRange(name string, expected []int) error {
-	return fmt.Errorf("%s: expected %v arguments", name, expected)
-}
-
 func Abs() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "abs"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		num, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -47,7 +31,7 @@ func Sign() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "sign"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		num, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -67,7 +51,7 @@ func Max() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "max"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) == 0 {
-			return nil, argumentErrorMin(name, 1)
+			return nil, lib.ArgumentErrorMin(name, 1)
 		}
 		max, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -91,7 +75,7 @@ func Min() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "min"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) == 0 {
-			return nil, argumentErrorMin(name, 1)
+			return nil, lib.ArgumentErrorMin(name, 1)
 		}
 		min, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -115,7 +99,7 @@ func Clamp() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "clamp"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 3 {
-			return nil, argumentError(name, 3)
+			return nil, lib.ArgumentError(name, 3)
 		}
 		value, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -144,7 +128,7 @@ func Ceil() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "ceil"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		num, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -159,7 +143,7 @@ func Floor() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "floor"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		num, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -174,7 +158,7 @@ func Round() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "round"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 1 || len(args) > 2 {
-			return nil, argumentErrorRange(name, 1, 2)
+			return nil, lib.ArgumentErrorRange(name, 1, 2)
 		}
 		value, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -201,7 +185,7 @@ func Trunc() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "trunc"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		num, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -216,7 +200,7 @@ func Pow() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "pow"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		base, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -235,7 +219,7 @@ func Sqrt() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "sqrt"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		num, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -253,7 +237,7 @@ func Cbrt() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "cbrt"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		num, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -268,7 +252,7 @@ func Exp() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "exp"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		num, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -283,7 +267,7 @@ func Exp2() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "exp2"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		num, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -298,7 +282,7 @@ func Log() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "log"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		num, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -316,7 +300,7 @@ func Log10() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "log10"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		num, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -334,7 +318,7 @@ func Log2() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "log2"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		num, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -352,7 +336,7 @@ func Sin() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "sin"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		num, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -367,7 +351,7 @@ func Cos() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "cos"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		num, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -382,7 +366,7 @@ func Tan() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "tan"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		num, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -397,7 +381,7 @@ func Asin() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "asin"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		num, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -415,7 +399,7 @@ func Acos() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "acos"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		num, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -433,7 +417,7 @@ func Atan() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "atan"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		num, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -448,7 +432,7 @@ func Atan2() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "atan2"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
-			return nil, argumentError(name, 2)
+			return nil, lib.ArgumentError(name, 2)
 		}
 		y, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -467,7 +451,7 @@ func Sinh() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "sinh"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		num, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -482,7 +466,7 @@ func Cosh() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "cosh"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		num, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -497,7 +481,7 @@ func Tanh() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "tanh"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		num, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -512,7 +496,7 @@ func Radians() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "radians"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		degrees, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -527,7 +511,7 @@ func Degrees() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "degrees"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		radians, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -568,7 +552,7 @@ func Mean() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "mean"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) == 0 {
-			return nil, argumentErrorMin(name, 1)
+			return nil, lib.ArgumentErrorMin(name, 1)
 		}
 		count := 0
 		sum := 0.0
@@ -757,7 +741,7 @@ func Random() (string, func([]lang.Value) (lang.Value, error)) {
 			}
 			return lang.NumberValue(float64(rand.Intn(max-min) + min)), nil
 		}
-		return nil, argumentErrorMultiRange(name, []int{0, 1, 2})
+		return nil, lib.ArgumentErrorMultiRange(name, []int{0, 1, 2})
 	}
 	return name, fn
 }
@@ -775,7 +759,7 @@ func RandomSeed() (string, func([]lang.Value) (lang.Value, error)) {
 			seed := int64(seedVal)
 			rand.Seed(seed)
 		} else {
-			return nil, argumentErrorRange(name, 0, 1)
+			return nil, lib.ArgumentErrorRange(name, 0, 1)
 		}
 		return lang.BoolValue(true), nil
 	}
@@ -806,7 +790,7 @@ func RandomFloat() (string, func([]lang.Value) (lang.Value, error)) {
 			}
 			return lang.NumberValue(minVal + rand.Float64()*(maxVal-minVal)), nil
 		}
-		return nil, argumentErrorMultiRange(name, []int{0, 1, 2})
+		return nil, lib.ArgumentErrorMultiRange(name, []int{0, 1, 2})
 	}
 	return name, fn
 }
@@ -815,7 +799,7 @@ func IsNaN() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_nan"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		num, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -830,7 +814,7 @@ func IsInf() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_inf"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		num, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -845,7 +829,7 @@ func IsFinite() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "is_finite"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		num, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -860,7 +844,7 @@ func GCD() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "gcd"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 2 {
-			return nil, argumentErrorMin(name, 2)
+			return nil, lib.ArgumentErrorMin(name, 2)
 		}
 		firstVal, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -884,7 +868,7 @@ func LCM() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "lcm"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 2 {
-			return nil, argumentErrorMin(name, 2)
+			return nil, lib.ArgumentErrorMin(name, 2)
 		}
 		firstVal, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -908,7 +892,7 @@ func Factorial() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "factorial"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
-			return nil, argumentError(name, 1)
+			return nil, lib.ArgumentError(name, 1)
 		}
 		num, err := lib.ToNumber(args[0])
 		if err != nil {
@@ -934,7 +918,7 @@ func Pi() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "pi"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 0 {
-			return nil, argumentError(name, 0)
+			return nil, lib.ArgumentError(name, 0)
 		}
 		return lang.NumberValue(math.Pi), nil
 	}
@@ -945,7 +929,7 @@ func E() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "e"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 0 {
-			return nil, argumentError(name, 0)
+			return nil, lib.ArgumentError(name, 0)
 		}
 		return lang.NumberValue(math.E), nil
 	}
@@ -956,7 +940,7 @@ func Phi() (string, func([]lang.Value) (lang.Value, error)) {
 	name := "phi"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 0 {
-			return nil, argumentError(name, 0)
+			return nil, lib.ArgumentError(name, 0)
 		}
 		return lang.NumberValue(math.Phi), nil
 	}

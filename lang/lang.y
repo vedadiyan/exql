@@ -19,7 +19,7 @@ package lang
 %token EQ NE LT LE GT GE
 %token LPAREN RPAREN LBRACKET RBRACKET
 %token DOT COMMA QUOTE DQUOTE COLON
-%token <expr> QMARK
+%token QMARK
 
 %type <expr> expr logical_expr equality_expr relational_expr additive_expr multiplicative_expr unary_expr primary_expr
 %type <expr> field_access function_call list_literal

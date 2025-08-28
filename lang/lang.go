@@ -89,6 +89,16 @@ const yyInitialStackSize = 16
 
 //line lang.y:173
 
+func ParseExpression(input string) (ExprNode, error) {
+	yyErrorVerbose = true
+	lexer := &yyLex{input: input}
+	yyParse(lexer)
+	if lexer.error != nil {
+		return nil, lexer.error
+	}
+	return lexer.result, nil
+}
+
 //line yacctab:1
 var yyExca = [...]int8{
 	-1, 1,

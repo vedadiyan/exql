@@ -171,3 +171,13 @@ expression_list: expr {
     }
 
 %%
+
+func ParseExpression(input string) (ExprNode, error) {
+	yyErrorVerbose = true
+	lexer := &yyLex{input: input}
+	yyParse(lexer)
+	if lexer.error != nil {
+		return nil, lexer.error
+	}
+	return lexer.result, nil
+}

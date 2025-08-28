@@ -12,7 +12,7 @@ type Context struct {
 }
 
 func main() {
-	input := "role[?][?].test"
+	input := "role[0:][?].test"
 	context := new(Context)
 	context.vars = make(map[string]lang.Value)
 	context.vars["role"] = lang.ListValue{

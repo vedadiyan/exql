@@ -147,7 +147,10 @@ state 11
 	unary_expr:  primary_expr.    (24)
 	field_access:  primary_expr.DOT IDENTIFIER 
 	field_access:  primary_expr.LBRACKET expr RBRACKET 
-	field_access:  primary_expr.LBRACKET EACH RBRACKET 
+	field_access:  primary_expr.LBRACKET QMARK RBRACKET 
+	field_access:  primary_expr.LBRACKET expr COLON expr RBRACKET 
+	field_access:  primary_expr.LBRACKET COLON expr RBRACKET 
+	field_access:  primary_expr.LBRACKET expr COLON RBRACKET 
 
 	LBRACKET  shift 39
 	DOT  shift 38
@@ -574,7 +577,10 @@ state 38
 
 state 39
 	field_access:  primary_expr LBRACKET.expr RBRACKET 
-	field_access:  primary_expr LBRACKET.EACH RBRACKET 
+	field_access:  primary_expr LBRACKET.QMARK RBRACKET 
+	field_access:  primary_expr LBRACKET.expr COLON expr RBRACKET 
+	field_access:  primary_expr LBRACKET.COLON expr RBRACKET 
+	field_access:  primary_expr LBRACKET.expr COLON RBRACKET 
 
 	IDENTIFIER  shift 12
 	STRING  shift 14
@@ -584,7 +590,8 @@ state 39
 	NOT  shift 9
 	LPAREN  shift 17
 	LBRACKET  shift 21
-	EACH  shift 61
+	COLON  shift 62
+	QMARK  shift 61
 	'-'  shift 10
 	.  error
 
@@ -611,12 +618,12 @@ state 40
 	BOOLEAN  shift 16
 	NOT  shift 9
 	LPAREN  shift 17
-	RPAREN  shift 63
+	RPAREN  shift 64
 	LBRACKET  shift 21
 	'-'  shift 10
 	.  error
 
-	expr  goto 64
+	expr  goto 65
 	logical_expr  goto 3
 	equality_expr  goto 4
 	relational_expr  goto 5
@@ -627,12 +634,12 @@ state 40
 	field_access  goto 18
 	function_call  goto 19
 	list_literal  goto 20
-	argument_list  goto 62
+	argument_list  goto 63
 
 state 41
 	primary_expr:  LPAREN expr.RPAREN 
 
-	RPAREN  shift 65
+	RPAREN  shift 66
 	.  error
 
 
@@ -640,21 +647,21 @@ state 42
 	list_literal:  LBRACKET expression_list.RBRACKET 
 	expression_list:  expression_list.COMMA expr 
 
-	RBRACKET  shift 66
-	COMMA  shift 67
+	RBRACKET  shift 67
+	COMMA  shift 68
 	.  error
 
 
 state 43
-	list_literal:  LBRACKET RBRACKET.    (40)
+	list_literal:  LBRACKET RBRACKET.    (43)
 
-	.  reduce 40 (src line 146)
+	.  reduce 43 (src line 155)
 
 
 state 44
-	expression_list:  expr.    (43)
+	expression_list:  expr.    (46)
 
-	.  reduce 43 (src line 157)
+	.  reduce 46 (src line 166)
 
 
 state 45
@@ -777,7 +784,7 @@ state 54
 	'-'  shift 10
 	.  error
 
-	additive_expr  goto 68
+	additive_expr  goto 69
 	multiplicative_expr  goto 7
 	unary_expr  goto 8
 	primary_expr  goto 11
@@ -825,53 +832,23 @@ state 59
 
 state 60
 	field_access:  primary_expr LBRACKET expr.RBRACKET 
+	field_access:  primary_expr LBRACKET expr.COLON expr RBRACKET 
+	field_access:  primary_expr LBRACKET expr.COLON RBRACKET 
 
-	RBRACKET  shift 69
+	RBRACKET  shift 70
+	COLON  shift 71
 	.  error
 
 
 state 61
-	field_access:  primary_expr LBRACKET EACH.RBRACKET 
+	field_access:  primary_expr LBRACKET QMARK.RBRACKET 
 
-	RBRACKET  shift 70
+	RBRACKET  shift 72
 	.  error
 
 
 state 62
-	function_call:  IDENTIFIER LPAREN argument_list.RPAREN 
-	argument_list:  argument_list.COMMA expr 
-
-	RPAREN  shift 71
-	COMMA  shift 72
-	.  error
-
-
-state 63
-	function_call:  IDENTIFIER LPAREN RPAREN.    (38)
-
-	.  reduce 38 (src line 139)
-
-
-state 64
-	argument_list:  expr.    (41)
-
-	.  reduce 41 (src line 150)
-
-
-state 65
-	primary_expr:  LPAREN expr RPAREN.    (30)
-
-	.  reduce 30 (src line 119)
-
-
-state 66
-	list_literal:  LBRACKET expression_list RBRACKET.    (39)
-
-	.  reduce 39 (src line 143)
-
-
-state 67
-	expression_list:  expression_list COMMA.expr 
+	field_access:  primary_expr LBRACKET COLON.expr RBRACKET 
 
 	IDENTIFIER  shift 12
 	STRING  shift 14
@@ -896,7 +873,66 @@ state 67
 	function_call  goto 19
 	list_literal  goto 20
 
+state 63
+	function_call:  IDENTIFIER LPAREN argument_list.RPAREN 
+	argument_list:  argument_list.COMMA expr 
+
+	RPAREN  shift 74
+	COMMA  shift 75
+	.  error
+
+
+state 64
+	function_call:  IDENTIFIER LPAREN RPAREN.    (41)
+
+	.  reduce 41 (src line 148)
+
+
+state 65
+	argument_list:  expr.    (44)
+
+	.  reduce 44 (src line 159)
+
+
+state 66
+	primary_expr:  LPAREN expr RPAREN.    (30)
+
+	.  reduce 30 (src line 119)
+
+
+state 67
+	list_literal:  LBRACKET expression_list RBRACKET.    (42)
+
+	.  reduce 42 (src line 152)
+
+
 state 68
+	expression_list:  expression_list COMMA.expr 
+
+	IDENTIFIER  shift 12
+	STRING  shift 14
+	DSTRING  shift 15
+	NUMBER  shift 13
+	BOOLEAN  shift 16
+	NOT  shift 9
+	LPAREN  shift 17
+	LBRACKET  shift 21
+	'-'  shift 10
+	.  error
+
+	expr  goto 76
+	logical_expr  goto 3
+	equality_expr  goto 4
+	relational_expr  goto 5
+	additive_expr  goto 6
+	multiplicative_expr  goto 7
+	unary_expr  goto 8
+	primary_expr  goto 11
+	field_access  goto 18
+	function_call  goto 19
+	list_literal  goto 20
+
+state 69
 	relational_expr:  relational_expr NOT IN additive_expr.    (14)
 	additive_expr:  additive_expr.'+' multiplicative_expr 
 	additive_expr:  additive_expr.'-' multiplicative_expr 
@@ -906,25 +942,60 @@ state 68
 	.  reduce 14 (src line 75)
 
 
-state 69
+state 70
 	field_access:  primary_expr LBRACKET expr RBRACKET.    (35)
 
 	.  reduce 35 (src line 129)
 
 
-state 70
-	field_access:  primary_expr LBRACKET EACH RBRACKET.    (36)
+state 71
+	field_access:  primary_expr LBRACKET expr COLON.expr RBRACKET 
+	field_access:  primary_expr LBRACKET expr COLON.RBRACKET 
+
+	IDENTIFIER  shift 12
+	STRING  shift 14
+	DSTRING  shift 15
+	NUMBER  shift 13
+	BOOLEAN  shift 16
+	NOT  shift 9
+	LPAREN  shift 17
+	LBRACKET  shift 21
+	RBRACKET  shift 78
+	'-'  shift 10
+	.  error
+
+	expr  goto 77
+	logical_expr  goto 3
+	equality_expr  goto 4
+	relational_expr  goto 5
+	additive_expr  goto 6
+	multiplicative_expr  goto 7
+	unary_expr  goto 8
+	primary_expr  goto 11
+	field_access  goto 18
+	function_call  goto 19
+	list_literal  goto 20
+
+state 72
+	field_access:  primary_expr LBRACKET QMARK RBRACKET.    (36)
 
 	.  reduce 36 (src line 132)
 
 
-state 71
-	function_call:  IDENTIFIER LPAREN argument_list RPAREN.    (37)
+state 73
+	field_access:  primary_expr LBRACKET COLON expr.RBRACKET 
 
-	.  reduce 37 (src line 136)
+	RBRACKET  shift 79
+	.  error
 
 
-state 72
+state 74
+	function_call:  IDENTIFIER LPAREN argument_list RPAREN.    (40)
+
+	.  reduce 40 (src line 145)
+
+
+state 75
 	argument_list:  argument_list COMMA.expr 
 
 	IDENTIFIER  shift 12
@@ -938,7 +1009,7 @@ state 72
 	'-'  shift 10
 	.  error
 
-	expr  goto 74
+	expr  goto 80
 	logical_expr  goto 3
 	equality_expr  goto 4
 	relational_expr  goto 5
@@ -950,27 +1021,52 @@ state 72
 	function_call  goto 19
 	list_literal  goto 20
 
-state 73
-	expression_list:  expression_list COMMA expr.    (44)
+state 76
+	expression_list:  expression_list COMMA expr.    (47)
 
-	.  reduce 44 (src line 160)
-
-
-state 74
-	argument_list:  argument_list COMMA expr.    (42)
-
-	.  reduce 42 (src line 153)
+	.  reduce 47 (src line 169)
 
 
-32 terminals, 15 nonterminals
-45 grammar rules, 75/16000 states
+state 77
+	field_access:  primary_expr LBRACKET expr COLON expr.RBRACKET 
+
+	RBRACKET  shift 81
+	.  error
+
+
+state 78
+	field_access:  primary_expr LBRACKET expr COLON RBRACKET.    (39)
+
+	.  reduce 39 (src line 141)
+
+
+state 79
+	field_access:  primary_expr LBRACKET COLON expr RBRACKET.    (38)
+
+	.  reduce 38 (src line 138)
+
+
+state 80
+	argument_list:  argument_list COMMA expr.    (45)
+
+	.  reduce 45 (src line 162)
+
+
+state 81
+	field_access:  primary_expr LBRACKET expr COLON expr RBRACKET.    (37)
+
+	.  reduce 37 (src line 135)
+
+
+33 terminals, 15 nonterminals
+48 grammar rules, 82/16000 states
 0 shift/reduce, 0 reduce/reduce conflicts reported
 64 working sets used
-memory: parser 190/240000
-66 extra closures
-268 shift entries, 1 exceptions
-36 goto entries
-152 entries saved by goto default
-Optimizer space used: output 127/240000
-127 table entries, 26 zero
-maximum spread: 31, maximum offset: 72
+memory: parser 212/240000
+73 extra closures
+291 shift entries, 1 exceptions
+38 goto entries
+172 entries saved by goto default
+Optimizer space used: output 142/240000
+142 table entries, 25 zero
+maximum spread: 32, maximum offset: 75

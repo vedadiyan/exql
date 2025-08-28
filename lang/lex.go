@@ -124,7 +124,12 @@ func (l *yyLex) Lex(lval *yySymType) int {
 	case '?':
 		{
 			l.pos++
-			return EACH
+			return QMARK
+		}
+	case ':':
+		{
+			l.pos++
+			return COLON
 		}
 	default:
 		if ch >= '0' && ch <= '9' {

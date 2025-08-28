@@ -52,7 +52,11 @@ type (
 	ListNode struct {
 		Elements []ExprNode
 	}
-	EachNode struct{}
+	EachNode  struct{}
+	RangeNode struct {
+		Begin Value
+		End   Value
+	}
 )
 
 func (n *BinaryOpNode) Evaluate(ctx Context) Value {
@@ -210,6 +214,10 @@ func (n *ListNode) Evaluate(ctx Context) Value {
 }
 
 func (n *EachNode) Evaluate(ctx Context) Value {
+	return EachValue(0)
+}
+
+func (n *RangeNode) Evaluate(ctx Context) Value {
 	return EachValue(0)
 }
 

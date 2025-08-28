@@ -18,8 +18,8 @@ package lang
 %token AND OR NOT IN
 %token EQ NE LT LE GT GE
 %token LPAREN RPAREN LBRACKET RBRACKET
-%token DOT COMMA QUOTE DQUOTE
-%token <expr> EACH
+%token DOT COMMA QUOTE DQUOTE COLON
+%token <expr> QMARK
 
 %type <expr> expr logical_expr equality_expr relational_expr additive_expr multiplicative_expr unary_expr primary_expr
 %type <expr> field_access function_call list_literal
@@ -129,8 +129,17 @@ field_access: primary_expr DOT IDENTIFIER {
     | primary_expr LBRACKET expr RBRACKET {
         $$ = &IndexAccessNode{Object: $1, Index: $3}
     }
-    | primary_expr LBRACKET EACH RBRACKET {
+    | primary_expr LBRACKET QMARK RBRACKET {
         $$ = &IndexAccessNode{Object: $1, Index: &EachNode{}}
+    }
+    | primary_expr LBRACKET expr COLON expr RBRACKET {
+        $$ = &IndexAccessNode{Object: $1, Index: &RangeNode{ Begin: $3, End: $5}}
+    }
+    | primary_expr LBRACKET COLON expr RBRACKET {
+        $$ = &IndexAccessNode{Object: $1, Index: &RangeNode{ Begin: NumberValue(0), End: $4}}
+    }
+    | primary_expr LBRACKET expr COLON RBRACKET {
+        $$ = &IndexAccessNode{Object: $1, Index: &RangeNode{ Begin: $3, End: NumberValue(-1)}}
     }
 
 function_call: IDENTIFIER LPAREN argument_list RPAREN {

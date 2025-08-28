@@ -138,7 +138,7 @@ func query() (string, lang.Function) {
 }
 
 func queryParam() (string, lang.Function) {
-	name := "query_param"
+	name := "queryParam"
 	_, Query := query()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -242,7 +242,7 @@ func ip() (string, lang.Function) {
 }
 
 func userAgent() (string, lang.Function) {
-	name := "user_agent"
+	name := "userAgent"
 	_, Headers := headers()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -261,7 +261,7 @@ func userAgent() (string, lang.Function) {
 }
 
 func contentType() (string, lang.Function) {
-	name := "content_type"
+	name := "contentType"
 	_, Headers := headers()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -284,7 +284,7 @@ func contentType() (string, lang.Function) {
 }
 
 func contentLength() (string, lang.Function) {
-	name := "content_length"
+	name := "contentLength"
 	_, Headers := headers()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {

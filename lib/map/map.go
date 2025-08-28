@@ -68,7 +68,7 @@ func values() (string, lang.Function) {
 }
 
 func size() (string, lang.Function) {
-	name := "map_size"
+	name := "size"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -83,7 +83,7 @@ func size() (string, lang.Function) {
 }
 
 func isEmpty() (string, lang.Function) {
-	name := "map_is_empty"
+	name := "isEmpty"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -120,7 +120,7 @@ func has() (string, lang.Function) {
 }
 
 func get() (string, lang.Function) {
-	name := "map_get"
+	name := "get"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 2 || len(args) > 3 {
 			return nil, fmt.Errorf("%s: expected 2 or 3 arguments (map, key, default?)", name)
@@ -150,7 +150,7 @@ func get() (string, lang.Function) {
 }
 
 func set() (string, lang.Function) {
-	name := "map_set"
+	name := "set"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 3 {
 			return nil, lib.ArgumentError(name, 3)
@@ -180,7 +180,7 @@ func set() (string, lang.Function) {
 }
 
 func remove() (string, lang.Function) {
-	name := "map_delete"
+	name := "delete"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
 			return nil, lib.ArgumentError(name, 2)
@@ -234,7 +234,7 @@ func merge() (string, lang.Function) {
 }
 
 func mergeDeep() (string, lang.Function) {
-	name := "merge_deep"
+	name := "mergeDeep"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) == 0 {
 			return nil, fmt.Errorf("%s: expected at least 1 argument", name)
@@ -301,7 +301,7 @@ func deepCopyValue(v lang.Value) lang.Value {
 
 // Map Transformation
 func invert() (string, lang.Function) {
-	name := "map_invert"
+	name := "invert"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -323,7 +323,7 @@ func invert() (string, lang.Function) {
 }
 
 func filter() (string, lang.Function) {
-	name := "map_filter"
+	name := "filter"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -347,7 +347,7 @@ func filter() (string, lang.Function) {
 }
 
 func filterKeys() (string, lang.Function) {
-	name := "map_filter_keys"
+	name := "filterKeys"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
 			return nil, lib.ArgumentError(name, 2)
@@ -386,7 +386,7 @@ func filterKeys() (string, lang.Function) {
 }
 
 func omitKeys() (string, lang.Function) {
-	name := "map_omit_keys"
+	name := "omitKeys"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
 			return nil, lib.ArgumentError(name, 2)
@@ -425,7 +425,7 @@ func omitKeys() (string, lang.Function) {
 }
 
 func rename() (string, lang.Function) {
-	name := "map_rename"
+	name := "rename"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
 			return nil, lib.ArgumentError(name, 2)
@@ -461,7 +461,7 @@ func rename() (string, lang.Function) {
 
 // Map Conversion
 func toList() (string, lang.Function) {
-	name := "map_to_list"
+	name := "toList"
 	_, Keys := keys()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -492,7 +492,7 @@ func toList() (string, lang.Function) {
 }
 
 func fromList() (string, lang.Function) {
-	name := "map_from_list"
+	name := "fromList"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -527,7 +527,7 @@ func fromList() (string, lang.Function) {
 }
 
 func toQueryString() (string, lang.Function) {
-	name := "map_to_query_string"
+	name := "toQueryString"
 	_, Keys := keys()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -575,7 +575,7 @@ func toQueryString() (string, lang.Function) {
 }
 
 func fromQueryString() (string, lang.Function) {
-	name := "map_from_query_string"
+	name := "fromQueryString"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -619,7 +619,7 @@ func fromQueryString() (string, lang.Function) {
 
 // Map Path Operations (dot notation)
 func getPath() (string, lang.Function) {
-	name := "map_get_path"
+	name := "getPath"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 2 || len(args) > 3 {
 			return nil, fmt.Errorf("%s: expected 2 or 3 arguments (map, path, default?)", name)
@@ -665,7 +665,7 @@ func getPath() (string, lang.Function) {
 }
 
 func setPath() (string, lang.Function) {
-	name := "map_set_path"
+	name := "setPath"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 3 {
 			return nil, lib.ArgumentError(name, 3)
@@ -721,7 +721,7 @@ func setPath() (string, lang.Function) {
 }
 
 func hasPath() (string, lang.Function) {
-	name := "map_has_path"
+	name := "hasPath"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
 			return nil, lib.ArgumentError(name, 2)
@@ -761,7 +761,7 @@ func hasPath() (string, lang.Function) {
 }
 
 func deletePath() (string, lang.Function) {
-	name := "map_delete_path"
+	name := "deletePath"
 	_, Delete := remove()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {

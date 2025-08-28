@@ -170,7 +170,7 @@ func capitalize() (string, lang.Function) {
 }
 
 func swapCase() (string, lang.Function) {
-	name := "swap_case"
+	name := "swapCase"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -215,7 +215,7 @@ func trim() (string, lang.Function) {
 }
 
 func trimLeft() (string, lang.Function) {
-	name := "trim_left"
+	name := "trimLeft"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 1 || len(args) > 2 {
 			return nil, fmt.Errorf("%s: expected 1 or 2 arguments", name)
@@ -237,7 +237,7 @@ func trimLeft() (string, lang.Function) {
 }
 
 func trimRight() (string, lang.Function) {
-	name := "trim_right"
+	name := "trimRight"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 1 || len(args) > 2 {
 			return nil, fmt.Errorf("%s: expected 1 or 2 arguments", name)
@@ -259,7 +259,7 @@ func trimRight() (string, lang.Function) {
 }
 
 func padLeft() (string, lang.Function) {
-	name := "pad_left"
+	name := "padLeft"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 2 || len(args) > 3 {
 			return nil, fmt.Errorf("%s: expected 2 or 3 arguments", name)
@@ -299,7 +299,7 @@ func padLeft() (string, lang.Function) {
 }
 
 func padRight() (string, lang.Function) {
-	name := "pad_right"
+	name := "padRight"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 2 || len(args) > 3 {
 			return nil, fmt.Errorf("%s: expected 2 or 3 arguments", name)
@@ -339,7 +339,7 @@ func padRight() (string, lang.Function) {
 }
 
 func padCenter() (string, lang.Function) {
-	name := "pad_center"
+	name := "padCenter"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 2 || len(args) > 3 {
 			return nil, fmt.Errorf("%s: expected 2 or 3 arguments", name)
@@ -593,7 +593,7 @@ func indexOf() (string, lang.Function) {
 }
 
 func lastIndexOf() (string, lang.Function) {
-	name := "last_index_of"
+	name := "lastIndexOf"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
 			return nil, lib.ArgumentError(name, 2)
@@ -653,7 +653,7 @@ func replace() (string, lang.Function) {
 }
 
 func replaceAll() (string, lang.Function) {
-	name := "replace_all"
+	name := "replaceAll"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 3 {
 			return nil, lib.ArgumentError(name, 3)
@@ -808,7 +808,7 @@ func match() (string, lang.Function) {
 }
 
 func findAll() (string, lang.Function) {
-	name := "find_all"
+	name := "findAll"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 2 || len(args) > 3 {
 			return nil, fmt.Errorf("%s: expected 2 or 3 arguments", name)
@@ -847,7 +847,7 @@ func findAll() (string, lang.Function) {
 }
 
 func replaceRegex() (string, lang.Function) {
-	name := "replace_regex"
+	name := "replaceRegex"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 3 {
 			return nil, lib.ArgumentError(name, 3)
@@ -876,7 +876,7 @@ func replaceRegex() (string, lang.Function) {
 }
 
 func charAt() (string, lang.Function) {
-	name := "char_at"
+	name := "charAt"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
 			return nil, lib.ArgumentError(name, 2)
@@ -902,7 +902,7 @@ func charAt() (string, lang.Function) {
 }
 
 func charCode() (string, lang.Function) {
-	name := "char_code"
+	name := "charCode"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
 			return nil, lib.ArgumentError(name, 2)
@@ -928,7 +928,7 @@ func charCode() (string, lang.Function) {
 }
 
 func fromCharCode() (string, lang.Function) {
-	name := "from_char_code"
+	name := "fromCharCode"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) == 0 {
 			return lang.StringValue(""), nil
@@ -950,7 +950,7 @@ func fromCharCode() (string, lang.Function) {
 }
 
 func isEmpty() (string, lang.Function) {
-	name := "is_empty"
+	name := "isEmpty"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -965,7 +965,7 @@ func isEmpty() (string, lang.Function) {
 }
 
 func isNumeric() (string, lang.Function) {
-	name := "is_numeric"
+	name := "isNumeric"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -981,7 +981,7 @@ func isNumeric() (string, lang.Function) {
 }
 
 func isAlpha() (string, lang.Function) {
-	name := "is_alpha"
+	name := "isAlpha"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -1006,7 +1006,7 @@ func isAlpha() (string, lang.Function) {
 }
 
 func isAlphaNumeric() (string, lang.Function) {
-	name := "is_alphanumeric"
+	name := "isAlphanumeric"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -1031,7 +1031,7 @@ func isAlphaNumeric() (string, lang.Function) {
 }
 
 func isSpace() (string, lang.Function) {
-	name := "is_space"
+	name := "isSpace"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -1056,7 +1056,7 @@ func isSpace() (string, lang.Function) {
 }
 
 func toStr() (string, lang.Function) {
-	name := "tostring"
+	name := "toString"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -1071,7 +1071,7 @@ func toStr() (string, lang.Function) {
 }
 
 func toNumber() (string, lang.Function) {
-	name := "tonumber"
+	name := "toNumber"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)

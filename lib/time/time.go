@@ -22,7 +22,7 @@ func now() (string, lang.Function) {
 }
 
 func nowMillis() (string, lang.Function) {
-	name := "now_millis"
+	name := "nowMillis"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 0 {
 			return nil, lib.ArgumentError(name, 0)
@@ -33,7 +33,7 @@ func nowMillis() (string, lang.Function) {
 }
 
 func nowNanos() (string, lang.Function) {
-	name := "now_nanos"
+	name := "nowNanos"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 0 {
 			return nil, lib.ArgumentError(name, 0)
@@ -114,7 +114,7 @@ func add() (string, lang.Function) {
 }
 
 func addDays() (string, lang.Function) {
-	name := "add_days"
+	name := "addDays"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
 			return nil, lib.ArgumentError(name, 2)
@@ -133,7 +133,7 @@ func addDays() (string, lang.Function) {
 }
 
 func addHours() (string, lang.Function) {
-	name := "add_hours"
+	name := "addHours"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
 			return nil, lib.ArgumentError(name, 2)
@@ -152,7 +152,7 @@ func addHours() (string, lang.Function) {
 }
 
 func addMinutes() (string, lang.Function) {
-	name := "add_minutes"
+	name := "addMinutes"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
 			return nil, lib.ArgumentError(name, 2)
@@ -190,7 +190,7 @@ func diff() (string, lang.Function) {
 }
 
 func diffDays() (string, lang.Function) {
-	name := "diff_days"
+	name := "diffDays"
 	_, diff := diff()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		diff, err := diff(args)
@@ -207,7 +207,7 @@ func diffDays() (string, lang.Function) {
 }
 
 func diffHours() (string, lang.Function) {
-	name := "diff_hours"
+	name := "diffHours"
 	_, diff := diff()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		diff, err := diff(args)
@@ -224,7 +224,7 @@ func diffHours() (string, lang.Function) {
 }
 
 func diffMinutes() (string, lang.Function) {
-	name := "diff_minutes"
+	name := "diffMinutes"
 	_, diff := diff()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		diff, err := diff(args)
@@ -386,7 +386,7 @@ func week() (string, lang.Function) {
 }
 
 func startOfDay() (string, lang.Function) {
-	name := "start_of_day"
+	name := "startOfDay"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -403,7 +403,7 @@ func startOfDay() (string, lang.Function) {
 }
 
 func toEndOfDay() (string, lang.Function) {
-	name := "end_of_day"
+	name := "endOfDay"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -420,7 +420,7 @@ func toEndOfDay() (string, lang.Function) {
 }
 
 func startOfWeek() (string, lang.Function) {
-	name := "start_of_week"
+	name := "startOfWeek"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -443,7 +443,7 @@ func startOfWeek() (string, lang.Function) {
 }
 
 func startOfMonth() (string, lang.Function) {
-	name := "start_of_month"
+	name := "startOfMonth"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -460,7 +460,7 @@ func startOfMonth() (string, lang.Function) {
 }
 
 func startOfYear() (string, lang.Function) {
-	name := "start_of_year"
+	name := "startOfYear"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -477,7 +477,7 @@ func startOfYear() (string, lang.Function) {
 }
 
 func isWeekend() (string, lang.Function) {
-	name := "is_weekend"
+	name := "isWeekend"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -494,7 +494,7 @@ func isWeekend() (string, lang.Function) {
 }
 
 func isLeapYear() (string, lang.Function) {
-	name := "is_leap_year"
+	name := "isLeapYear"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -511,7 +511,7 @@ func isLeapYear() (string, lang.Function) {
 }
 
 func daysInMonth() (string, lang.Function) {
-	name := "days_in_month"
+	name := "daysInMonth"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -558,7 +558,7 @@ func age() (string, lang.Function) {
 }
 
 func toTimezone() (string, lang.Function) {
-	name := "to_timezone"
+	name := "toTimezone"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
 			return nil, lib.ArgumentError(name, 2)
@@ -586,7 +586,7 @@ func toTimezone() (string, lang.Function) {
 }
 
 func toFromTimezone() (string, lang.Function) {
-	name := "from_timezone"
+	name := "fromTimezone"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
 			return nil, lib.ArgumentError(name, 2)

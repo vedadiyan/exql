@@ -12,7 +12,7 @@ import (
 )
 
 func length() (string, lang.Function) {
-	name := "list_length"
+	name := "length"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -26,7 +26,7 @@ func length() (string, lang.Function) {
 }
 
 func isEmpty() (string, lang.Function) {
-	name := "list_is_empty"
+	name := "isEmpty"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -40,10 +40,10 @@ func isEmpty() (string, lang.Function) {
 }
 
 func get() (string, lang.Function) {
-	name := "list_get"
+	name := "get"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 2 || len(args) > 3 {
-			return nil, errors.New("list_get: expected 2 or 3 arguments (list, index, default?)")
+			return nil, errors.New("get: expected 2 or 3 arguments (list, index, default?)")
 		}
 		list, ok := args[0].(lang.ListValue)
 		if !ok {
@@ -69,7 +69,7 @@ func get() (string, lang.Function) {
 }
 
 func set() (string, lang.Function) {
-	name := "list_set"
+	name := "set"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 3 {
 			return nil, lib.ArgumentError(name, 3)
@@ -139,7 +139,7 @@ func prepend() (string, lang.Function) {
 }
 
 func insert() (string, lang.Function) {
-	name := "list_insert"
+	name := "insert"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 3 {
 			return nil, lib.ArgumentError(name, 3)
@@ -173,7 +173,7 @@ func insert() (string, lang.Function) {
 }
 
 func remove() (string, lang.Function) {
-	name := "list_remove"
+	name := "remove"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
 			return nil, lib.ArgumentError(name, 2)
@@ -202,7 +202,7 @@ func remove() (string, lang.Function) {
 }
 
 func concat() (string, lang.Function) {
-	name := "list_concat"
+	name := "concat"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		var result lang.ListValue
 		for i, arg := range args {
@@ -298,7 +298,7 @@ func rest() (string, lang.Function) {
 }
 
 func iinit() (string, lang.Function) {
-	name := "list_init"
+	name := "init"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -468,7 +468,7 @@ func ssort() (string, lang.Function) {
 }
 
 func sortDesc() (string, lang.Function) {
-	name := "sort_desc"
+	name := "sortDesc"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -575,7 +575,7 @@ func flattenList(list lang.ListValue, depth int) lang.ListValue {
 }
 
 func contains() (string, lang.Function) {
-	name := "list_contains"
+	name := "contains"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
 			return nil, lib.ArgumentError(name, 2)
@@ -596,10 +596,10 @@ func contains() (string, lang.Function) {
 }
 
 func indexOf() (string, lang.Function) {
-	name := "list_index_of"
+	name := "indexOf"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) < 2 || len(args) > 3 {
-			return nil, errors.New("list_index_of: expected 2 or 3 arguments (list, value, start?)")
+			return nil, fmt.Errorf("%s: expected 2 or 3 arguments (list, value, start?)", name)
 		}
 		list, ok := args[0].(lang.ListValue)
 		if !ok {
@@ -628,7 +628,7 @@ func indexOf() (string, lang.Function) {
 }
 
 func lastIndexOf() (string, lang.Function) {
-	name := "list_last_index_of"
+	name := "lastIndexOf"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
 			return nil, lib.ArgumentError(name, 2)
@@ -649,7 +649,7 @@ func lastIndexOf() (string, lang.Function) {
 }
 
 func count() (string, lang.Function) {
-	name := "list_count"
+	name := "count"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
 			return nil, lib.ArgumentError(name, 2)
@@ -722,7 +722,7 @@ func rrange() (string, lang.Function) {
 }
 
 func repeat() (string, lang.Function) {
-	name := "list_repeat"
+	name := "repeat"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
 			return nil, lib.ArgumentError(name, 2)
@@ -734,7 +734,7 @@ func repeat() (string, lang.Function) {
 		}
 		count := int(countNum)
 		if count < 0 {
-			return nil, errors.New("list_repeat: count must be non-negative")
+			return nil, errors.New("repeat: count must be non-negative")
 		}
 		if count == 0 {
 			return lang.ListValue{}, nil

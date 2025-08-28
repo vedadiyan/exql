@@ -10,7 +10,7 @@ import (
 )
 
 func isValidIP() (string, lang.Function) {
-	name := "is_valid_ip"
+	name := "isValidIP"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -26,7 +26,7 @@ func isValidIP() (string, lang.Function) {
 }
 
 func isIPv4() (string, lang.Function) {
-	name := "is_ipv4"
+	name := "isIPv4"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -45,7 +45,7 @@ func isIPv4() (string, lang.Function) {
 }
 
 func isIPv6() (string, lang.Function) {
-	name := "is_ipv6"
+	name := "isIPv6"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -64,7 +64,7 @@ func isIPv6() (string, lang.Function) {
 }
 
 func isPrivateIP() (string, lang.Function) {
-	name := "is_private_ip"
+	name := "isPrivateIP"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -83,7 +83,7 @@ func isPrivateIP() (string, lang.Function) {
 }
 
 func isLoopbackIP() (string, lang.Function) {
-	name := "is_loopback_ip"
+	name := "isLoopbackIP"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -102,7 +102,7 @@ func isLoopbackIP() (string, lang.Function) {
 }
 
 func isMulticastIP() (string, lang.Function) {
-	name := "is_multicast_ip"
+	name := "isMulticastIP"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -121,7 +121,7 @@ func isMulticastIP() (string, lang.Function) {
 }
 
 func isLinkLocalIP() (string, lang.Function) {
-	name := "is_link_local_ip"
+	name := "isLinkLocalIP"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -140,7 +140,7 @@ func isLinkLocalIP() (string, lang.Function) {
 }
 
 func cidrMatch() (string, lang.Function) {
-	name := "cidr_match"
+	name := "cidrMatch"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
 			return nil, lib.ArgumentError(name, 2)
@@ -169,7 +169,7 @@ func cidrMatch() (string, lang.Function) {
 }
 
 func cidrContains() (string, lang.Function) {
-	name := "cidr_contains"
+	name := "cidrContains"
 	_, cidrMatch := cidrMatch()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		return cidrMatch(args)
@@ -178,7 +178,7 @@ func cidrContains() (string, lang.Function) {
 }
 
 func ipInRange() (string, lang.Function) {
-	name := "ip_in_range"
+	name := "IPInRange"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 3 {
 			return nil, lib.ArgumentError(name, 3)
@@ -226,7 +226,7 @@ func ipInRange() (string, lang.Function) {
 }
 
 func cidrNetworkAddress() (string, lang.Function) {
-	name := "cidr_network"
+	name := "cidrNetwork"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -247,7 +247,7 @@ func cidrNetworkAddress() (string, lang.Function) {
 }
 
 func cidrBroadcastAddress() (string, lang.Function) {
-	name := "cidr_broadcast"
+	name := "cidrBroadcast"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -276,7 +276,7 @@ func cidrBroadcastAddress() (string, lang.Function) {
 }
 
 func cidrHostCount() (string, lang.Function) {
-	name := "cidr_host_count"
+	name := "cidrHostCount"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -313,7 +313,7 @@ func cidrHostCount() (string, lang.Function) {
 }
 
 func cidrSubnets() (string, lang.Function) {
-	name := "cidr_subnets"
+	name := "cidrSubnets"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
 			return nil, lib.ArgumentError(name, 2)
@@ -358,7 +358,7 @@ func cidrSubnets() (string, lang.Function) {
 }
 
 func normalizeIP() (string, lang.Function) {
-	name := "normalize_ip"
+	name := "normalizeIP"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -377,7 +377,7 @@ func normalizeIP() (string, lang.Function) {
 }
 
 func expandIPv6() (string, lang.Function) {
-	name := "expand_ipv6"
+	name := "expandIPv6"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -407,7 +407,7 @@ func expandIPv6() (string, lang.Function) {
 }
 
 func compressIPv6() (string, lang.Function) {
-	name := "compress_ipv6"
+	name := "compressIPv6"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -429,7 +429,7 @@ func compressIPv6() (string, lang.Function) {
 }
 
 func ipToInt() (string, lang.Function) {
-	name := "ip_to_int"
+	name := "IPToInt"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -448,7 +448,7 @@ func ipToInt() (string, lang.Function) {
 }
 
 func intToIP() (string, lang.Function) {
-	name := "int_to_ip"
+	name := "intToIP"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -465,7 +465,7 @@ func intToIP() (string, lang.Function) {
 }
 
 func reverseIP() (string, lang.Function) {
-	name := "reverse_ip"
+	name := "reverseIP"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -498,7 +498,7 @@ func reverseIP() (string, lang.Function) {
 }
 
 func isRFC1918() (string, lang.Function) {
-	name := "is_rfc1918"
+	name := "isRfc1918"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)

@@ -747,7 +747,7 @@ func Random() (string, lang.Function) {
 }
 
 func RandomSeed() (string, lang.Function) {
-	name := "random_seed"
+	name := "randomSeed"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) == 0 {
 			rand.Seed(time.Now().UnixNano())
@@ -767,7 +767,7 @@ func RandomSeed() (string, lang.Function) {
 }
 
 func RandomFloat() (string, lang.Function) {
-	name := "random_float"
+	name := "randomFloat"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) == 0 {
 			return lang.NumberValue(rand.Float64()), nil
@@ -796,7 +796,7 @@ func RandomFloat() (string, lang.Function) {
 }
 
 func IsNaN() (string, lang.Function) {
-	name := "is_nan"
+	name := "isNan"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -811,7 +811,7 @@ func IsNaN() (string, lang.Function) {
 }
 
 func IsInf() (string, lang.Function) {
-	name := "is_inf"
+	name := "isInf"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -826,7 +826,7 @@ func IsInf() (string, lang.Function) {
 }
 
 func IsFinite() (string, lang.Function) {
-	name := "is_finite"
+	name := "isFinite"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)

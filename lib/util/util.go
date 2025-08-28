@@ -122,7 +122,7 @@ func defaultValue() (string, lang.Function) {
 }
 
 func firstNonNull() (string, lang.Function) {
-	name := "first_non_null"
+	name := "firstNonNull"
 	_, coalesceFunc := coalesce()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		return coalesceFunc(args)
@@ -131,7 +131,7 @@ func firstNonNull() (string, lang.Function) {
 }
 
 func firstNonEmpty() (string, lang.Function) {
-	name := "first_non_empty"
+	name := "firstNonEmpty"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		for _, arg := range args {
 			if arg != nil && !isEmpty(arg) {
@@ -289,7 +289,7 @@ func constant() (string, lang.Function) {
 
 // Error Handling
 func tryOr() (string, lang.Function) {
-	name := "try_or"
+	name := "tryOr"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
 			return nil, lib.ArgumentError(name, 2)
@@ -530,7 +530,7 @@ func timestamp() (string, lang.Function) {
 }
 
 func randomString() (string, lang.Function) {
-	name := "random_string"
+	name := "randomString"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		length := 10 // default length
 		if len(args) == 1 {

@@ -63,9 +63,9 @@ func (n *BinaryOpNode) Evaluate(ctx Context) Value {
 
 	switch n.Operator {
 	case "and":
-		return BoolValue(toBool(left) && toBool(right))
+		return BoolValue(ToBool(left) && ToBool(right))
 	case "or":
-		return BoolValue(toBool(left) || toBool(right))
+		return BoolValue(ToBool(left) || ToBool(right))
 	case "=", "==":
 		return BoolValue(equal(left, right))
 	case "!=":
@@ -83,13 +83,13 @@ func (n *BinaryOpNode) Evaluate(ctx Context) Value {
 	case "not in":
 		return BoolValue(!contains(right, left))
 	case "+":
-		return NumberValue(toNumber(left) + toNumber(right))
+		return NumberValue(ToNumber(left) + ToNumber(right))
 	case "-":
-		return NumberValue(toNumber(left) - toNumber(right))
+		return NumberValue(ToNumber(left) - ToNumber(right))
 	case "*":
-		return NumberValue(toNumber(left) * toNumber(right))
+		return NumberValue(ToNumber(left) * ToNumber(right))
 	case "/":
-		return NumberValue(toNumber(left) / toNumber(right))
+		return NumberValue(ToNumber(left) / ToNumber(right))
 	}
 	return BoolValue(false)
 }
@@ -98,9 +98,9 @@ func (n *UnaryOpNode) Evaluate(ctx Context) Value {
 	operand := n.Operand.Evaluate(ctx)
 	switch n.Operator {
 	case "not":
-		return BoolValue(!toBool(operand))
+		return BoolValue(!ToBool(operand))
 	case "-":
-		return NumberValue(-toNumber(operand))
+		return NumberValue(-ToNumber(operand))
 	}
 	return operand
 }
@@ -219,7 +219,7 @@ func (n *RangeNode) Evaluate(ctx Context) Value {
 	return EachValue(0)
 }
 
-func toBool(v Value) bool {
+func ToBool(v Value) bool {
 	switch val := v.(type) {
 	case BoolValue:
 		return bool(val)
@@ -232,7 +232,7 @@ func toBool(v Value) bool {
 	}
 }
 
-func toNumber(v Value) float64 {
+func ToNumber(v Value) float64 {
 	switch val := v.(type) {
 	case NumberValue:
 		return float64(val)
@@ -254,7 +254,7 @@ func equal(a, b Value) bool {
 }
 
 func compare(a, b Value) int {
-	aNum, bNum := toNumber(a), toNumber(b)
+	aNum, bNum := ToNumber(a), ToNumber(b)
 	if aNum < bNum {
 		return -1
 	}

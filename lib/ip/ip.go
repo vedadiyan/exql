@@ -357,25 +357,6 @@ func cidrSubnets() (string, lang.Function) {
 	return name, fn
 }
 
-func normalizeIP() (string, lang.Function) {
-	name := "normalizeIP"
-	fn := func(args []lang.Value) (lang.Value, error) {
-		if len(args) != 1 {
-			return nil, lib.ArgumentError(name, 1)
-		}
-		str, err := lib.ToString(args[0])
-		if err != nil {
-			return nil, fmt.Errorf("%s: %w", name, err)
-		}
-		ip := net.ParseIP(string(str))
-		if ip == nil {
-			return nil, fmt.Errorf("%s: invalid IP address '%s'", name, string(str))
-		}
-		return lang.StringValue(ip.String()), nil
-	}
-	return name, fn
-}
-
 func expandIPv6() (string, lang.Function) {
 	name := "expandIPv6"
 	fn := func(args []lang.Value) (lang.Value, error) {
@@ -563,7 +544,6 @@ var ipFunctions = []func() (string, lang.Function){
 	cidrBroadcastAddress,
 	cidrHostCount,
 	cidrSubnets,
-	normalizeIP,
 	expandIPv6,
 	compressIPv6,
 	ipToInt,

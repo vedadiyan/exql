@@ -10,6 +10,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"hash/crc32"
+	"html"
 	"strconv"
 	"strings"
 
@@ -324,7 +325,7 @@ func hmacSHA512() (string, lang.Function) {
 }
 
 // Binary/ASCII Functions
-func binary() (string, lang.Function) {
+func toBinary() (string, lang.Function) {
 	name := "toBinary"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -385,7 +386,7 @@ func fromBinary() (string, lang.Function) {
 	return name, fn
 }
 
-func octal() (string, lang.Function) {
+func toOctal() (string, lang.Function) {
 	name := "toOctal"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -524,14 +525,7 @@ func htmlEscape() (string, lang.Function) {
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", name, err)
 		}
-		s := string(str)
-		s = strings.ReplaceAll(s, "&", "&amp;")
-		s = strings.ReplaceAll(s, "<", "&lt;")
-		s = strings.ReplaceAll(s, ">", "&gt;")
-		s = strings.ReplaceAll(s, "\"", "&quot;")
-		s = strings.ReplaceAll(s, "'", "&#39;")
-
-		return lang.StringValue(s), nil
+		return lang.StringValue(html.EscapeString(string(str))), nil
 	}
 	return name, fn
 }
@@ -547,15 +541,7 @@ func htmlUnescape() (string, lang.Function) {
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", name, err)
 		}
-		s := string(str)
-		s = strings.ReplaceAll(s, "&amp;", "&")
-		s = strings.ReplaceAll(s, "&lt;", "<")
-		s = strings.ReplaceAll(s, "&gt;", ">")
-		s = strings.ReplaceAll(s, "&quot;", "\"")
-		s = strings.ReplaceAll(s, "&#39;", "'")
-		s = strings.ReplaceAll(s, "&#x27;", "'")
-
-		return lang.StringValue(s), nil
+		return lang.StringValue(html.UnescapeString(string(str))), nil
 	}
 	return name, fn
 }
@@ -692,9 +678,9 @@ var encodingFunctions = []func() (string, lang.Function){
 	hmacSHA1,
 	hmacSHA256,
 	hmacSHA512,
-	binary,
+	toBinary,
 	fromBinary,
-	octal,
+	toOctal,
 	fromOctal,
 	toASCII,
 	fromASCII,

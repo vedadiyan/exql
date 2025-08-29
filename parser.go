@@ -1,8 +1,11 @@
 package exql
 
-import "github.com/vedadiyan/exql/lang"
+import (
+	"github.com/vedadiyan/exql/lang"
+)
 
 func Parse(expr string) (lang.ExprNode, error) {
+
 	return lang.ParseExpression(expr)
 }
 

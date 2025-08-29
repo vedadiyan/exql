@@ -10,6 +10,10 @@ import (
 // Helper functions - these need to be implemented based on your lang package
 func ToString(v lang.Value) (lang.StringValue, error) {
 	switch val := v.(type) {
+	case string:
+		{
+			return lang.StringValue(val), nil
+		}
 	case lang.StringValue:
 		return val, nil
 	case lang.NumberValue:
@@ -31,6 +35,54 @@ func ToString(v lang.Value) (lang.StringValue, error) {
 
 func ToNumber(v lang.Value) (float64, error) {
 	switch val := v.(type) {
+	case int:
+		{
+			return float64(val), nil
+		}
+	case int16:
+		{
+			return float64(val), nil
+		}
+	case int32:
+		{
+			return float64(val), nil
+		}
+	case int64:
+		{
+			return float64(val), nil
+		}
+	case int8:
+		{
+			return float64(val), nil
+		}
+	case uint:
+		{
+			return float64(val), nil
+		}
+	case uint16:
+		{
+			return float64(val), nil
+		}
+	case uint32:
+		{
+			return float64(val), nil
+		}
+	case uint64:
+		{
+			return float64(val), nil
+		}
+	case uint8:
+		{
+			return float64(val), nil
+		}
+	case float32:
+		{
+			return float64(val), nil
+		}
+	case float64:
+		{
+			return val, nil
+		}
 	case lang.NumberValue:
 		return float64(val), nil
 	case lang.StringValue:
@@ -51,6 +103,10 @@ func ToNumber(v lang.Value) (float64, error) {
 
 func ToBool(v lang.Value) (bool, error) {
 	switch val := v.(type) {
+	case bool:
+		{
+			return val, nil
+		}
 	case lang.BoolValue:
 		return bool(val), nil
 	case lang.NumberValue:

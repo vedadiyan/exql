@@ -1,6 +1,8 @@
 package types
 
 import (
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"math"
 	"regexp"
@@ -575,7 +577,6 @@ func isUUID() (string, lang.Function) {
 
 func isJSON() (string, lang.Function) {
 	name := "isJSON"
-	_, isNumericString := isNumericString()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
@@ -585,25 +586,11 @@ func isJSON() (string, lang.Function) {
 			if s == "" {
 				return lang.BoolValue(false), nil
 			}
-
-			// Simple JSON validation - check if it starts/ends with proper brackets/braces
-			isValidJSON := (strings.HasPrefix(s, "{") && strings.HasSuffix(s, "}")) ||
-				(strings.HasPrefix(s, "[") && strings.HasSuffix(s, "]")) ||
-				(strings.HasPrefix(s, "\"") && strings.HasSuffix(s, "\"")) ||
-				s == "true" || s == "false" || s == "null"
-
-			if !isValidJSON {
-				// Check if it's a valid numeric string
-				result, err := isNumericString([]lang.Value{lang.StringValue(s)})
-				if err != nil {
-					return nil, fmt.Errorf("%s: error checking numeric string: %w", name, err)
-				}
-				if boolVal, ok := result.(lang.BoolValue); ok {
-					isValidJSON = bool(boolVal)
-				}
+			var tmp any
+			if err := json.Unmarshal([]byte(s), &tmp); err != nil {
+				return lang.BoolValue(false), nil
 			}
-
-			return lang.BoolValue(isValidJSON), nil
+			return lang.BoolValue(true), nil
 		}
 		return lang.BoolValue(false), nil
 	}
@@ -618,17 +605,13 @@ func isBase64() (string, lang.Function) {
 		}
 		if str, ok := args[0].(lang.StringValue); ok {
 			s := string(str)
-			// Base64 regex
-			base64Regex := `^[A-Za-z0-9+/]*={0,2}$`
-			matched, err := regexp.MatchString(base64Regex, s)
-			if err != nil {
-				return nil, fmt.Errorf("%s: regex error: %w", name, err)
+			if _, err := base64.StdEncoding.DecodeString(s); err == nil {
+				return lang.BoolValue(true), nil
 			}
-			if !matched {
-				return lang.BoolValue(false), nil
+			if _, err := base64.RawStdEncoding.DecodeString(s); err == nil {
+				return lang.BoolValue(true), nil
 			}
-			// Check length (must be multiple of 4)
-			return lang.BoolValue(len(s)%4 == 0), nil
+			return lang.BoolValue(false), nil
 		}
 		return lang.BoolValue(false), nil
 	}

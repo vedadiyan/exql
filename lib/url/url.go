@@ -386,13 +386,7 @@ func join() (string, lang.Function) {
 			if string(pathSegment) == "" {
 				continue
 			}
-
-			ref, err := url.Parse(string(pathSegment))
-			if err != nil {
-				return nil, fmt.Errorf("%s: invalid path segment: %w", name, err)
-			}
-
-			u = u.ResolveReference(ref)
+			u = u.JoinPath(string(pathSegment))
 		}
 
 		return lang.StringValue(u.String()), nil

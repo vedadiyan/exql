@@ -148,6 +148,12 @@ function_call: IDENTIFIER LPAREN argument_list RPAREN {
     | IDENTIFIER LPAREN RPAREN {
         $$ = &FunctionCallNode{Name: $1, Args: []ExprNode{}}
     }
+    | primary_expr DOT IDENTIFIER LPAREN RPAREN {
+        $$ = &FunctionCallNode{Namespace: $1, Name: $3, Args: []ExprNode{}}
+    }
+    | primary_expr DOT IDENTIFIER LPAREN argument_list RPAREN {
+        $$ = &FunctionCallNode{Namespace: $1, Name: $3, Args: $5}
+    }
 
 list_literal: LBRACKET expression_list RBRACKET {
         $$ = &ListNode{Elements: $2}

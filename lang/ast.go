@@ -191,6 +191,10 @@ func (n *IndexAccessNode) Evaluate(ctx Context) (Value, error) {
 					expr.Object = n.Object
 					return expr.Evaluate(ctx)
 				}
+			case BoolValue:
+				{
+					return nil, fmt.Errorf("expectation failed: %T not supported", index)
+				}
 			case EachValue:
 				{
 					return obj, nil
@@ -277,7 +281,7 @@ func ToNumber(v Value) float64 {
 }
 
 func equal(a, b Value) bool {
-	return fmt.Sprintf("%v", a) == fmt.Sprintf("%v", b)
+	return fmt.Sprintf("%T %v", a, a) == fmt.Sprintf("%T %v", b, b)
 }
 
 func compare(a, b Value) int {

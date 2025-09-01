@@ -44,8 +44,9 @@ type (
 		Index  ExprNode
 	}
 	FunctionCallNode struct {
-		Name string
-		Args []ExprNode
+		Namespace ExprNode
+		Name      string
+		Args      []ExprNode
 	}
 	ListNode struct {
 		Elements []ExprNode
@@ -213,6 +214,15 @@ func (n *IndexAccessNode) Evaluate(ctx Context) (Value, error) {
 }
 
 func (n *FunctionCallNode) Evaluate(ctx Context) (Value, error) {
+	value, err := n.Namespace.Evaluate(ctx)
+	if err != nil {
+		return nil, err
+	}
+	namespace, ok := value.(Context)
+	if !ok {
+		return nil, fmt.Errorf("unexpected identifier %v", value)
+	}
+	ctx = namespace
 	fn := ctx.GetFunction(n.Name)
 	if fn == nil {
 		return BoolValue(false), nil

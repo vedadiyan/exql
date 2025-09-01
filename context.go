@@ -27,6 +27,12 @@ func WithFunctions(funcs map[string]lang.Function) DefaultContextOption {
 	}
 }
 
+func WithBuiltInLibrary() DefaultContextOption {
+	return func(dc *DefaultContext) {
+		dc.values = Exports()
+	}
+}
+
 func NewDefaultContext(opts ...DefaultContextOption) *DefaultContext {
 	out := new(DefaultContext)
 

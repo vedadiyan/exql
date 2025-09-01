@@ -1,9 +1,11 @@
 package exql
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestParser(t *testing.T) {
-	ctx := NewDefaultContext()
-	ctx.values = Exports()
-	Eval("url.parse('test')", ctx)
+	ctx := NewDefaultContext(WithBuiltInLibrary())
+	fmt.Println(Eval("parse('https://www.abc.com')", ctx))
 }

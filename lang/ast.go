@@ -214,16 +214,19 @@ func (n *IndexAccessNode) Evaluate(ctx Context) (Value, error) {
 }
 
 func (n *FunctionCallNode) Evaluate(ctx Context) (Value, error) {
-	value, err := n.Namespace.Evaluate(ctx)
-	if err != nil {
-		return nil, err
+	namespace := ctx
+	if n.Namespace != nil {
+		value, err := n.Namespace.Evaluate(ctx)
+		if err != nil {
+			return nil, err
+		}
+		n, ok := value.(Context)
+		if !ok {
+			return nil, fmt.Errorf("unexpected identifier %v", value)
+		}
+		namespace = n
 	}
-	namespace, ok := value.(Context)
-	if !ok {
-		return nil, fmt.Errorf("unexpected identifier %v", value)
-	}
-	ctx = namespace
-	fn := ctx.GetFunction(n.Name)
+	fn := namespace.GetFunction(n.Name)
 	if fn == nil {
 		return BoolValue(false), nil
 	}

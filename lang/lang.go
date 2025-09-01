@@ -2,13 +2,28 @@
 
 //line lang.y:1
 
+/*
+ * Copyright 2025 Pouya Vedadiyan
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package lang
 
 import __yyfmt__ "fmt"
 
-//line lang.y:3
+//line lang.y:18
 
-//line lang.y:6
+//line lang.y:21
 type yySymType struct {
 	yys      int
 	expr     ExprNode
@@ -87,7 +102,7 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyInitialStackSize = 16
 
-//line lang.y:179
+//line lang.y:194
 
 func ParseExpression(input string) (ExprNode, error) {
 	yyErrorVerbose = true
@@ -542,295 +557,295 @@ yydefault:
 
 	case 1:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line lang.y:40
+//line lang.y:55
 		{
 			yylex.(*yyLex).result = yyDollar[1].expr
 		}
 	case 2:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line lang.y:42
+//line lang.y:57
 		{
 			yyVAL.expr = yyDollar[1].expr
 		}
 	case 3:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line lang.y:44
+//line lang.y:59
 		{
 			yyVAL.expr = &BinaryOpNode{Left: yyDollar[1].expr, Right: yyDollar[3].expr, Operator: "and"}
 		}
 	case 4:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line lang.y:47
+//line lang.y:62
 		{
 			yyVAL.expr = &BinaryOpNode{Left: yyDollar[1].expr, Right: yyDollar[3].expr, Operator: "or"}
 		}
 	case 5:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line lang.y:50
+//line lang.y:65
 		{
 			yyVAL.expr = yyDollar[1].expr
 		}
 	case 6:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line lang.y:52
+//line lang.y:67
 		{
 			yyVAL.expr = &BinaryOpNode{Left: yyDollar[1].expr, Right: yyDollar[3].expr, Operator: "="}
 		}
 	case 7:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line lang.y:55
+//line lang.y:70
 		{
 			yyVAL.expr = &BinaryOpNode{Left: yyDollar[1].expr, Right: yyDollar[3].expr, Operator: "!="}
 		}
 	case 8:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line lang.y:58
+//line lang.y:73
 		{
 			yyVAL.expr = yyDollar[1].expr
 		}
 	case 9:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line lang.y:60
+//line lang.y:75
 		{
 			yyVAL.expr = &BinaryOpNode{Left: yyDollar[1].expr, Right: yyDollar[3].expr, Operator: "<"}
 		}
 	case 10:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line lang.y:63
+//line lang.y:78
 		{
 			yyVAL.expr = &BinaryOpNode{Left: yyDollar[1].expr, Right: yyDollar[3].expr, Operator: "<="}
 		}
 	case 11:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line lang.y:66
+//line lang.y:81
 		{
 			yyVAL.expr = &BinaryOpNode{Left: yyDollar[1].expr, Right: yyDollar[3].expr, Operator: ">"}
 		}
 	case 12:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line lang.y:69
+//line lang.y:84
 		{
 			yyVAL.expr = &BinaryOpNode{Left: yyDollar[1].expr, Right: yyDollar[3].expr, Operator: ">="}
 		}
 	case 13:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line lang.y:72
+//line lang.y:87
 		{
 			yyVAL.expr = &BinaryOpNode{Left: yyDollar[1].expr, Right: yyDollar[3].expr, Operator: "in"}
 		}
 	case 14:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line lang.y:75
+//line lang.y:90
 		{
 			yyVAL.expr = &BinaryOpNode{Left: yyDollar[1].expr, Right: yyDollar[4].expr, Operator: "not in"}
 		}
 	case 15:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line lang.y:78
+//line lang.y:93
 		{
 			yyVAL.expr = yyDollar[1].expr
 		}
 	case 16:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line lang.y:80
+//line lang.y:95
 		{
 			yyVAL.expr = &BinaryOpNode{Left: yyDollar[1].expr, Right: yyDollar[3].expr, Operator: "+"}
 		}
 	case 17:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line lang.y:83
+//line lang.y:98
 		{
 			yyVAL.expr = &BinaryOpNode{Left: yyDollar[1].expr, Right: yyDollar[3].expr, Operator: "-"}
 		}
 	case 18:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line lang.y:86
+//line lang.y:101
 		{
 			yyVAL.expr = yyDollar[1].expr
 		}
 	case 19:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line lang.y:88
+//line lang.y:103
 		{
 			yyVAL.expr = &BinaryOpNode{Left: yyDollar[1].expr, Right: yyDollar[3].expr, Operator: "*"}
 		}
 	case 20:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line lang.y:91
+//line lang.y:106
 		{
 			yyVAL.expr = &BinaryOpNode{Left: yyDollar[1].expr, Right: yyDollar[3].expr, Operator: "/"}
 		}
 	case 21:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line lang.y:94
+//line lang.y:109
 		{
 			yyVAL.expr = yyDollar[1].expr
 		}
 	case 22:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line lang.y:96
+//line lang.y:111
 		{
 			yyVAL.expr = &UnaryOpNode{Operand: yyDollar[2].expr, Operator: "not"}
 		}
 	case 23:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line lang.y:99
+//line lang.y:114
 		{
 			yyVAL.expr = &UnaryOpNode{Operand: yyDollar[2].expr, Operator: "-"}
 		}
 	case 24:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line lang.y:102
+//line lang.y:117
 		{
 			yyVAL.expr = yyDollar[1].expr
 		}
 	case 25:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line lang.y:104
+//line lang.y:119
 		{
 			yyVAL.expr = &VariableNode{Name: yyDollar[1].str}
 		}
 	case 26:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line lang.y:107
+//line lang.y:122
 		{
 			yyVAL.expr = &LiteralNode{Value: NumberValue(yyDollar[1].num)}
 		}
 	case 27:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line lang.y:110
+//line lang.y:125
 		{
 			yyVAL.expr = &LiteralNode{Value: StringValue(yyDollar[1].str)}
 		}
 	case 28:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line lang.y:113
+//line lang.y:128
 		{
 			yyVAL.expr = &LiteralNode{Value: StringValue(yyDollar[1].str)}
 		}
 	case 29:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line lang.y:116
+//line lang.y:131
 		{
 			yyVAL.expr = &LiteralNode{Value: BoolValue(yyDollar[1].boolean)}
 		}
 	case 30:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line lang.y:119
+//line lang.y:134
 		{
 			yyVAL.expr = yyDollar[2].expr
 		}
 	case 31:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line lang.y:122
+//line lang.y:137
 		{
 			yyVAL.expr = yyDollar[1].expr
 		}
 	case 32:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line lang.y:123
+//line lang.y:138
 		{
 			yyVAL.expr = yyDollar[1].expr
 		}
 	case 33:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line lang.y:124
+//line lang.y:139
 		{
 			yyVAL.expr = yyDollar[1].expr
 		}
 	case 34:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line lang.y:126
+//line lang.y:141
 		{
 			yyVAL.expr = &FieldAccessNode{Object: yyDollar[1].expr, Field: yyDollar[3].str}
 		}
 	case 35:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line lang.y:129
+//line lang.y:144
 		{
 			yyVAL.expr = &IndexAccessNode{Object: yyDollar[1].expr, Index: yyDollar[3].expr}
 		}
 	case 36:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line lang.y:132
+//line lang.y:147
 		{
 			yyVAL.expr = &IndexAccessNode{Object: yyDollar[1].expr, Index: &EachNode{}}
 		}
 	case 37:
 		yyDollar = yyS[yypt-6 : yypt+1]
-//line lang.y:135
+//line lang.y:150
 		{
 			yyVAL.expr = &IndexAccessNode{Object: yyDollar[1].expr, Index: &RangeNode{Begin: yyDollar[3].expr, End: yyDollar[5].expr}}
 		}
 	case 38:
 		yyDollar = yyS[yypt-5 : yypt+1]
-//line lang.y:138
+//line lang.y:153
 		{
 			yyVAL.expr = &IndexAccessNode{Object: yyDollar[1].expr, Index: &RangeNode{Begin: NumberValue(0), End: yyDollar[4].expr}}
 		}
 	case 39:
 		yyDollar = yyS[yypt-5 : yypt+1]
-//line lang.y:141
+//line lang.y:156
 		{
 			yyVAL.expr = &IndexAccessNode{Object: yyDollar[1].expr, Index: &RangeNode{Begin: yyDollar[3].expr, End: NumberValue(-1)}}
 		}
 	case 40:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line lang.y:145
+//line lang.y:160
 		{
 			yyVAL.expr = &FunctionCallNode{Name: yyDollar[1].str, Args: yyDollar[3].exprList}
 		}
 	case 41:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line lang.y:148
+//line lang.y:163
 		{
 			yyVAL.expr = &FunctionCallNode{Name: yyDollar[1].str, Args: []ExprNode{}}
 		}
 	case 42:
 		yyDollar = yyS[yypt-5 : yypt+1]
-//line lang.y:151
+//line lang.y:166
 		{
 			yyVAL.expr = &FunctionCallNode{Namespace: yyDollar[1].expr, Name: yyDollar[3].str, Args: []ExprNode{}}
 		}
 	case 43:
 		yyDollar = yyS[yypt-6 : yypt+1]
-//line lang.y:154
+//line lang.y:169
 		{
 			yyVAL.expr = &FunctionCallNode{Namespace: yyDollar[1].expr, Name: yyDollar[3].str, Args: yyDollar[5].exprList}
 		}
 	case 44:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line lang.y:158
+//line lang.y:173
 		{
 			yyVAL.expr = &ListNode{Elements: yyDollar[2].exprList}
 		}
 	case 45:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line lang.y:161
+//line lang.y:176
 		{
 			yyVAL.expr = &ListNode{Elements: []ExprNode{}}
 		}
 	case 46:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line lang.y:165
+//line lang.y:180
 		{
 			yyVAL.exprList = []ExprNode{yyDollar[1].expr}
 		}
 	case 47:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line lang.y:168
+//line lang.y:183
 		{
 			yyVAL.exprList = append(yyDollar[1].exprList, yyDollar[3].expr)
 		}
 	case 48:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line lang.y:172
+//line lang.y:187
 		{
 			yyVAL.exprList = []ExprNode{yyDollar[1].expr}
 		}
 	case 49:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line lang.y:175
+//line lang.y:190
 		{
 			yyVAL.exprList = append(yyDollar[1].exprList, yyDollar[3].expr)
 		}

@@ -66,7 +66,7 @@ func conditionalUnless() (string, lang.Function) {
 func conditionalSwitch() (string, lang.Function) {
 	name := "switch"
 	fn := func(args []lang.Value) (lang.Value, error) {
-		if len(args) < 3 || len(args)%2 == 0 {
+		if len(args) < 3 || (len(args)-1)%2 == 0 {
 			return nil, fmt.Errorf("%s: expected an odd number of arguments (value, case1, result1, ... , default)", name)
 		}
 

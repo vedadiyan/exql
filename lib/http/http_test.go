@@ -42,6 +42,11 @@ func mockRequest() HttpProtocol {
 		"X-Forwarded-Proto": []string{"https"},
 	}
 
+	trailers := http.Header{
+		"Test-1": []string{"trailer-value"},
+		"Test-2": []string{"custom-trailer"},
+	}
+
 	url := url.URL{}
 	url.Path = "/api/users"
 	url.Scheme = "https"
@@ -55,12 +60,20 @@ func mockRequest() HttpProtocol {
 	request.Method = "POST"
 	request.ContentLength = 1024
 	request.Host = "example.com"
+	request.Proto = "HTTP/1.1"
+	request.ProtoMajor = 1
+	request.ProtoMinor = 1
+	request.TransferEncoding = []string{"chunked", "gzip"}
 	request.Body = io.NopCloser(bytes.NewBufferString(`{"name": "John", "email": "john@example.com"}`))
-	request.Response = &http.Response{}
-	request.Response.StatusCode = 200
+	request.Response = &http.Response{
+		StatusCode: 200,
+		Trailer:    trailers,
+	}
 	request.Header = headers
+	request.Trailer = trailers
 	request.RemoteAddr = "192.168.1.100"
 	request.URL = &url
+	request.TransferEncoding = []string{"chunked", "gzip"}
 
 	return New(&request)
 }
@@ -78,11 +91,15 @@ func mockResponse() HttpProtocol {
 		"X-Forwarded-For":   []string{"192.168.1.1, 10.0.0.1"},
 		"X-Real-IP":         []string{"203.0.113.1"},
 		"X-Forwarded-Proto": []string{"https"},
+		"X-Trailer-One":     []string{"trailer1"},
+		"X-Trailer-Two":     []string{"trailer2", "trailer3"},
 	}
 
 	url := url.URL{}
 	url.Path = "/api/users"
 	url.Scheme = "https"
+	url.Host = "example.com"
+
 	query := url.Query()
 	query.Add("page", "1")
 	query.Add("limit", "10")
@@ -94,6 +111,7 @@ func mockResponse() HttpProtocol {
 	request.Body = io.NopCloser(bytes.NewBufferString(`{"name": "John", "email": "john@example.com"}`))
 	request.StatusCode = 200
 	request.Header = headers
+	request.Request = &http.Request{URL: &url}
 
 	return New(&request)
 }
@@ -249,6 +267,240 @@ func TestHeaders(t *testing.T) {
 		if _, exists := headersMap[header]; !exists {
 			t.Errorf("Expected header %s not found", header)
 		}
+	}
+}
+
+func TestTrailer(t *testing.T) {
+	_, fn := trailerFn()
+	ctx := mockRequest()
+
+	tests := []struct {
+		name        string
+		trailerName string
+		expected    lang.Value
+		hasError    bool
+	}{
+		{
+			name:        "existing trailer",
+			trailerName: "Test-1",
+			expected:    lang.StringValue("trailer-value"),
+			hasError:    false,
+		},
+		{
+			name:        "non-existent trailer",
+			trailerName: "X-Missing",
+			expected:    lang.StringValue(""),
+			hasError:    false,
+		},
+		{
+			name:     "wrong argument count",
+			hasError: true,
+		},
+		{
+			name:        "invalid context type",
+			trailerName: "X-Test",
+			hasError:    true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var args []lang.Value
+			if tt.name == "invalid context type" {
+				args = []lang.Value{lang.StringValue("invalid"), lang.StringValue(tt.trailerName)}
+			} else if !tt.hasError {
+				args = []lang.Value{ctx, lang.StringValue(tt.trailerName)}
+			} else {
+				args = []lang.Value{ctx}
+			}
+
+			result, err := fn(args)
+			if tt.hasError {
+				if err == nil {
+					t.Errorf("Expected error but got none")
+				}
+				return
+			}
+			if err != nil {
+				t.Errorf("Unexpected error: %v", err)
+				return
+			}
+			if !reflect.DeepEqual(result, tt.expected) {
+				t.Errorf("Expected %v, got %v", tt.expected, result)
+			}
+		})
+	}
+}
+
+func TestTrailers(t *testing.T) {
+	_, fn := trailersFn()
+	ctx := mockRequest()
+
+	result, err := fn([]lang.Value{ctx})
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+		return
+	}
+
+	trailersMap, ok := result.(lang.MapValue)
+	if !ok {
+		t.Errorf("Expected MapValue, got %T", result)
+		return
+	}
+
+	expectedTrailers := []string{"Test-1", "Test-2"}
+	for _, trailer := range expectedTrailers {
+		if _, exists := trailersMap[trailer]; !exists {
+			t.Errorf("Expected trailer %s not found", trailer)
+		}
+	}
+}
+
+func TestRouteValues(t *testing.T) {
+	_, fn := routeValuesFn()
+	ctx := mockRequest()
+
+	result, err := fn([]lang.Value{ctx})
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+		return
+	}
+
+	routeMap, ok := result.(lang.MapValue)
+	if !ok {
+		t.Errorf("Expected MapValue, got %T", result)
+		return
+	}
+
+	if routeMap == nil {
+		t.Errorf("Expected non-nil MapValue")
+	}
+}
+
+func TestPattern(t *testing.T) {
+	_, fn := patternFn()
+	ctx := mockRequest()
+
+	result, err := fn([]lang.Value{ctx})
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+		return
+	}
+
+	expected := lang.StringValue("")
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("Expected %v, got %v", expected, result)
+	}
+}
+
+func TestProto(t *testing.T) {
+	_, fn := protoFn()
+	ctx := mockRequest()
+
+	result, err := fn([]lang.Value{ctx})
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+		return
+	}
+
+	expected := lang.StringValue("HTTP/1.1")
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("Expected %v, got %v", expected, result)
+	}
+}
+
+func TestProtoMajor(t *testing.T) {
+	_, fn := protoMajorFn()
+	ctx := mockRequest()
+
+	result, err := fn([]lang.Value{ctx})
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+		return
+	}
+
+	expected := lang.NumberValue(1)
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("Expected %v, got %v", expected, result)
+	}
+}
+
+func TestProtoMinor(t *testing.T) {
+	_, fn := protoMinorFn()
+	ctx := mockRequest()
+
+	result, err := fn([]lang.Value{ctx})
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+		return
+	}
+
+	expected := lang.NumberValue(1)
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("Expected %v, got %v", expected, result)
+	}
+}
+
+func TestTransferEncoding(t *testing.T) {
+	_, fn := transferEncodingFn()
+	ctx := mockRequest()
+
+	result, err := fn([]lang.Value{ctx})
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+		return
+	}
+
+	expected := lang.ListValue{
+		lang.StringValue("chunked"),
+		lang.StringValue("gzip"),
+	}
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("Expected %v, got %v", expected, result)
+	}
+}
+
+func TestUrl(t *testing.T) {
+	_, fn := urlFn()
+	ctx := mockResponse()
+
+	result, err := fn([]lang.Value{ctx})
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+		return
+	}
+
+	urlMap, ok := result.(lang.MapValue)
+	if !ok {
+		t.Errorf("Expected MapValue, got %T", result)
+		return
+	}
+
+	expectedFields := []string{"scheme", "host", "path", "rawQuery", "fragment", "user"}
+	for _, field := range expectedFields {
+		if _, exists := urlMap[field]; !exists {
+			t.Errorf("Expected URL field %s not found", field)
+		}
+	}
+
+	// Check user field structure
+	userValue, exists := urlMap["user"]
+	if !exists {
+		t.Errorf("Expected 'user' field in URL")
+		return
+	}
+
+	userMap, ok := userValue.(lang.MapValue)
+	if !ok {
+		t.Errorf("Expected MapValue for user field, got %T", userValue)
+		return
+	}
+
+	if _, exists := userMap["username"]; !exists {
+		t.Errorf("Expected 'username' in user field")
+	}
+	if _, exists := userMap["password"]; !exists {
+		t.Errorf("Expected 'password' in user field")
 	}
 }
 
@@ -809,6 +1061,12 @@ func TestFunctionsWithInvalidContext(t *testing.T) {
 		pathFn,
 		bodyFn,
 		statusFn,
+		trailerFn,
+		patternFn,
+		protoFn,
+		protoMajorFn,
+		protoMinorFn,
+		transferEncodingFn,
 	}
 
 	invalidContext := lang.StringValue("invalid")
@@ -816,7 +1074,13 @@ func TestFunctionsWithInvalidContext(t *testing.T) {
 	for _, tf := range functions {
 		name, fn := tf()
 		t.Run(name+"_invalid_context", func(t *testing.T) {
-			_, err := fn([]lang.Value{invalidContext})
+			var args []lang.Value
+			if name == "trailer" {
+				args = []lang.Value{invalidContext, lang.StringValue("X-Test")}
+			} else {
+				args = []lang.Value{invalidContext}
+			}
+			_, err := fn(args)
 			if err == nil {
 				t.Errorf("Expected error for invalid context in %s", name)
 			}
@@ -834,7 +1098,11 @@ func TestFunctionsWithMissingData(t *testing.T) {
 		Response: &http.Response{
 			StatusCode: 0,
 		},
-		Header: http.Header{},
+		Header:           http.Header{},
+		Proto:            "",
+		ProtoMajor:       0,
+		ProtoMinor:       0,
+		TransferEncoding: []string{},
 	}
 	emptyCtx := New(emptyRequest)
 
@@ -843,12 +1111,18 @@ func TestFunctionsWithMissingData(t *testing.T) {
 		pathFn,
 		bodyFn,
 		statusFn,
+		protoFn,
+		protoMajorFn,
+		protoMinorFn,
 	}
 
 	expected := []lang.Value{
 		lang.StringValue(""),
 		lang.StringValue(""),
 		lang.StringValue(""),
+		lang.NumberValue(0),
+		lang.StringValue(""),
+		lang.NumberValue(0),
 		lang.NumberValue(0),
 	}
 
@@ -902,6 +1176,16 @@ func BenchmarkHeader(b *testing.B) {
 	}
 }
 
+func BenchmarkTrailer(b *testing.B) {
+	_, fn := trailerFn()
+	ctx := mockRequest()
+	args := []lang.Value{ctx, lang.StringValue("X-Trailer-Test")}
+
+	for i := 0; i < b.N; i++ {
+		fn(args)
+	}
+}
+
 func BenchmarkIP(b *testing.B) {
 	_, fn := ipFn()
 	ctx := mockRequest()
@@ -914,7 +1198,27 @@ func BenchmarkIP(b *testing.B) {
 
 func BenchmarkCookies(b *testing.B) {
 	_, fn := cookiesFn()
+	ctx := mockResponse()
+	args := []lang.Value{ctx}
+
+	for i := 0; i < b.N; i++ {
+		fn(args)
+	}
+}
+
+func BenchmarkTransferEncoding(b *testing.B) {
+	_, fn := transferEncodingFn()
 	ctx := mockRequest()
+	args := []lang.Value{ctx}
+
+	for i := 0; i < b.N; i++ {
+		fn(args)
+	}
+}
+
+func BenchmarkUrl(b *testing.B) {
+	_, fn := urlFn()
+	ctx := mockResponse()
 	args := []lang.Value{ctx}
 
 	for i := 0; i < b.N; i++ {

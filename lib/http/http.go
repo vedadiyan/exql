@@ -217,7 +217,7 @@ func transferEncodingFn() (string, lang.Function) {
 		value := make(lang.ListValue, len(transferEncoding))
 
 		for i := 0; i < len(transferEncoding); i++ {
-			value = append(value, lang.StringValue(transferEncoding[i]))
+			value[i] = lang.StringValue(transferEncoding[i])
 		}
 
 		return value, nil

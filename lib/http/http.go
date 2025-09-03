@@ -519,8 +519,12 @@ func cookieFn() (string, lang.Function) {
 			return nil, fmt.Errorf("%s: cookie name %w", name, err)
 		}
 
-		if cookiesMap, ok := cookies.(lang.MapValue); ok {
-			return cookiesMap[string(cookieName)], nil
+		if cookies, ok := cookies.(lang.ListValue); ok {
+			for _, item := range cookies {
+				if item, ok := item.(lang.MapValue); ok && item["name"] == cookieName {
+					return item, nil
+				}
+			}
 		}
 		return nil, nil
 	}

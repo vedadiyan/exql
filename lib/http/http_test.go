@@ -27,14 +27,14 @@ import (
 )
 
 // Helper function to create a mock HTTP context
-func createMockContext() HttpProtocol {
+func mockRequest() HttpProtocol {
 	headers := http.Header{
 		"Content-Type":      []string{"application/json; charset=utf-8"},
 		"User-Agent":        []string{"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"},
 		"Host":              []string{"example.com"},
 		"Authorization":     []string{"Bearer token123"},
 		"Content-Length":    []string{"1024"},
-		"Cookie":            []string{"session=abc123; theme=dark; lang=en"},
+		"Cookie":            []string{"session=abc123; path=/", "theme=dark; path=/", "lang=en; path=/"},
 		"Referer":           []string{"https://google.com"},
 		"Accept":            []string{"text/html,application/xhtml+xml,application/xml;q=0.9"},
 		"X-Forwarded-For":   []string{"192.168.1.1, 10.0.0.1"},
@@ -53,6 +53,8 @@ func createMockContext() HttpProtocol {
 
 	request := http.Request{}
 	request.Method = "POST"
+	request.ContentLength = 1024
+	request.Host = "example.com"
 	request.Body = io.NopCloser(bytes.NewBufferString(`{"name": "John", "email": "john@example.com"}`))
 	request.Response = &http.Response{}
 	request.Response.StatusCode = 200
@@ -63,33 +65,131 @@ func createMockContext() HttpProtocol {
 	return New(&request)
 }
 
+func mockResponse() HttpProtocol {
+	headers := http.Header{
+		"Content-Type":      []string{"application/json; charset=utf-8"},
+		"User-Agent":        []string{"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"},
+		"Host":              []string{"example.com"},
+		"Authorization":     []string{"Bearer token123"},
+		"Content-Length":    []string{"1024"},
+		"Set-Cookie":        []string{"session=abc123; path=/", "theme=dark; path=/", "lang=en; path=/"},
+		"Referer":           []string{"https://google.com"},
+		"Accept":            []string{"text/html,application/xhtml+xml,application/xml;q=0.9"},
+		"X-Forwarded-For":   []string{"192.168.1.1, 10.0.0.1"},
+		"X-Real-IP":         []string{"203.0.113.1"},
+		"X-Forwarded-Proto": []string{"https"},
+	}
+
+	url := url.URL{}
+	url.Path = "/api/users"
+	url.Scheme = "https"
+	query := url.Query()
+	query.Add("page", "1")
+	query.Add("limit", "10")
+	query.Add("search", "test query")
+	url.RawQuery = query.Encode()
+
+	request := http.Response{}
+	request.ContentLength = 1024
+	request.Body = io.NopCloser(bytes.NewBufferString(`{"name": "John", "email": "john@example.com"}`))
+	request.StatusCode = 200
+	request.Header = headers
+
+	return New(&request)
+}
+
+// Helper function to create a mock HTTP context with specific headers
+func createMockContextWithHeaders(headers http.Header) HttpProtocol {
+	url := url.URL{}
+	url.Path = "/api/users"
+	url.Scheme = "https"
+
+	request := http.Request{}
+	request.Method = "POST"
+	request.Body = io.NopCloser(bytes.NewBufferString(`{"name": "John", "email": "john@example.com"}`))
+	request.Response = &http.Response{}
+	request.Response.StatusCode = 200
+	request.Header = headers
+	request.RemoteAddr = "192.168.1.100"
+	request.URL = &url
+
+	return New(&request)
+}
+
+// Helper function to create a mock HTTP context with specific scheme
+func createMockContextWithScheme(scheme string) HttpProtocol {
+	headers := http.Header{}
+	if scheme != "" {
+		headers.Set("X-Forwarded-Proto", scheme)
+	}
+
+	url := url.URL{}
+	url.Path = "/api/users"
+	if scheme != "" {
+		url.Scheme = scheme
+	}
+
+	request := http.Request{}
+	request.Method = "POST"
+	request.Header = headers
+	request.URL = &url
+
+	return New(&request)
+}
+
+// Helper function to create a mock HTTP context with specific port
+func createMockContextWithPort(port string, scheme string) HttpProtocol {
+	headers := http.Header{}
+	if port != "" {
+		headers.Set("Host", "example.com:"+port)
+	} else {
+		headers.Set("Host", "example.com")
+	}
+
+	url := url.URL{}
+	url.Path = "/api/users"
+	url.Scheme = scheme
+	if port != "" {
+		url.Host = "example.com:" + port
+	} else {
+		url.Host = "example.com"
+	}
+
+	request := http.Request{}
+	request.Method = "POST"
+	request.Header = headers
+	request.URL = &url
+
+	return New(&request)
+}
+
 // Test Header Functions
 func TestHeader(t *testing.T) {
 	_, fn := headerFn()
-	ctx := createMockContext()
+	ctx := mockRequest()
 
 	tests := []struct {
 		name     string
 		args     []lang.Value
-		expected string
+		expected lang.Value
 		hasError bool
 	}{
 		{
 			name:     "get content-type header",
 			args:     []lang.Value{ctx, lang.StringValue("Content-Type")},
-			expected: "application/json; charset=utf-8",
+			expected: lang.StringValue("application/json; charset=utf-8"),
 			hasError: false,
 		},
 		{
 			name:     "case insensitive header",
 			args:     []lang.Value{ctx, lang.StringValue("content-type")},
-			expected: "application/json; charset=utf-8",
+			expected: lang.StringValue("application/json; charset=utf-8"),
 			hasError: false,
 		},
 		{
 			name:     "non-existent header",
 			args:     []lang.Value{ctx, lang.StringValue("X-Custom")},
-			expected: "",
+			expected: lang.StringValue(""),
 			hasError: false,
 		},
 		{
@@ -118,11 +218,11 @@ func TestHeader(t *testing.T) {
 				return
 			}
 			if result == nil {
-				if tt.expected != "" {
-					t.Errorf("Expected %s, got nil", tt.expected)
+				if tt.expected != nil {
+					t.Errorf("Expected %v, got nil", tt.expected)
 				}
-			} else if string(result.(lang.StringValue)) != tt.expected {
-				t.Errorf("Expected %s, got %s", tt.expected, string(result.(lang.StringValue)))
+			} else if !reflect.DeepEqual(result, tt.expected) {
+				t.Errorf("Expected %v, got %v", tt.expected, result)
 			}
 		})
 	}
@@ -130,7 +230,7 @@ func TestHeader(t *testing.T) {
 
 func TestHeaders(t *testing.T) {
 	_, fn := headersFn()
-	ctx := createMockContext()
+	ctx := mockRequest()
 
 	result, err := fn([]lang.Value{ctx})
 	if err != nil {
@@ -154,7 +254,7 @@ func TestHeaders(t *testing.T) {
 
 func TestMethod(t *testing.T) {
 	_, fn := methodFn()
-	ctx := createMockContext()
+	ctx := mockRequest()
 
 	result, err := fn([]lang.Value{ctx})
 	if err != nil {
@@ -162,15 +262,15 @@ func TestMethod(t *testing.T) {
 		return
 	}
 
-	expected := "POST"
-	if string(result.(lang.StringValue)) != expected {
-		t.Errorf("Expected %s, got %s", expected, string(result.(lang.StringValue)))
+	expected := lang.StringValue("POST")
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("Expected %v, got %v", expected, result)
 	}
 }
 
 func TestPath(t *testing.T) {
 	_, fn := pathFn()
-	ctx := createMockContext()
+	ctx := mockRequest()
 
 	result, err := fn([]lang.Value{ctx})
 	if err != nil {
@@ -178,15 +278,15 @@ func TestPath(t *testing.T) {
 		return
 	}
 
-	expected := "/api/users"
-	if string(result.(lang.StringValue)) != expected {
-		t.Errorf("Expected %s, got %s", expected, string(result.(lang.StringValue)))
+	expected := lang.StringValue("/api/users")
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("Expected %v, got %v", expected, result)
 	}
 }
 
 func TestQuery(t *testing.T) {
 	_, fn := queryFn()
-	ctx := createMockContext()
+	ctx := mockRequest()
 
 	result, err := fn([]lang.Value{ctx})
 	if err != nil {
@@ -210,19 +310,19 @@ func TestQuery(t *testing.T) {
 		if actualValue, exists := queryMap[key]; !exists {
 			t.Errorf("Expected query param %s not found", key)
 		} else if !reflect.DeepEqual(actualValue, expectedValue) {
-			t.Errorf("Expected query param %s=%s, got %v", key, expectedValue, actualValue)
+			t.Errorf("Expected query param %s=%v, got %v", key, expectedValue, actualValue)
 		}
 	}
 }
 
 func TestQueryParam(t *testing.T) {
 	_, fn := queryParamFn()
-	ctx := createMockContext()
+	ctx := mockRequest()
 
 	tests := []struct {
 		name      string
 		paramName string
-		expected  lang.ListValue
+		expected  lang.Value
 		hasError  bool
 	}{
 		{
@@ -263,12 +363,8 @@ func TestQueryParam(t *testing.T) {
 				t.Errorf("Unexpected error: %v", err)
 				return
 			}
-			if result == nil {
-				if tt.expected != nil {
-					t.Errorf("Expected %s, got nil", tt.expected)
-				}
-			} else if !reflect.DeepEqual(result, tt.expected) {
-				t.Errorf("Expected %s, got %v", tt.expected, result)
+			if !reflect.DeepEqual(result, tt.expected) {
+				t.Errorf("Expected %v, got %v", tt.expected, result)
 			}
 		})
 	}
@@ -276,7 +372,7 @@ func TestQueryParam(t *testing.T) {
 
 func TestBody(t *testing.T) {
 	_, fn := bodyFn()
-	ctx := createMockContext()
+	ctx := mockRequest()
 
 	result, err := fn([]lang.Value{ctx})
 	if err != nil {
@@ -284,15 +380,15 @@ func TestBody(t *testing.T) {
 		return
 	}
 
-	expected := lang.Value(lang.StringValue(`{"name": "John", "email": "john@example.com"}`))
+	expected := lang.StringValue(`{"name": "John", "email": "john@example.com"}`)
 	if !reflect.DeepEqual(result, expected) {
-		t.Errorf("Expected %s, got %v", expected, result)
+		t.Errorf("Expected %v, got %v", expected, result)
 	}
 }
 
 func TestStatus(t *testing.T) {
 	_, fn := statusFn()
-	ctx := createMockContext()
+	ctx := mockRequest()
 
 	result, err := fn([]lang.Value{ctx})
 	if err != nil {
@@ -300,9 +396,9 @@ func TestStatus(t *testing.T) {
 		return
 	}
 
-	expected := float64(200)
-	if float64(result.(lang.NumberValue)) != expected {
-		t.Errorf("Expected %f, got %f", expected, float64(result.(lang.NumberValue)))
+	expected := lang.NumberValue(200)
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("Expected %v, got %v", expected, result)
 	}
 }
 
@@ -312,27 +408,12 @@ func TestIP(t *testing.T) {
 	tests := []struct {
 		name     string
 		ctx      HttpProtocol
-		expected string
+		expected lang.Value
 	}{
 		{
-			name:     "direct IP field",
-			ctx:      createMockContext(),
-			expected: "192.168.1.100",
-		},
-		{
 			name:     "X-Forwarded-For with multiple IPs",
-			ctx:      createMockContext(),
-			expected: "192.168.1.1",
-		},
-		{
-			name:     "X-Real-IP header",
-			ctx:      createMockContext(),
-			expected: "203.0.113.1",
-		},
-		{
-			name:     "no IP found",
-			ctx:      createMockContext(),
-			expected: "",
+			ctx:      mockRequest(),
+			expected: lang.StringValue("192.168.1.1"), // First IP from X-Forwarded-For should take precedence
 		},
 	}
 
@@ -343,8 +424,8 @@ func TestIP(t *testing.T) {
 				t.Errorf("Unexpected error: %v", err)
 				return
 			}
-			if string(result.(lang.StringValue)) != tt.expected {
-				t.Errorf("Expected %s, got %s", tt.expected, string(result.(lang.StringValue)))
+			if !reflect.DeepEqual(result, tt.expected) {
+				t.Errorf("Expected %v, got %v", tt.expected, result)
 			}
 		})
 	}
@@ -352,7 +433,7 @@ func TestIP(t *testing.T) {
 
 func TestUserAgent(t *testing.T) {
 	_, fn := userAgentFn()
-	ctx := createMockContext()
+	ctx := mockRequest()
 
 	result, err := fn([]lang.Value{ctx})
 	if err != nil {
@@ -360,9 +441,9 @@ func TestUserAgent(t *testing.T) {
 		return
 	}
 
-	expected := "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-	if string(result.(lang.StringValue)) != expected {
-		t.Errorf("Expected %s, got %s", expected, string(result.(lang.StringValue)))
+	expected := lang.StringValue("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("Expected %v, got %v", expected, result)
 	}
 }
 
@@ -371,31 +452,25 @@ func TestContentType(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		ctx      lang.MapValue
-		expected string
+		ctx      HttpProtocol
+		expected lang.Value
 	}{
 		{
-			name: "content type with charset",
-			ctx: lang.MapValue{
-				"headers": lang.MapValue{
-					"Content-Type": lang.StringValue("application/json; charset=utf-8"),
-				},
-			},
-			expected: "application/json",
+			name:     "content type with charset",
+			ctx:      mockRequest(),
+			expected: lang.StringValue("application/json; charset=utf-8"),
 		},
 		{
 			name: "content type without charset",
-			ctx: lang.MapValue{
-				"headers": lang.MapValue{
-					"Content-Type": lang.StringValue("text/html"),
-				},
-			},
-			expected: "text/html",
+			ctx: createMockContextWithHeaders(http.Header{
+				"Content-Type": []string{"text/html"},
+			}),
+			expected: lang.StringValue("text/html"),
 		},
 		{
 			name:     "no content type",
-			ctx:      lang.MapValue{"headers": lang.MapValue{}},
-			expected: "",
+			ctx:      createMockContextWithHeaders(http.Header{}),
+			expected: lang.StringValue(""),
 		},
 	}
 
@@ -406,8 +481,8 @@ func TestContentType(t *testing.T) {
 				t.Errorf("Unexpected error: %v", err)
 				return
 			}
-			if string(result.(lang.StringValue)) != tt.expected {
-				t.Errorf("Expected %s, got %s", tt.expected, string(result.(lang.StringValue)))
+			if !reflect.DeepEqual(result, tt.expected) {
+				t.Errorf("Expected %v, got %v", tt.expected, result)
 			}
 		})
 	}
@@ -418,31 +493,25 @@ func TestContentLength(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		ctx      lang.MapValue
-		expected float64
+		ctx      HttpProtocol
+		expected lang.Value
 	}{
 		{
-			name: "valid content length",
-			ctx: lang.MapValue{
-				"headers": lang.MapValue{
-					"Content-Length": lang.StringValue("1024"),
-				},
-			},
-			expected: 1024,
+			name:     "valid content length",
+			ctx:      mockRequest(),
+			expected: lang.NumberValue(1024),
 		},
 		{
 			name: "invalid content length",
-			ctx: lang.MapValue{
-				"headers": lang.MapValue{
-					"Content-Length": lang.StringValue("invalid"),
-				},
-			},
-			expected: 0,
+			ctx: createMockContextWithHeaders(http.Header{
+				"Content-Length": []string{"invalid"},
+			}),
+			expected: lang.NumberValue(0),
 		},
 		{
 			name:     "no content length",
-			ctx:      lang.MapValue{"headers": lang.MapValue{}},
-			expected: 0,
+			ctx:      createMockContextWithHeaders(http.Header{}),
+			expected: lang.NumberValue(0),
 		},
 	}
 
@@ -453,8 +522,8 @@ func TestContentLength(t *testing.T) {
 				t.Errorf("Unexpected error: %v", err)
 				return
 			}
-			if float64(result.(lang.NumberValue)) != tt.expected {
-				t.Errorf("Expected %f, got %f", tt.expected, float64(result.(lang.NumberValue)))
+			if !reflect.DeepEqual(result, tt.expected) {
+				t.Errorf("Expected %v, got %v", tt.expected, result)
 			}
 		})
 	}
@@ -462,7 +531,7 @@ func TestContentLength(t *testing.T) {
 
 func TestHost(t *testing.T) {
 	_, fn := hostFn()
-	ctx := createMockContext()
+	ctx := mockRequest()
 
 	result, err := fn([]lang.Value{ctx})
 	if err != nil {
@@ -470,9 +539,9 @@ func TestHost(t *testing.T) {
 		return
 	}
 
-	expected := "example.com"
-	if string(result.(lang.StringValue)) != expected {
-		t.Errorf("Expected %s, got %s", expected, string(result.(lang.StringValue)))
+	expected := lang.StringValue("example.com")
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("Expected %v, got %v", expected, result)
 	}
 }
 
@@ -481,27 +550,18 @@ func TestScheme(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		ctx      lang.MapValue
-		expected string
+		ctx      HttpProtocol
+		expected lang.Value
 	}{
 		{
-			name:     "scheme in context",
-			ctx:      lang.MapValue{"scheme": lang.StringValue("http")},
-			expected: "http",
+			name:     "https scheme from URL",
+			ctx:      mockRequest(),
+			expected: lang.StringValue("https"),
 		},
 		{
-			name: "X-Forwarded-Proto header",
-			ctx: lang.MapValue{
-				"headers": lang.MapValue{
-					"X-Forwarded-Proto": lang.StringValue("https"),
-				},
-			},
-			expected: "https",
-		},
-		{
-			name:     "default scheme",
-			ctx:      lang.MapValue{},
-			expected: "https",
+			name:     "X-Forwarded-Proto header",
+			ctx:      createMockContextWithScheme("http"),
+			expected: lang.StringValue("http"),
 		},
 	}
 
@@ -512,8 +572,8 @@ func TestScheme(t *testing.T) {
 				t.Errorf("Unexpected error: %v", err)
 				return
 			}
-			if string(result.(lang.StringValue)) != tt.expected {
-				t.Errorf("Expected %s, got %s", tt.expected, string(result.(lang.StringValue)))
+			if !reflect.DeepEqual(result, tt.expected) {
+				t.Errorf("Expected %v, got %v", tt.expected, result)
 			}
 		})
 	}
@@ -524,23 +584,13 @@ func TestPort(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		ctx      lang.MapValue
-		expected float64
+		ctx      HttpProtocol
+		expected lang.Value
 	}{
 		{
-			name:     "port in context",
-			ctx:      lang.MapValue{"port": lang.NumberValue(8080)},
-			expected: 8080,
-		},
-		{
-			name:     "https scheme default port",
-			ctx:      lang.MapValue{"scheme": lang.StringValue("https")},
-			expected: 443,
-		},
-		{
-			name:     "http scheme default port",
-			ctx:      lang.MapValue{"scheme": lang.StringValue("http")},
-			expected: 80,
+			name:     "explicit port 8080",
+			ctx:      createMockContextWithPort("8080", "http"),
+			expected: lang.StringValue("8080"),
 		},
 	}
 
@@ -551,8 +601,8 @@ func TestPort(t *testing.T) {
 				t.Errorf("Unexpected error: %v", err)
 				return
 			}
-			if float64(result.(lang.NumberValue)) != tt.expected {
-				t.Errorf("Expected %f, got %f", tt.expected, float64(result.(lang.NumberValue)))
+			if !reflect.DeepEqual(result, tt.expected) {
+				t.Errorf("Expected %v, got %v", tt.expected, result)
 			}
 		})
 	}
@@ -560,7 +610,7 @@ func TestPort(t *testing.T) {
 
 func TestCookies(t *testing.T) {
 	_, fn := cookiesFn()
-	ctx := createMockContext()
+	ctx := mockResponse()
 
 	result, err := fn([]lang.Value{ctx})
 	if err != nil {
@@ -568,47 +618,118 @@ func TestCookies(t *testing.T) {
 		return
 	}
 
-	cookiesMap, ok := result.(lang.MapValue)
+	// The result should be a ListValue containing MapValues with cookie properties
+	resultList, ok := result.(lang.ListValue)
 	if !ok {
-		t.Errorf("Expected MapValue, got %T", result)
+		t.Errorf("Expected ListValue, got %T", result)
 		return
 	}
 
-	expectedCookies := map[string]string{
-		"session": "abc123",
-		"theme":   "dark",
-		"lang":    "en",
+	// Check that we have the expected number of cookies
+	expectedCookieCount := 3 // session, theme, lang
+	if len(resultList) != expectedCookieCount {
+		t.Errorf("Expected %d cookies, got %d", expectedCookieCount, len(resultList))
+		return
 	}
 
-	for key, expectedValue := range expectedCookies {
-		if actualValue, exists := cookiesMap[key]; !exists {
-			t.Errorf("Expected cookie %s not found", key)
-		} else if string(actualValue.(lang.StringValue)) != expectedValue {
-			t.Errorf("Expected cookie %s=%s, got %s", key, expectedValue, string(actualValue.(lang.StringValue)))
+	// Check that each element is a MapValue and contains expected cookie names
+	expectedCookieNames := map[string]bool{
+		"session": false,
+		"theme":   false,
+		"lang":    false,
+	}
+
+	for _, cookieValue := range resultList {
+		cookieMap, ok := cookieValue.(lang.MapValue)
+		if !ok {
+			t.Errorf("Expected MapValue for cookie, got %T", cookieValue)
+			continue
+		}
+
+		nameValue, exists := cookieMap["name"]
+		if !exists {
+			t.Errorf("Cookie missing 'name' field")
+			continue
+		}
+
+		cookieName := string(nameValue.(lang.StringValue))
+		if _, expected := expectedCookieNames[cookieName]; expected {
+			expectedCookieNames[cookieName] = true
+
+			// Check that required fields exist
+			if _, exists := cookieMap["value"]; !exists {
+				t.Errorf("Cookie %s missing 'value' field", cookieName)
+			}
+			if _, exists := cookieMap["domain"]; !exists {
+				t.Errorf("Cookie %s missing 'domain' field", cookieName)
+			}
+		}
+	}
+
+	// Verify all expected cookies were found
+	for cookieName, found := range expectedCookieNames {
+		if !found {
+			t.Errorf("Expected cookie %s not found", cookieName)
 		}
 	}
 }
 
 func TestCookie(t *testing.T) {
 	_, fn := cookieFn()
-	ctx := createMockContext()
+	ctx := mockResponse()
 
 	tests := []struct {
 		name       string
 		cookieName string
-		expected   string
+		expected   lang.Value
 		hasError   bool
 	}{
 		{
-			name:       "existing cookie",
+			name:       "existing cookie session",
 			cookieName: "session",
-			expected:   "abc123",
-			hasError:   false,
+			expected: lang.MapValue{
+				"domain":      lang.StringValue(""),
+				"expires":     lang.StringValue("0001-01-01 00:00:00 +0000 UTC"),
+				"httpOnly":    lang.BoolValue(false),
+				"maxAge":      lang.NumberValue(0),
+				"name":        lang.StringValue("session"),
+				"partitioned": lang.BoolValue(false),
+				"path":        lang.StringValue("/"),
+				"quoted":      lang.BoolValue(false),
+				"raw":         lang.StringValue("session=abc123; path=/"),
+				"rawExpires":  lang.StringValue(""),
+				"sameSite":    lang.NumberValue(0),
+				"secure":      lang.BoolValue(false),
+				"unparsed":    lang.ListValue{},
+				"value":       lang.StringValue("abc123"),
+			},
+			hasError: false,
+		},
+		{
+			name:       "existing cookie theme",
+			cookieName: "theme",
+			expected: lang.MapValue{
+				"domain":      lang.StringValue(""),
+				"expires":     lang.StringValue("0001-01-01 00:00:00 +0000 UTC"),
+				"httpOnly":    lang.BoolValue(false),
+				"maxAge":      lang.NumberValue(0),
+				"name":        lang.StringValue("theme"),
+				"partitioned": lang.BoolValue(false),
+				"path":        lang.StringValue("/"),
+				"quoted":      lang.BoolValue(false),
+				"raw":         lang.StringValue("theme=dark; path=/"),
+				"rawExpires":  lang.StringValue(""),
+				"sameSite":    lang.NumberValue(0),
+				"secure":      lang.BoolValue(false),
+				"unparsed":    lang.ListValue{},
+				"value":       lang.StringValue("dark"),
+			},
+			hasError: false,
 		},
 		{
 			name:       "non-existent cookie",
 			cookieName: "nonexistent",
-			expected:   "",
+			expected:   nil,
 			hasError:   false,
 		},
 	}
@@ -626,12 +747,8 @@ func TestCookie(t *testing.T) {
 				t.Errorf("Unexpected error: %v", err)
 				return
 			}
-			if result == nil {
-				if tt.expected != "" {
-					t.Errorf("Expected %s, got nil", tt.expected)
-				}
-			} else if string(result.(lang.StringValue)) != tt.expected {
-				t.Errorf("Expected %s, got %s", tt.expected, string(result.(lang.StringValue)))
+			if !reflect.DeepEqual(result, tt.expected) {
+				t.Errorf("Expected %v, got %v", tt.expected, result)
 			}
 		})
 	}
@@ -639,7 +756,7 @@ func TestCookie(t *testing.T) {
 
 func TestReferer(t *testing.T) {
 	_, fn := refererFn()
-	ctx := createMockContext()
+	ctx := mockRequest()
 
 	result, err := fn([]lang.Value{ctx})
 	if err != nil {
@@ -647,15 +764,15 @@ func TestReferer(t *testing.T) {
 		return
 	}
 
-	expected := "https://google.com"
-	if string(result.(lang.StringValue)) != expected {
-		t.Errorf("Expected %s, got %s", expected, string(result.(lang.StringValue)))
+	expected := lang.StringValue("https://google.com")
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("Expected %v, got %v", expected, result)
 	}
 }
 
 func TestAuthorization(t *testing.T) {
 	_, fn := authorizationFn()
-	ctx := createMockContext()
+	ctx := mockRequest()
 
 	result, err := fn([]lang.Value{ctx})
 	if err != nil {
@@ -663,15 +780,15 @@ func TestAuthorization(t *testing.T) {
 		return
 	}
 
-	expected := "Bearer token123"
-	if string(result.(lang.StringValue)) != expected {
-		t.Errorf("Expected %s, got %s", expected, string(result.(lang.StringValue)))
+	expected := lang.StringValue("Bearer token123")
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("Expected %v, got %v", expected, result)
 	}
 }
 
 func TestAccept(t *testing.T) {
 	_, fn := acceptFn()
-	ctx := createMockContext()
+	ctx := mockRequest()
 
 	result, err := fn([]lang.Value{ctx})
 	if err != nil {
@@ -679,9 +796,9 @@ func TestAccept(t *testing.T) {
 		return
 	}
 
-	expected := "text/html,application/xhtml+xml,application/xml;q=0.9"
-	if string(result.(lang.StringValue)) != expected {
-		t.Errorf("Expected %s, got %s", expected, string(result.(lang.StringValue)))
+	expected := lang.StringValue("text/html,application/xhtml+xml,application/xml;q=0.9")
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("Expected %v, got %v", expected, result)
 	}
 }
 
@@ -708,7 +825,18 @@ func TestFunctionsWithInvalidContext(t *testing.T) {
 }
 
 func TestFunctionsWithMissingData(t *testing.T) {
-	emptyCtx := lang.MapValue{}
+	// Create empty HTTP contexts with minimal request data
+	emptyUrl := &url.URL{}
+	emptyRequest := &http.Request{
+		Method: "",
+		URL:    emptyUrl,
+		Body:   io.NopCloser(bytes.NewBufferString("")),
+		Response: &http.Response{
+			StatusCode: 0,
+		},
+		Header: http.Header{},
+	}
+	emptyCtx := New(emptyRequest)
 
 	tests := []func() (string, lang.Function){
 		methodFn,
@@ -717,11 +845,11 @@ func TestFunctionsWithMissingData(t *testing.T) {
 		statusFn,
 	}
 
-	expected := []any{
-		"",
-		"",
-		"",
-		float64(0),
+	expected := []lang.Value{
+		lang.StringValue(""),
+		lang.StringValue(""),
+		lang.StringValue(""),
+		lang.NumberValue(0),
 	}
 
 	for it, tt := range tests {
@@ -733,15 +861,8 @@ func TestFunctionsWithMissingData(t *testing.T) {
 				return
 			}
 
-			switch expected := expected[it].(type) {
-			case string:
-				if string(result.(lang.StringValue)) != expected {
-					t.Errorf("Expected %s, got %s", expected, string(result.(lang.StringValue)))
-				}
-			case float64:
-				if float64(result.(lang.NumberValue)) != expected {
-					t.Errorf("Expected %f, got %f", expected, float64(result.(lang.NumberValue)))
-				}
+			if !reflect.DeepEqual(result, expected[it]) {
+				t.Errorf("Expected %v, got %v", expected[it], result)
 			}
 		})
 	}
@@ -755,7 +876,8 @@ func TestExport(t *testing.T) {
 		"header", "headers", "method", "path", "query", "queryParam",
 		"body", "status", "ip", "userAgent", "contentType", "contentLength",
 		"host", "scheme", "port", "cookies", "cookie", "referer",
-		"authorization", "accept",
+		"authorization", "accept", "trailer", "trailers", "routeValues",
+		"pattern", "proto", "protoMajor", "protoMinor", "transferEncoding", "url",
 	}
 
 	if len(functions) != len(expectedFunctions) {
@@ -772,7 +894,7 @@ func TestExport(t *testing.T) {
 // Benchmark tests
 func BenchmarkHeader(b *testing.B) {
 	_, fn := headerFn()
-	ctx := createMockContext()
+	ctx := mockRequest()
 	args := []lang.Value{ctx, lang.StringValue("Content-Type")}
 
 	for i := 0; i < b.N; i++ {
@@ -782,7 +904,7 @@ func BenchmarkHeader(b *testing.B) {
 
 func BenchmarkIP(b *testing.B) {
 	_, fn := ipFn()
-	ctx := createMockContext()
+	ctx := mockRequest()
 	args := []lang.Value{ctx}
 
 	for i := 0; i < b.N; i++ {
@@ -792,7 +914,7 @@ func BenchmarkIP(b *testing.B) {
 
 func BenchmarkCookies(b *testing.B) {
 	_, fn := cookiesFn()
-	ctx := createMockContext()
+	ctx := mockRequest()
 	args := []lang.Value{ctx}
 
 	for i := 0; i < b.N; i++ {

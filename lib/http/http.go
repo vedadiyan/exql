@@ -24,7 +24,7 @@ import (
 	"github.com/vedadiyan/exql/lib"
 )
 
-func header() (string, lang.Function) {
+func headerFn() (string, lang.Function) {
 	name := "header"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
@@ -44,7 +44,7 @@ func header() (string, lang.Function) {
 	return name, fn
 }
 
-func headers() (string, lang.Function) {
+func headersFn() (string, lang.Function) {
 	name := "headers"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -69,7 +69,163 @@ func headers() (string, lang.Function) {
 	return name, fn
 }
 
-func method() (string, lang.Function) {
+func trailerFn() (string, lang.Function) {
+	name := "trailer"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 2 {
+			return nil, lib.ArgumentError(name, 2)
+		}
+		protocol, ok := args[0].(HttpProtocol)
+		if !ok {
+			return nil, lib.ArgumenErrorType(name, 0, "HttpProtocol", args[0])
+		}
+		headerName, err := lib.ToString(args[1])
+		if err != nil {
+			return nil, fmt.Errorf("%s: header name %w", name, err)
+		}
+
+		return lang.StringValue(protocol.Trailers().Get(string(headerName))), nil
+	}
+	return name, fn
+}
+
+func trailersFn() (string, lang.Function) {
+	name := "trailers"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, lib.ArgumentError(name, 1)
+		}
+		protocol, ok := args[0].(HttpProtocol)
+		if !ok {
+			return nil, lib.ArgumenErrorType(name, 0, "HttpProtocol", args[0])
+		}
+
+		value := make(lang.MapValue)
+
+		for key, val := range protocol.Trailers() {
+			values := make(lang.ListValue, len(val))
+			for i := 0; i < len(val); i++ {
+				values[i] = val[i]
+			}
+			value[key] = values
+		}
+		return value, nil
+	}
+	return name, fn
+}
+
+func routeValuesFn() (string, lang.Function) {
+	name := "routeValues"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, lib.ArgumentError(name, 1)
+		}
+		protocol, ok := args[0].(HttpProtocol)
+		if !ok {
+			return nil, lib.ArgumenErrorType(name, 0, "HttpProtocol", args[0])
+		}
+
+		value := make(lang.MapValue)
+
+		pattern := strings.Split(protocol.Pattern(), "/")
+		path := strings.Split(protocol.Url().Path, "/")
+		for i := 0; i < len(pattern); i++ {
+			value[strings.TrimLeft(pattern[i], ":")] = path[i]
+		}
+		return value, nil
+	}
+	return name, fn
+}
+
+func patternFn() (string, lang.Function) {
+	name := "pattern"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, lib.ArgumentError(name, 1)
+		}
+		protocol, ok := args[0].(HttpProtocol)
+		if !ok {
+			return nil, lib.ArgumenErrorType(name, 0, "HttpProtocol", args[0])
+		}
+
+		return lang.StringValue(protocol.Pattern()), nil
+	}
+	return name, fn
+}
+
+func protoFn() (string, lang.Function) {
+	name := "proto"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, lib.ArgumentError(name, 1)
+		}
+		protocol, ok := args[0].(HttpProtocol)
+		if !ok {
+			return nil, lib.ArgumenErrorType(name, 0, "HttpProtocol", args[0])
+		}
+
+		return lang.StringValue(protocol.Proto()), nil
+	}
+	return name, fn
+}
+
+func protoMajorFn() (string, lang.Function) {
+	name := "protoMajor"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, lib.ArgumentError(name, 1)
+		}
+		protocol, ok := args[0].(HttpProtocol)
+		if !ok {
+			return nil, lib.ArgumenErrorType(name, 0, "HttpProtocol", args[0])
+		}
+
+		return lang.NumberValue(protocol.ProtoMajor()), nil
+	}
+	return name, fn
+}
+
+func protoMinorFn() (string, lang.Function) {
+	name := "protoMinor"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, lib.ArgumentError(name, 1)
+		}
+		protocol, ok := args[0].(HttpProtocol)
+		if !ok {
+			return nil, lib.ArgumenErrorType(name, 0, "HttpProtocol", args[0])
+		}
+
+		return lang.NumberValue(protocol.ProtoMinor()), nil
+	}
+	return name, fn
+}
+
+func transferEncodingFn() (string, lang.Function) {
+	name := "transferEncoding"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, lib.ArgumentError(name, 1)
+		}
+		protocol, ok := args[0].(HttpProtocol)
+		if !ok {
+			return nil, lib.ArgumenErrorType(name, 0, "HttpProtocol", args[0])
+		}
+
+		transferEncoding := protocol.TransferEncoding()
+
+		value := make(lang.ListValue, len(transferEncoding))
+
+		for i := 0; i < len(transferEncoding); i++ {
+			value = append(value, lang.StringValue(transferEncoding[i]))
+		}
+
+		return value, nil
+	}
+	return name, fn
+}
+
+func methodFn() (string, lang.Function) {
 	name := "method"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -85,7 +241,7 @@ func method() (string, lang.Function) {
 	return name, fn
 }
 
-func path() (string, lang.Function) {
+func pathFn() (string, lang.Function) {
 	name := "path"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -100,7 +256,7 @@ func path() (string, lang.Function) {
 	return name, fn
 }
 
-func query() (string, lang.Function) {
+func queryFn() (string, lang.Function) {
 	name := "query"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -125,9 +281,9 @@ func query() (string, lang.Function) {
 	return name, fn
 }
 
-func queryParam() (string, lang.Function) {
+func queryParamFn() (string, lang.Function) {
 	name := "queryParam"
-	_, Query := query()
+	_, Query := queryFn()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
 			return nil, lib.ArgumentError(name, 2)
@@ -149,7 +305,7 @@ func queryParam() (string, lang.Function) {
 	return name, fn
 }
 
-func body() (string, lang.Function) {
+func bodyFn() (string, lang.Function) {
 	name := "body"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -173,7 +329,7 @@ func body() (string, lang.Function) {
 	return name, fn
 }
 
-func status() (string, lang.Function) {
+func statusFn() (string, lang.Function) {
 	name := "status"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -189,7 +345,7 @@ func status() (string, lang.Function) {
 	return name, fn
 }
 
-func ip() (string, lang.Function) {
+func ipFn() (string, lang.Function) {
 	name := "ip"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -213,7 +369,7 @@ func ip() (string, lang.Function) {
 	return name, fn
 }
 
-func userAgent() (string, lang.Function) {
+func userAgentFn() (string, lang.Function) {
 	name := "userAgent"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -228,7 +384,7 @@ func userAgent() (string, lang.Function) {
 	return name, fn
 }
 
-func contentType() (string, lang.Function) {
+func contentTypeFn() (string, lang.Function) {
 	name := "contentType"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -243,7 +399,7 @@ func contentType() (string, lang.Function) {
 	return name, fn
 }
 
-func contentLength() (string, lang.Function) {
+func contentLengthFn() (string, lang.Function) {
 	name := "contentLength"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -258,7 +414,7 @@ func contentLength() (string, lang.Function) {
 	return name, fn
 }
 
-func host() (string, lang.Function) {
+func hostFn() (string, lang.Function) {
 	name := "host"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -273,7 +429,7 @@ func host() (string, lang.Function) {
 	return name, fn
 }
 
-func scheme() (string, lang.Function) {
+func schemeFn() (string, lang.Function) {
 	name := "scheme"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -288,7 +444,7 @@ func scheme() (string, lang.Function) {
 	return name, fn
 }
 
-func port() (string, lang.Function) {
+func portFn() (string, lang.Function) {
 	name := "port"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -303,7 +459,7 @@ func port() (string, lang.Function) {
 	return name, fn
 }
 
-func cookies() (string, lang.Function) {
+func cookiesFn() (string, lang.Function) {
 	name := "cookies"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -347,9 +503,9 @@ func cookies() (string, lang.Function) {
 	return name, fn
 }
 
-func cookie() (string, lang.Function) {
+func cookieFn() (string, lang.Function) {
 	name := "cookie"
-	_, Cookies := cookies()
+	_, Cookies := cookiesFn()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 2 {
 			return nil, lib.ArgumentError(name, 2)
@@ -371,7 +527,41 @@ func cookie() (string, lang.Function) {
 	return name, fn
 }
 
-func referer() (string, lang.Function) {
+func urlFn() (string, lang.Function) {
+	name := "url"
+	fn := func(args []lang.Value) (lang.Value, error) {
+		if len(args) != 1 {
+			return nil, lib.ArgumentError(name, 1)
+		}
+		protocol, ok := args[0].(HttpProtocol)
+		if !ok {
+			return nil, lib.ArgumenErrorType(name, 0, "HttpProtocol", args[0])
+		}
+
+		url := protocol.Url()
+
+		value := make(lang.MapValue)
+		value["forceQuery"] = url.ForceQuery
+		value["fragment"] = url.Fragment
+		value["host"] = url.Host
+		value["omitHost"] = url.OmitHost
+		value["opaque"] = url.Opaque
+		value["path"] = url.Path
+		value["rawFragment"] = url.RawFragment
+		value["rawPath"] = url.RawPath
+		value["rawQuery"] = url.RawQuery
+		value["scheme"] = url.Scheme
+		user := make(lang.MapValue)
+		user["username"] = url.User.Username()
+		user["password"], _ = url.User.Password()
+		value["user"] = user
+
+		return value, nil
+	}
+	return name, fn
+}
+
+func refererFn() (string, lang.Function) {
 	name := "referer"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -386,7 +576,7 @@ func referer() (string, lang.Function) {
 	return name, fn
 }
 
-func authorization() (string, lang.Function) {
+func authorizationFn() (string, lang.Function) {
 	name := "authorization"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -401,7 +591,7 @@ func authorization() (string, lang.Function) {
 	return name, fn
 }
 
-func accept() (string, lang.Function) {
+func acceptFn() (string, lang.Function) {
 	name := "accept"
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
@@ -417,26 +607,35 @@ func accept() (string, lang.Function) {
 }
 
 var httpFunctions = []func() (string, lang.Function){
-	header,
-	headers,
-	method,
-	path,
-	query,
-	queryParam,
-	body,
-	status,
-	ip,
-	userAgent,
-	contentType,
-	contentLength,
-	host,
-	scheme,
-	port,
-	cookies,
-	cookie,
-	referer,
-	authorization,
-	accept,
+	headerFn,
+	headersFn,
+	methodFn,
+	pathFn,
+	queryFn,
+	queryParamFn,
+	bodyFn,
+	statusFn,
+	ipFn,
+	userAgentFn,
+	contentTypeFn,
+	contentLengthFn,
+	hostFn,
+	schemeFn,
+	portFn,
+	cookiesFn,
+	cookieFn,
+	refererFn,
+	authorizationFn,
+	acceptFn,
+	trailerFn,
+	trailersFn,
+	routeValuesFn,
+	patternFn,
+	protoFn,
+	protoMajorFn,
+	protoMinorFn,
+	transferEncodingFn,
+	urlFn,
 }
 
 func Export() map[string]lang.Function {

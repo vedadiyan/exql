@@ -58,7 +58,7 @@ func createMockContext() lang.MapValue {
 
 // Test Header Functions
 func TestHeader(t *testing.T) {
-	_, fn := header()
+	_, fn := headerFn()
 	ctx := createMockContext()
 
 	tests := []struct {
@@ -122,7 +122,7 @@ func TestHeader(t *testing.T) {
 }
 
 func TestHeaders(t *testing.T) {
-	_, fn := headers()
+	_, fn := headersFn()
 	ctx := createMockContext()
 
 	result, err := fn([]lang.Value{ctx})
@@ -146,7 +146,7 @@ func TestHeaders(t *testing.T) {
 }
 
 func TestMethod(t *testing.T) {
-	_, fn := method()
+	_, fn := methodFn()
 	ctx := createMockContext()
 
 	result, err := fn([]lang.Value{ctx})
@@ -162,7 +162,7 @@ func TestMethod(t *testing.T) {
 }
 
 func TestPath(t *testing.T) {
-	_, fn := path()
+	_, fn := pathFn()
 	ctx := createMockContext()
 
 	result, err := fn([]lang.Value{ctx})
@@ -178,7 +178,7 @@ func TestPath(t *testing.T) {
 }
 
 func TestQuery(t *testing.T) {
-	_, fn := query()
+	_, fn := queryFn()
 	ctx := createMockContext()
 
 	result, err := fn([]lang.Value{ctx})
@@ -209,7 +209,7 @@ func TestQuery(t *testing.T) {
 }
 
 func TestQueryParam(t *testing.T) {
-	_, fn := queryParam()
+	_, fn := queryParamFn()
 	ctx := createMockContext()
 
 	tests := []struct {
@@ -268,7 +268,7 @@ func TestQueryParam(t *testing.T) {
 }
 
 func TestBody(t *testing.T) {
-	_, fn := body()
+	_, fn := bodyFn()
 	ctx := createMockContext()
 
 	result, err := fn([]lang.Value{ctx})
@@ -284,7 +284,7 @@ func TestBody(t *testing.T) {
 }
 
 func TestStatus(t *testing.T) {
-	_, fn := status()
+	_, fn := statusFn()
 	ctx := createMockContext()
 
 	result, err := fn([]lang.Value{ctx})
@@ -300,7 +300,7 @@ func TestStatus(t *testing.T) {
 }
 
 func TestIP(t *testing.T) {
-	_, fn := ip()
+	_, fn := ipFn()
 
 	tests := []struct {
 		name     string
@@ -344,7 +344,7 @@ func TestIP(t *testing.T) {
 }
 
 func TestUserAgent(t *testing.T) {
-	_, fn := userAgent()
+	_, fn := userAgentFn()
 	ctx := createMockContext()
 
 	result, err := fn([]lang.Value{ctx})
@@ -360,7 +360,7 @@ func TestUserAgent(t *testing.T) {
 }
 
 func TestContentType(t *testing.T) {
-	_, fn := contentType()
+	_, fn := contentTypeFn()
 
 	tests := []struct {
 		name     string
@@ -407,7 +407,7 @@ func TestContentType(t *testing.T) {
 }
 
 func TestContentLength(t *testing.T) {
-	_, fn := contentLength()
+	_, fn := contentLengthFn()
 
 	tests := []struct {
 		name     string
@@ -454,7 +454,7 @@ func TestContentLength(t *testing.T) {
 }
 
 func TestHost(t *testing.T) {
-	_, fn := host()
+	_, fn := hostFn()
 	ctx := createMockContext()
 
 	result, err := fn([]lang.Value{ctx})
@@ -470,7 +470,7 @@ func TestHost(t *testing.T) {
 }
 
 func TestScheme(t *testing.T) {
-	_, fn := scheme()
+	_, fn := schemeFn()
 
 	tests := []struct {
 		name     string
@@ -513,7 +513,7 @@ func TestScheme(t *testing.T) {
 }
 
 func TestPort(t *testing.T) {
-	_, fn := port()
+	_, fn := portFn()
 
 	tests := []struct {
 		name     string
@@ -552,7 +552,7 @@ func TestPort(t *testing.T) {
 }
 
 func TestCookies(t *testing.T) {
-	_, fn := cookies()
+	_, fn := cookiesFn()
 	ctx := createMockContext()
 
 	result, err := fn([]lang.Value{ctx})
@@ -583,7 +583,7 @@ func TestCookies(t *testing.T) {
 }
 
 func TestCookie(t *testing.T) {
-	_, fn := cookie()
+	_, fn := cookieFn()
 	ctx := createMockContext()
 
 	tests := []struct {
@@ -631,7 +631,7 @@ func TestCookie(t *testing.T) {
 }
 
 func TestReferer(t *testing.T) {
-	_, fn := referer()
+	_, fn := refererFn()
 	ctx := createMockContext()
 
 	result, err := fn([]lang.Value{ctx})
@@ -647,7 +647,7 @@ func TestReferer(t *testing.T) {
 }
 
 func TestAuthorization(t *testing.T) {
-	_, fn := authorization()
+	_, fn := authorizationFn()
 	ctx := createMockContext()
 
 	result, err := fn([]lang.Value{ctx})
@@ -663,7 +663,7 @@ func TestAuthorization(t *testing.T) {
 }
 
 func TestAccept(t *testing.T) {
-	_, fn := accept()
+	_, fn := acceptFn()
 	ctx := createMockContext()
 
 	result, err := fn([]lang.Value{ctx})
@@ -681,10 +681,10 @@ func TestAccept(t *testing.T) {
 // Test Error Cases
 func TestFunctionsWithInvalidContext(t *testing.T) {
 	functions := []func() (string, lang.Function){
-		method,
-		path,
-		body,
-		status,
+		methodFn,
+		pathFn,
+		bodyFn,
+		statusFn,
 	}
 
 	invalidContext := lang.StringValue("invalid")
@@ -704,10 +704,10 @@ func TestFunctionsWithMissingData(t *testing.T) {
 	emptyCtx := lang.MapValue{}
 
 	tests := []func() (string, lang.Function){
-		method,
-		path,
-		body,
-		status,
+		methodFn,
+		pathFn,
+		bodyFn,
+		statusFn,
 	}
 
 	expected := []any{
@@ -764,7 +764,7 @@ func TestExport(t *testing.T) {
 
 // Benchmark tests
 func BenchmarkHeader(b *testing.B) {
-	_, fn := header()
+	_, fn := headerFn()
 	ctx := createMockContext()
 	args := []lang.Value{ctx, lang.StringValue("Content-Type")}
 
@@ -774,7 +774,7 @@ func BenchmarkHeader(b *testing.B) {
 }
 
 func BenchmarkIP(b *testing.B) {
-	_, fn := ip()
+	_, fn := ipFn()
 	ctx := createMockContext()
 	args := []lang.Value{ctx}
 
@@ -784,7 +784,7 @@ func BenchmarkIP(b *testing.B) {
 }
 
 func BenchmarkCookies(b *testing.B) {
-	_, fn := cookies()
+	_, fn := cookiesFn()
 	ctx := createMockContext()
 	args := []lang.Value{ctx}
 

@@ -17,35 +17,12 @@ package http
 
 import (
 	"fmt"
-	"strconv"
+	"io"
 	"strings"
 
 	"github.com/vedadiyan/exql/lang"
 	"github.com/vedadiyan/exql/lib"
 )
-
-func getHeaderValue(headers lang.MapValue, headerName string) string {
-	for key, value := range headers {
-		if strings.EqualFold(key, headerName) {
-			if str, err := lib.ToString(value); err == nil {
-				return string(str)
-			}
-		}
-	}
-	return ""
-}
-
-func parseCookies(cookieHeader string) lang.MapValue {
-	result := lang.MapValue{}
-	cookies := strings.Split(cookieHeader, ";")
-	for _, cookie := range cookies {
-		parts := strings.SplitN(strings.TrimSpace(cookie), "=", 2)
-		if len(parts) == 2 {
-			result[parts[0]] = lang.StringValue(parts[1])
-		}
-	}
-	return result
-}
 
 func header() (string, lang.Function) {
 	name := "header"
@@ -53,25 +30,16 @@ func header() (string, lang.Function) {
 		if len(args) != 2 {
 			return nil, lib.ArgumentError(name, 2)
 		}
-		contextMap, ok := args[0].(lang.MapValue)
+		protocol, ok := args[0].(HttpProtocol)
 		if !ok {
-			return nil, lib.ContextError(name, args[0])
+			return nil, lib.ArgumenErrorType(name, 0, "HttpProtocol", args[0])
 		}
 		headerName, err := lib.ToString(args[1])
 		if err != nil {
 			return nil, fmt.Errorf("%s: header name %w", name, err)
 		}
 
-		if headers, exists := contextMap["headers"]; exists {
-			if headersMap, ok := headers.(lang.MapValue); ok {
-				for key, value := range headersMap {
-					if strings.EqualFold(key, string(headerName)) {
-						return value, nil
-					}
-				}
-			}
-		}
-		return nil, nil
+		return lang.StringValue(protocol.Headers().Get(string(headerName))), nil
 	}
 	return name, fn
 }
@@ -82,16 +50,21 @@ func headers() (string, lang.Function) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
 		}
-		contextMap, ok := args[0].(lang.MapValue)
+		protocol, ok := args[0].(HttpProtocol)
 		if !ok {
-			return nil, lib.ContextError(name, args[0])
+			return nil, lib.ArgumenErrorType(name, 0, "HttpProtocol", args[0])
 		}
-		if headers, exists := contextMap["headers"]; exists {
-			if headersMap, ok := headers.(lang.MapValue); ok {
-				return headersMap, nil
+
+		value := make(lang.MapValue)
+
+		for key, val := range protocol.Headers() {
+			values := make(lang.ListValue, len(val))
+			for i := 0; i < len(val); i++ {
+				values[i] = val[i]
 			}
+			value[key] = values
 		}
-		return lang.MapValue{}, nil
+		return value, nil
 	}
 	return name, fn
 }
@@ -102,14 +75,12 @@ func method() (string, lang.Function) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
 		}
-		contextMap, ok := args[0].(lang.MapValue)
+		protocol, ok := args[0].(HttpProtocol)
 		if !ok {
-			return nil, lib.ContextError(name, args[0])
+			return nil, lib.ArgumenErrorType(name, 0, "HttpProtocol", args[0])
 		}
-		if method, exists := contextMap["method"]; exists {
-			return method, nil
-		}
-		return lang.StringValue(""), nil
+
+		return lang.StringValue(protocol.Method()), nil
 	}
 	return name, fn
 }
@@ -120,14 +91,11 @@ func path() (string, lang.Function) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
 		}
-		contextMap, ok := args[0].(lang.MapValue)
+		protocol, ok := args[0].(HttpProtocol)
 		if !ok {
-			return nil, lib.ContextError(name, args[0])
+			return nil, lib.ArgumenErrorType(name, 0, "HttpProtocol", args[0])
 		}
-		if path, exists := contextMap["path"]; exists {
-			return path, nil
-		}
-		return lang.StringValue(""), nil
+		return lang.StringValue(protocol.Url().Path), nil
 	}
 	return name, fn
 }
@@ -138,16 +106,21 @@ func query() (string, lang.Function) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
 		}
-		contextMap, ok := args[0].(lang.MapValue)
+		protocol, ok := args[0].(HttpProtocol)
 		if !ok {
-			return nil, lib.ContextError(name, args[0])
+			return nil, lib.ArgumenErrorType(name, 0, "HttpProtocol", args[0])
 		}
-		if query, exists := contextMap["query"]; exists {
-			if queryMap, ok := query.(lang.MapValue); ok {
-				return queryMap, nil
+
+		value := make(lang.MapValue)
+
+		for key, val := range protocol.Url().Query() {
+			values := make(lang.ListValue, len(val))
+			for i := 0; i < len(val); i++ {
+				values[i] = val[i]
 			}
+			value[key] = values
 		}
-		return lang.MapValue{}, nil
+		return value, nil
 	}
 	return name, fn
 }
@@ -182,14 +155,20 @@ func body() (string, lang.Function) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
 		}
-		contextMap, ok := args[0].(lang.MapValue)
+		protocol, ok := args[0].(HttpProtocol)
 		if !ok {
-			return nil, lib.ContextError(name, args[0])
+			return nil, lib.ArgumenErrorType(name, 0, "HttpProtocol", args[0])
 		}
-		if body, exists := contextMap["body"]; exists {
-			return body, nil
+
+		body, err := protocol.GetBody()
+		if err != nil {
+			return nil, err
 		}
-		return lang.StringValue(""), nil
+		data, err := io.ReadAll(body)
+		if err != nil {
+			return nil, err
+		}
+		return lang.StringValue(string(data)), nil
 	}
 	return name, fn
 }
@@ -200,221 +179,170 @@ func status() (string, lang.Function) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
 		}
-		contextMap, ok := args[0].(lang.MapValue)
+		protocol, ok := args[0].(HttpProtocol)
 		if !ok {
-			return nil, lib.ContextError(name, args[0])
+			return nil, lib.ArgumenErrorType(name, 0, "HttpProtocol", args[0])
 		}
-		if status, exists := contextMap["status"]; exists {
-			return status, nil
-		}
-		return lang.NumberValue(0), nil
+
+		return lang.NumberValue(protocol.StatusCode()), nil
 	}
 	return name, fn
 }
 
 func ip() (string, lang.Function) {
 	name := "ip"
-	_, Headers := headers()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
 		}
-		contextMap, ok := args[0].(lang.MapValue)
+		protocol, ok := args[0].(HttpProtocol)
 		if !ok {
-			return nil, lib.ContextError(name, args[0])
+			return nil, lib.ArgumenErrorType(name, 0, "HttpProtocol", args[0])
 		}
 
-		ipFields := []string{"remote_ip", "client_ip", "x_forwarded_for", "x_real_ip", "ip"}
-
-		for _, field := range ipFields {
-			if ip, exists := contextMap[field]; exists {
-				ipStr, err := lib.ToString(ip)
-				if err == nil && string(ipStr) != "" {
-					if strings.Contains(string(ipStr), ",") {
-						return lang.StringValue(strings.TrimSpace(strings.Split(string(ipStr), ",")[0])), nil
-					}
-					return lang.StringValue(string(ipStr)), nil
-				}
-			}
+		xForwardedFor := protocol.Headers().Get("X-Forwarded-For")
+		if xForwardedFor != "" {
+			return lang.StringValue(strings.TrimSpace(strings.Split(xForwardedFor, ",")[0])), nil
 		}
-		headers, err := Headers(args)
-		if err != nil {
-			return lang.StringValue(""), nil
+		xRealIP := protocol.Headers().Get("X-Real-IP")
+		if xRealIP != "" {
+			return lang.StringValue(xRealIP), nil
 		}
-		if headersMap, ok := headers.(lang.MapValue); ok {
-			xForwardedFor := getHeaderValue(headersMap, "X-Forwarded-For")
-			if xForwardedFor != "" {
-				return lang.StringValue(strings.TrimSpace(strings.Split(xForwardedFor, ",")[0])), nil
-			}
-			xRealIP := getHeaderValue(headersMap, "X-Real-IP")
-			if xRealIP != "" {
-				return lang.StringValue(xRealIP), nil
-			}
-		}
-		return lang.StringValue(""), nil
+		return lang.StringValue(protocol.RemoteAddress()), nil
 	}
 	return name, fn
 }
 
 func userAgent() (string, lang.Function) {
 	name := "userAgent"
-	_, Headers := headers()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
 		}
-		headers, err := Headers(args)
-		if err != nil {
-			return nil, fmt.Errorf("%s: %w", name, err)
+		protocol, ok := args[0].(HttpProtocol)
+		if !ok {
+			return nil, lib.ArgumenErrorType(name, 0, "HttpProtocol", args[0])
 		}
-		if headersMap, ok := headers.(lang.MapValue); ok {
-			return lang.StringValue(getHeaderValue(headersMap, "User-Agent")), nil
-		}
-		return lang.StringValue(""), nil
+		return lang.StringValue(protocol.Headers().Get("User-Agent")), nil
 	}
 	return name, fn
 }
 
 func contentType() (string, lang.Function) {
 	name := "contentType"
-	_, Headers := headers()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
 		}
-		headers, err := Headers(args)
-		if err != nil {
-			return nil, fmt.Errorf("%s: %w", name, err)
+		protocol, ok := args[0].(HttpProtocol)
+		if !ok {
+			return nil, lib.ArgumenErrorType(name, 0, "HttpProtocol", args[0])
 		}
-		if headersMap, ok := headers.(lang.MapValue); ok {
-			ct := getHeaderValue(headersMap, "Content-Type")
-			if idx := strings.Index(ct, ";"); idx != -1 {
-				ct = strings.TrimSpace(ct[:idx])
-			}
-			return lang.StringValue(ct), nil
-		}
-		return lang.StringValue(""), nil
+		return lang.StringValue(protocol.Headers().Get("Content-Type")), nil
 	}
 	return name, fn
 }
 
 func contentLength() (string, lang.Function) {
 	name := "contentLength"
-	_, Headers := headers()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
 		}
-		headers, err := Headers(args)
-		if err != nil {
-			return nil, fmt.Errorf("%s: %w", name, err)
+		protocol, ok := args[0].(HttpProtocol)
+		if !ok {
+			return nil, lib.ArgumenErrorType(name, 0, "HttpProtocol", args[0])
 		}
-		if headersMap, ok := headers.(lang.MapValue); ok {
-			cl := getHeaderValue(headersMap, "Content-Length")
-			if cl == "" {
-				return lang.NumberValue(0), nil
-			}
-			if length, err := strconv.ParseFloat(cl, 64); err == nil {
-				return lang.NumberValue(length), nil
-			}
-		}
-		return lang.NumberValue(0), nil
+		return lang.NumberValue(protocol.ContentLength()), nil
 	}
 	return name, fn
 }
 
 func host() (string, lang.Function) {
 	name := "host"
-	_, Headers := headers()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
 		}
-		headers, err := Headers(args)
-		if err != nil {
-			return nil, fmt.Errorf("%s: %w", name, err)
+		protocol, ok := args[0].(HttpProtocol)
+		if !ok {
+			return nil, lib.ArgumenErrorType(name, 0, "HttpProtocol", args[0])
 		}
-		if headersMap, ok := headers.(lang.MapValue); ok {
-			return lang.StringValue(getHeaderValue(headersMap, "Host")), nil
-		}
-		return lang.StringValue(""), nil
+		return lang.StringValue(protocol.Host()), nil
 	}
 	return name, fn
 }
 
 func scheme() (string, lang.Function) {
 	name := "scheme"
-	_, Headers := headers()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
 		}
-		contextMap, ok := args[0].(lang.MapValue)
+		protocol, ok := args[0].(HttpProtocol)
 		if !ok {
-			return nil, lib.ContextError(name, args[0])
+			return nil, lib.ArgumenErrorType(name, 0, "HttpProtocol", args[0])
 		}
-
-		if scheme, exists := contextMap["scheme"]; exists {
-			return scheme, nil
-		}
-
-		headers, err := Headers(args)
-		if err == nil {
-			if headersMap, ok := headers.(lang.MapValue); ok {
-				proto := getHeaderValue(headersMap, "X-Forwarded-Proto")
-				if proto != "" {
-					return lang.StringValue(proto), nil
-				}
-			}
-		}
-		return lang.StringValue("https"), nil
+		return lang.StringValue(protocol.Url().Scheme), nil
 	}
 	return name, fn
 }
 
 func port() (string, lang.Function) {
 	name := "port"
-	_, Scheme := scheme()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
 		}
-		contextMap, ok := args[0].(lang.MapValue)
+		protocol, ok := args[0].(HttpProtocol)
 		if !ok {
-			return nil, lib.ContextError(name, args[0])
+			return nil, lib.ArgumenErrorType(name, 0, "HttpProtocol", args[0])
 		}
-		if port, exists := contextMap["port"]; exists {
-			return port, nil
-		}
-		scheme, err := Scheme(args)
-		if err == nil {
-			if schemeStr, err := lib.ToString(scheme); err == nil && string(schemeStr) == "https" {
-				return lang.NumberValue(443), nil
-			}
-		}
-		return lang.NumberValue(80), nil
+		return lang.StringValue(protocol.Url().Port()), nil
 	}
 	return name, fn
 }
 
 func cookies() (string, lang.Function) {
 	name := "cookies"
-	_, Headers := headers()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
 		}
-		headers, err := Headers(args)
-		if err != nil {
-			return nil, fmt.Errorf("%s: %w", name, err)
+		protocol, ok := args[0].(HttpProtocol)
+		if !ok {
+			return nil, lib.ArgumenErrorType(name, 0, "HttpProtocol", args[0])
 		}
-		if headersMap, ok := headers.(lang.MapValue); ok {
-			cookieHeader := getHeaderValue(headersMap, "Cookie")
-			if cookieHeader != "" {
-				return parseCookies(cookieHeader), nil
+
+		cookies := protocol.Cookies()
+
+		values := make(lang.ListValue, len(cookies))
+
+		for i := 0; i < len(cookies); i++ {
+			value := make(lang.MapValue)
+			ref := cookies[i]
+			value["domain"] = lang.StringValue(ref.Domain)
+			value["expires"] = lang.StringValue(ref.Expires.String())
+			value["httpOnly"] = lang.BoolValue(ref.HttpOnly)
+			value["maxAge"] = lang.NumberValue(ref.MaxAge)
+			value["name"] = lang.StringValue(ref.Name)
+			value["partitioned"] = lang.BoolValue(ref.Partitioned)
+			value["path"] = lang.StringValue(ref.Path)
+			value["quoted"] = lang.BoolValue(ref.Quoted)
+			value["raw"] = lang.StringValue(ref.Raw)
+			value["rawExpires"] = lang.StringValue(ref.RawExpires)
+			value["sameSite"] = lang.NumberValue(ref.SameSite)
+			value["secure"] = lang.BoolValue(ref.Secure)
+			unparsed := make(lang.ListValue, len(ref.Unparsed))
+			for x := 0; x < len(ref.Unparsed); x++ {
+				unparsed[x] = lang.StringValue(ref.Unparsed[x])
 			}
+			value["unparsed"] = unparsed
+			value["value"] = lang.StringValue(ref.Value)
+			values[i] = value
 		}
-		return lang.MapValue{}, nil
+
+		return values, nil
 	}
 	return name, fn
 }
@@ -445,57 +373,45 @@ func cookie() (string, lang.Function) {
 
 func referer() (string, lang.Function) {
 	name := "referer"
-	_, Headers := headers()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
 		}
-		headers, err := Headers(args)
-		if err != nil {
-			return nil, fmt.Errorf("%s: %w", name, err)
+		protocol, ok := args[0].(HttpProtocol)
+		if !ok {
+			return nil, lib.ArgumenErrorType(name, 0, "HttpProtocol", args[0])
 		}
-		if headersMap, ok := headers.(lang.MapValue); ok {
-			return lang.StringValue(getHeaderValue(headersMap, "Referer")), nil
-		}
-		return lang.StringValue(""), nil
+		return lang.StringValue(protocol.Headers().Get("Referer")), nil
 	}
 	return name, fn
 }
 
 func authorization() (string, lang.Function) {
 	name := "authorization"
-	_, Headers := headers()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
 		}
-		headers, err := Headers(args)
-		if err != nil {
-			return nil, fmt.Errorf("%s: %w", name, err)
+		protocol, ok := args[0].(HttpProtocol)
+		if !ok {
+			return nil, lib.ArgumenErrorType(name, 0, "HttpProtocol", args[0])
 		}
-		if headersMap, ok := headers.(lang.MapValue); ok {
-			return lang.StringValue(getHeaderValue(headersMap, "Authorization")), nil
-		}
-		return lang.StringValue(""), nil
+		return lang.StringValue(protocol.Headers().Get("Authorization")), nil
 	}
 	return name, fn
 }
 
 func accept() (string, lang.Function) {
 	name := "accept"
-	_, Headers := headers()
 	fn := func(args []lang.Value) (lang.Value, error) {
 		if len(args) != 1 {
 			return nil, lib.ArgumentError(name, 1)
 		}
-		headers, err := Headers(args)
-		if err != nil {
-			return nil, fmt.Errorf("%s: %w", name, err)
+		protocol, ok := args[0].(HttpProtocol)
+		if !ok {
+			return nil, lib.ArgumenErrorType(name, 0, "HttpProtocol", args[0])
 		}
-		if headersMap, ok := headers.(lang.MapValue); ok {
-			return lang.StringValue(getHeaderValue(headersMap, "Accept")), nil
-		}
-		return lang.StringValue(""), nil
+		return lang.StringValue(protocol.Headers().Get("Accept")), nil
 	}
 	return name, fn
 }

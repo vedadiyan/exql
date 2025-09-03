@@ -60,3 +60,18 @@ func RgumentErrorMultiRange(name string, expected []int) error {
 func ArgumentErrorMultiRange(name string, expected []int) error {
 	return fmt.Errorf("%s: expected %v arguments", name, expected)
 }
+
+func ArgumenErrorType(name string, pos int, value string, actualValue any) error {
+	v := "rd"
+	switch pos {
+	case 1:
+		{
+			v = "st"
+		}
+	case 2:
+		{
+			v = "nd"
+		}
+	}
+	return fmt.Errorf("%s: %d%s argument must be %s, got %T", name, pos, v, value, actualValue)
+}

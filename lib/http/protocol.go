@@ -97,7 +97,12 @@ func (hp httpProtocol[T]) GetBody() (io.ReadCloser, error) {
 	switch v := hp.v.(type) {
 	case *http.Request:
 		{
-			return v.GetBody()
+			copy, err := io.ReadAll(v.Body)
+			if err != nil {
+				return nil, err
+			}
+			v.Body = io.NopCloser(bytes.NewBuffer(copy))
+			return io.NopCloser(bytes.NewBuffer(copy)), nil
 		}
 	case *http.Response:
 		{

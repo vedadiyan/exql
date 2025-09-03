@@ -284,7 +284,7 @@ func TestBody(t *testing.T) {
 		return
 	}
 
-	expected := `{"name": "John", "email": "john@example.com"}`
+	expected := lang.Value(lang.StringValue(`{"name": "John", "email": "john@example.com"}`))
 	if !reflect.DeepEqual(result, expected) {
 		t.Errorf("Expected %s, got %v", expected, result)
 	}
@@ -311,27 +311,27 @@ func TestIP(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		ctx      lang.MapValue
+		ctx      HttpProtocol
 		expected string
 	}{
 		{
 			name:     "direct IP field",
-			ctx:      lang.MapValue{"ip": lang.StringValue("192.168.1.100")},
+			ctx:      createMockContext(),
 			expected: "192.168.1.100",
 		},
 		{
 			name:     "X-Forwarded-For with multiple IPs",
-			ctx:      lang.MapValue{"headers": lang.MapValue{"X-Forwarded-For": lang.StringValue("192.168.1.1, 10.0.0.1")}},
+			ctx:      createMockContext(),
 			expected: "192.168.1.1",
 		},
 		{
 			name:     "X-Real-IP header",
-			ctx:      lang.MapValue{"headers": lang.MapValue{"X-Real-IP": lang.StringValue("203.0.113.1")}},
+			ctx:      createMockContext(),
 			expected: "203.0.113.1",
 		},
 		{
 			name:     "no IP found",
-			ctx:      lang.MapValue{},
+			ctx:      createMockContext(),
 			expected: "",
 		},
 	}
